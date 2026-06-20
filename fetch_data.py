@@ -12,6 +12,7 @@ fetch_data.py — 下载所有标的历史数据（via yfinance）
 
 import argparse
 import sys
+import time
 from pathlib import Path
 
 import pandas as pd
@@ -101,10 +102,12 @@ def fetch_symbol(symbol: str, tfs: list[str]):
 
         if df.empty:
             print(f"  [{tf}] ❌ 无数据（可能上市时间不足）")
+            time.sleep(2)
             continue
 
         df.to_csv(out_path)
         print(f"  [{tf}] ✅ {len(df)} 行  →  {out_path}")
+        time.sleep(2)
 
 
 def main():
