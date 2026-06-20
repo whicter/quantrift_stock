@@ -35,11 +35,18 @@ cd /Users/cohan/Documents/quantrift_stock && git pull origin master
 ## 常用命令
 
 ```bash
-# 下载历史数据
-ssh mac-studio "cd /Users/congrenhan/Documents/quantrift_stock && /opt/homebrew/bin/python3.11 fetch_data.py"
+# 数据拉取（Mac Studio 上跑，连 IB Gateway）
+ssh mac-studio "cd /Users/congrenhan/Documents/quantrift_stock && /opt/homebrew/bin/python3.11 fetch_ib_data.py"
 
-# 批量回测
-ssh mac-studio "cd /Users/congrenhan/Documents/quantrift_stock && /opt/homebrew/bin/python3.11 backtest_runner.py"
+# 单标的单周期
+ssh mac-studio "cd /Users/congrenhan/Documents/quantrift_stock && /opt/homebrew/bin/python3.11 fetch_ib_data.py --symbol NVDA --tf 1h"
+
+# 数据同步回本机
+rsync -av mac-studio:/Users/congrenhan/Documents/quantrift_stock/data/ /Users/cohan/Documents/quantrift_stock/data/
+
+# 批量回测（本机跑）
+cd /Users/cohan/Documents/quantrift_stock && .venv/bin/python backtest_runner.py
+cd /Users/cohan/Documents/quantrift_stock && .venv/bin/python backtest_runner.py --symbol NVDA --tf 1h
 
 # 启动告警引擎（前台）
 ssh mac-studio "cd /Users/congrenhan/Documents/quantrift_stock && /opt/homebrew/bin/python3.11 alert_engine.py --port 4002"
@@ -79,14 +86,18 @@ ssh -A mac-studio "cd /Users/congrenhan/Documents/quantrift_stock && git push"
 ## 回测工具
 
 ```bash
+# 全量批跑（本机）
+cd /Users/cohan/Documents/quantrift_stock && .venv/bin/python backtest_runner.py
+
+# 单标的
+.venv/bin/python backtest_runner.py --symbol NVDA
+
 # 单标的单周期
-python backtest_runner.py --symbol NVDA --tf 1h
+.venv/bin/python backtest_runner.py --symbol NVDA --tf 1h
 
-# 全量批跑
-python backtest_runner.py --all
-
-# 指定时间范围
-python backtest_runner.py --all --since 2023-01-01
+# 按不同指标排序
+.venv/bin/python backtest_runner.py --sort sharpe   # 默认
+.venv/bin/python backtest_runner.py --sort dd
 ```
 
 ## TODO
