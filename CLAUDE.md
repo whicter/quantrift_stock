@@ -15,7 +15,22 @@
 | IB Gateway 实盘端口 | 4001（只在 Mac Studio） |
 | IB Gateway 模拟盘端口 | 4002 |
 | clientId | **2**（期货引擎用 1，不能冲突） |
-| GitHub remote | `git@github.com:whicter/quantrift_stock.git`（SSH，待建） |
+| GitHub remote | `git@github.com:whicter/quantrift_stock.git`（SSH） |
+
+## 代码同步工作流
+
+```bash
+# 1. 把本机代码拷贝到 Mac Studio
+rsync -av --exclude='.git' \
+  /Users/cohan/Documents/quantrift_stock/ \
+  mac-studio:/Users/congrenhan/Documents/quantrift_stock/
+
+# 2. Mac Studio push 到 GitHub
+ssh -A mac-studio "cd /Users/congrenhan/Documents/quantrift_stock && git push"
+
+# 3. 本机 pull GitHub repo
+cd /Users/cohan/Documents/quantrift_stock && git pull origin master
+```
 
 ## 常用命令
 
@@ -34,9 +49,6 @@ ssh mac-studio "PATH=/opt/homebrew/bin:$PATH pm2 status"
 
 # 查看日志
 ssh mac-studio "PATH=/opt/homebrew/bin:$PATH pm2 logs stock-alert --lines 50"
-
-# 同步文件到 Mac Studio
-ssh mac-studio "cd /Users/congrenhan/Documents && git -C quantrift_stock pull || git clone <repo> quantrift_stock"
 
 # git push（必须用 -A 转发 SSH agent）
 ssh -A mac-studio "cd /Users/congrenhan/Documents/quantrift_stock && git push"
