@@ -10,7 +10,6 @@ backtest_runner.py — 批量回测所有标的 × 所有周期
 
 import argparse
 import warnings
-from copy import deepcopy
 from pathlib import Path
 
 import pandas as pd
@@ -20,6 +19,7 @@ warnings.filterwarnings("ignore")
 
 from backtesting import Backtest
 from indicators import compute_signals
+from param_loader import get_params
 from strategy import ConfluenceStrategy
 
 with open("config.yaml") as f:
@@ -55,10 +55,12 @@ def set_params(p: dict):
     _S.atr_tp1_mult        = float(p.get("atr_tp1_mult", 1.0))
     _S.atr_tp2_mult        = float(p.get("atr_tp2_mult", 2.0))
     _S.tp1_portion         = float(p.get("tp1_portion", 0.34))
-    _S.use_trend_filter    = bool(p.get("use_trend_filter", False))
-    _S.allow_reversal_flip = bool(p.get("allow_reversal_flip", True))
-    _S.n_contracts         = int(p.get("n_contracts", 1))
-    _S.contract_size       = int(p.get("contract_size", 1))
+    _S.use_trend_filter      = bool(p.get("use_trend_filter", False))
+    _S.allow_reversal_flip   = bool(p.get("allow_reversal_flip", True))
+    _S.use_fixed_initial_sl  = bool(p.get("use_fixed_initial_sl", False))
+    _S.atr_sl_mult           = float(p.get("atr_sl_mult", 1.5))
+    _S.n_contracts           = int(p.get("n_contracts", 1))
+    _S.contract_size         = int(p.get("contract_size", 1))
 
 
 def load_data(symbol: str, tf: str) -> pd.DataFrame | None:
@@ -137,15 +139,16 @@ def main():
     all_results = []
 
     for tf in tfs:
-        params = deepcopy(cfg["timeframes"][tf])
+        tf_defaults = cfg["timeframes"][tf]
         print(f"\n{'═'*65}")
-        print(f"  周期：{tf}  (adx≥{params['adx_threshold']}  ut_key={params['ut_key']}  "
-              f"min_score={params['min_score']})")
+        print(f"  周期：{tf}  (adx≥{tf_defaults['adx_threshold']}  ut_key={tf_defaults['ut_key']}  "
+              f"min_score={tf_defaults['min_score']})")
         print(f"{'═'*65}")
         print(HDR)
         print(SEP)
 
         for sym in symbols:
+            params = get_params(sym, tf)
             r = run_backtest(sym, tf, params)
             if r is None:
                 print(f"{sym:<8} {tf:<5}  — 无数据或数据不足")

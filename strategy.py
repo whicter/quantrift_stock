@@ -7,7 +7,10 @@ strategy.py — backtesting.py 策略类，完全复刻 Pine Script 状态机逻
      - 止损：收盘价穿越通道线（upperk / lowerk）
 
   B. 分批止盈模式（use_staged_tp=True）
-     - 止损：utTS（UT Bot 动态追踪止损线）
+     - 止损（stage=1）：
+         use_fixed_initial_sl=True  → 入场价 ± atr_sl_mult × 入场ATR（固定，不追踪）
+         use_fixed_initial_sl=False → utTS 动态追踪止损线
+     - TP1 触发后（stage≥2）：止损统一切换为 utTS 追踪
      - TP1：entry ± atr_tp1_mult × ATR，平 tp1_portion（默认 1/3）
      - TP2：entry ± atr_tp2_mult × ATR，再平剩余仓位的 1/2（共 2/3）
      - 剩余 1/3：沿用 sslExit 跟踪出场（吃大趋势）
@@ -16,6 +19,7 @@ strategy.py — backtesting.py 策略类，完全复刻 Pine Script 状态机逻
   - ADX >= adx_threshold
   - Volume > vol_ma × vol_mult
   - allow_short：控制是否允许做空
+  - use_trend_filter：收盘价须在 trend_filter_len 周期 SMA 上方才做多，下方才做空
 
 期货合约：
   - n_contracts > 0：固定合约数，size = n_contracts × contract_size
@@ -44,16 +48,14 @@ class ConfluenceStrategy(Strategy):
     rsi_mr_ob:            float = 65.0
     rsi_mr_os:            float = 35.0
 
-    # ── 方案二：固定 ATR 止盈止损（全仓，不分批）── 未使用，已禁用 ──
-    # use_atr_exit:         bool  = False   # 始终 False，不生效
-    # atr_tp_mult:          float = 2.0
-    # atr_sl_mult:          float = 1.5     # staged_tp=True 时止损用 utTS，此参数无效
-
     # ── 分批止盈（use_staged_tp=True 时启用）────────────────────
-    use_staged_tp:        bool  = False
-    atr_tp1_mult:         float = 1.0   # 第一批止盈倍数
-    atr_tp2_mult:         float = 2.0   # 第二批止盈倍数
-    tp1_portion:          float = 0.34  # TP1 平仓比例（≈1/3）
+    use_staged_tp:           bool  = False
+    atr_tp1_mult:            float = 1.0   # 第一批止盈倍数
+    atr_tp2_mult:            float = 4.0   # 第二批止盈倍数（放宽让利润跑）
+    tp1_portion:             float = 0.34  # TP1 平仓比例（≈1/3）
+    # 初始固定止损（stage=1 时生效，TP1 触发后切换为 utTS 追踪）
+    use_fixed_initial_sl:    bool  = False
+    atr_sl_mult:             float = 1.5   # 固定初始止损：entry ± atr_sl_mult × ATR
 
     # ── 趋势过滤器 ────────────────────────────────────────────────
     use_trend_filter:     bool  = False
@@ -158,8 +160,12 @@ class ConfluenceStrategy(Strategy):
             tp1_price = ep + d * self.atr_tp1_mult * ea
             tp2_price = ep + d * self.atr_tp2_mult * ea
 
-            # ① 止损：UT Bot 动态追踪止损线
-            sl_price = float(self.data.utTS[-1])
+            # ① 止损
+            # stage=1（刚入场）且启用固定初始止损时，用固定 ATR 止损；TP1 触发后切换为 utTS 追踪
+            if self.use_fixed_initial_sl and self._stage == 1:
+                sl_price = self._entry_price - d * self.atr_sl_mult * ea
+            else:
+                sl_price = float(self.data.utTS[-1])
             hit_sl = (d == 1 and close < sl_price) or (d == -1 and close > sl_price)
             if hit_sl:
                 self.position.close()

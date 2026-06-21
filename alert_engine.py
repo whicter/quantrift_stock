@@ -18,7 +18,6 @@ import os
 import sys
 import time
 import threading
-from copy import deepcopy
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -31,6 +30,7 @@ except ImportError:
     sys.exit("请安装 ib_insync：pip install ib_insync")
 
 from indicators import compute_signals
+from param_loader import get_params
 
 with open("config.yaml") as f:
     cfg = yaml.safe_load(f)
@@ -185,7 +185,7 @@ def run_scan(ib: IB):
 
     for symbol in ALL_SYMBOLS:
         for tf in TIMEFRAMES:
-            params = deepcopy(cfg["timeframes"][tf])
+            params = get_params(symbol, tf)
             df_raw = fetch_bars(ib, symbol, tf)
             if df_raw is None:
                 print(f"  {symbol} {tf}: 无数据")

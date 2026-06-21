@@ -43,7 +43,7 @@ timeframes:
     use_ci: true
     use_squeeze_mr: false
     use_staged_tp: true
-    use_trend_filter: false
+    use_trend_filter: true   # B: 只在趋势方向开仓（1h 用 200期≈8周 SMA）
     allow_short: true
     allow_reversal_flip: true
     # 指标参数
@@ -69,12 +69,13 @@ timeframes:
     ci_threshold: 61.8
     vol_len: 20
     vol_mult: 1.0
-    trend_filter_len: 200
+    trend_filter_len: 200    # 1h: 200小时 ≈ 8周，作为中期趋势基准
     # 止盈止损
     atr_tp1_mult: 1.0
-    atr_tp2_mult: 2.0
+    atr_tp2_mult: 4.0        # A: 从2.0放宽到4.0，让利润单跑更远
     tp1_portion: 0.34
-    atr_sl_mult: 1.5         # 仓位计算用（目前固定1手，暂无作用）
+    use_fixed_initial_sl: true  # D: stage=1 用固定止损，TP1后切换追踪
+    atr_sl_mult: 1.5
     reversal_score: 2
     conflict_threshold: 2
     # 回测参数（不影响告警逻辑）
@@ -95,7 +96,7 @@ timeframes:
     use_ci: true
     use_squeeze_mr: false
     use_staged_tp: true
-    use_trend_filter: false
+    use_trend_filter: true   # B: 只在趋势方向开仓（4h 用 100期≈50天 SMA）
     allow_short: true
     allow_reversal_flip: true
     ut_atr: 5
@@ -120,10 +121,11 @@ timeframes:
     ci_threshold: 61.3
     vol_len: 20
     vol_mult: 1.0
-    trend_filter_len: 200
+    trend_filter_len: 100    # 4h: 100×4h ≈ 50天，作为中期趋势基准
     atr_tp1_mult: 1.0
-    atr_tp2_mult: 2.0
+    atr_tp2_mult: 3.0        # A: 从2.0放宽到3.0
     tp1_portion: 0.34
+    use_fixed_initial_sl: true  # D: stage=1 用固定止损
     atr_sl_mult: 1.5
     reversal_score: 2
     conflict_threshold: 2
@@ -169,11 +171,12 @@ timeframes:
     ci_threshold: 70.9
     vol_len: 20
     vol_mult: 1.0
-    trend_filter_len: 200
+    trend_filter_len: 200    # 1d: 200日 SMA，标准牛熊分界线
     atr_tp1_mult: 1.0
-    atr_tp2_mult: 2.0
+    atr_tp2_mult: 3.0        # A: 从2.0放宽到3.0
     tp1_portion: 0.34
-    atr_sl_mult: 1.5
+    use_fixed_initial_sl: true  # D: stage=1 用固定止损
+    atr_sl_mult: 2.0         # 1d 波动更大，初始止损给更多空间
     reversal_score: 3
     conflict_threshold: 2
     n_contracts: 1
@@ -181,3 +184,66 @@ timeframes:
     cash: 100000
     commission: 0.001
     margin: 0.5
+
+# ── 各标的参数覆盖（只写需要覆盖的字段，其余继承 timeframes 默认值） ──────
+symbol_params:
+  AAPL:
+    1h:  {adx_threshold: 15.0, ut_key: 3.0, min_score: 5}
+    4h:  {adx_threshold: 15.0, ut_key: 3.0, min_score: 4}
+    1d:  {adx_threshold: 25.0, ut_key: 3.0, min_score: 5}
+  MSFT:
+    1h:  {adx_threshold: 20.0, ut_key: 1.0, min_score: 5}
+    4h:  {adx_threshold: 15.0, ut_key: 3.0, min_score: 4}
+    1d:  {adx_threshold: 15.0, ut_key: 2.5, min_score: 4}
+  GOOGL:
+    1h:  {adx_threshold: 15.0, ut_key: 2.5, min_score: 4}
+    4h:  {adx_threshold: 25.0, ut_key: 3.0, min_score: 4}
+    1d:  {adx_threshold: 15.0, ut_key: 2.0, min_score: 4}
+  AMZN:
+    1h:  {adx_threshold: 25.0, ut_key: 3.0, min_score: 5}
+    4h:  {adx_threshold: 15.0, ut_key: 2.0, min_score: 5}
+    1d:  {adx_threshold: 15.0, ut_key: 2.0, min_score: 5}
+  META:
+    1h:  {adx_threshold: 15.0, ut_key: 2.0, min_score: 5}
+    4h:  {adx_threshold: 20.0, ut_key: 1.5, min_score: 5}
+    1d:  {adx_threshold: 15.0, ut_key: 3.0, min_score: 5}
+  NVDA:
+    1h:  {adx_threshold: 30.0, ut_key: 1.0, min_score: 5}
+    4h:  {adx_threshold: 20.0, ut_key: 3.0, min_score: 5}
+    1d:  {adx_threshold: 30.0, ut_key: 2.5, min_score: 4}
+  TSLA:
+    1h:  {adx_threshold: 25.0, ut_key: 2.5, min_score: 4}
+    4h:  {adx_threshold: 30.0, ut_key: 3.0, min_score: 5}
+    1d:  {adx_threshold: 15.0, ut_key: 2.0, min_score: 4}
+  SNDK:
+    1h:  {adx_threshold: 15.0, ut_key: 1.5, min_score: 5}
+    4h:  {adx_threshold: 15.0, ut_key: 3.0, min_score: 4}
+    1d:  {adx_threshold: 30.0, ut_key: 3.0, min_score: 4}
+  MU:
+    1h:  {adx_threshold: 30.0, ut_key: 2.0, min_score: 5}
+    4h:  {adx_threshold: 20.0, ut_key: 1.0, min_score: 4}
+    1d:  {adx_threshold: 15.0, ut_key: 3.0, min_score: 4}
+  STX:
+    1h:  {adx_threshold: 30.0, ut_key: 3.0, min_score: 4}
+    4h:  {adx_threshold: 25.0, ut_key: 1.5, min_score: 4}
+    1d:  {adx_threshold: 20.0, ut_key: 1.5, min_score: 4}
+  MRVL:
+    1h:  {adx_threshold: 15.0, ut_key: 1.0, min_score: 5}
+    4h:  {adx_threshold: 30.0, ut_key: 3.0, min_score: 4}
+    1d:  {adx_threshold: 20.0, ut_key: 3.0, min_score: 4}
+  SOXX:
+    1h:  {adx_threshold: 15.0, ut_key: 2.5, min_score: 5}
+    4h:  {adx_threshold: 15.0, ut_key: 1.0, min_score: 5}
+    1d:  {adx_threshold: 15.0, ut_key: 3.0, min_score: 4}
+  SMH:
+    1h:  {adx_threshold: 15.0, ut_key: 1.5, min_score: 5}
+    4h:  {adx_threshold: 20.0, ut_key: 3.0, min_score: 4}
+    1d:  {adx_threshold: 20.0, ut_key: 2.0, min_score: 4}
+  QQQ:
+    1h:  {adx_threshold: 15.0, ut_key: 2.0, min_score: 5}
+    4h:  {adx_threshold: 20.0, ut_key: 3.0, min_score: 5}
+    1d:  {adx_threshold: 20.0, ut_key: 2.5, min_score: 5}
+  SPY:
+    1h:  {adx_threshold: 15.0, ut_key: 2.0, min_score: 5}
+    4h:  {adx_threshold: 15.0, ut_key: 1.5, min_score: 5}
+    1d:  {adx_threshold: 30.0, ut_key: 2.0, min_score: 4}
