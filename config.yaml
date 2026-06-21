@@ -13,11 +13,31 @@ ib:
   port: 4002       # 模拟盘；实盘改 4001
   client_id: 2     # 期货引擎用 1，不能冲突
 
-# ── 标的列表 ────────────────────────────────────────────────────────────
+# ── 标的列表（v2 分类） ──────────────────────────────────────────────────
+# 策略说明见 LEARNING.md
 symbols:
-  mag7:  [AAPL, MSFT, GOOGL, AMZN, META, NVDA, TSLA]
-  semis: [SNDK, MU, STX, MRVL]
-  etfs:  [SOXX, SMH, QQQ, SPY]
+  # ConfluenceStrategy（高 ADX 动量，趋势跟踪）
+  momentum:    [NVDA, MU, MRVL]
+
+  # 高波动单股：独立处理，不与 momentum 混桶
+  high_vol:    [TSLA]
+
+  # 存储周期股：ConfluenceStrategy 谨慎使用（财报驱动、周期强）
+  storage:     [SNDK, STX]
+
+  # Mega-cap compounders：RSI2 + Market Regime Score + RS 过滤（4h/1d）
+  mega_cap:    [MSFT, GOOGL, META]
+
+  # 弱化/待观察：RSI2 Sharpe 低，暂不纳入主策略池
+  watch:       [AAPL]
+
+  # 已删除：AMZN（Sharpe 上限 0.27，任何策略均失效）
+
+  # 半导体 ETF：RSI2（不强制 RS vs QQQ）或 MR+ATR（待重新调参）
+  sector_etf:  [SOXX, SMH]
+
+  # 宽基 ETF：RSI2 benchmark 模式（不参与 RS 过滤）
+  broad_etf:   [QQQ, SPY]
 
 # ── 数据设置 ────────────────────────────────────────────────────────────
 data:
