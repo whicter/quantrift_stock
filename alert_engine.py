@@ -129,6 +129,10 @@ RSI2_PARAMS: dict[tuple[str, str], dict] = {
 BENCHMARK_SYMBOLS  = {"QQQ", "SPY"}
 SECTOR_ETF_SYMBOLS = {"SOXX", "SMH"}
 
+# ── 信号去重：同一根 bar 的信号只发一次 ─────────────────────────────────────
+# key: (symbol, tf, strategy, direction)  value: bar 时间戳字符串
+_sent_signals: dict[tuple, str] = {}
+
 
 # ── Telegram ────────────────────────────────────────────────────────────
 
@@ -501,26 +505,37 @@ def run_scan(ib: IB):
                 continue
 
             strategy = STRATEGY_MAP.get((symbol, tf), "confluence")
+            bar_date = str(df_raw.index[-1].date())
 
             if strategy == "confluence":
                 sig = check_confluence_signal(df_raw, params, df_qqq, vix_value)
                 if sig:
-                    msg = build_confluence_alert(symbol, tf, sig)
-                    print(f"\n  ⚡ 信号：{symbol} {tf} {sig['direction']} [Confluence]")
-                    print(msg)
-                    tg_alert(msg)
-                    found += 1
+                    dedup_key = (symbol, tf, "confluence", sig["direction"])
+                    if _sent_signals.get(dedup_key) == bar_date:
+                        print(f"  {symbol} {tf}: 已发送（同 bar），跳过 [Confluence]")
+                    else:
+                        msg = build_confluence_alert(symbol, tf, sig)
+                        print(f"\n  ⚡ 信号：{symbol} {tf} {sig['direction']} [Confluence]")
+                        print(msg)
+                        tg_alert(msg)
+                        _sent_signals[dedup_key] = bar_date
+                        found += 1
                 else:
                     print(f"  {symbol} {tf}: 无信号 [Confluence]")
 
             elif strategy == "rsi2":
                 sig = check_rsi2_signal(df_raw, symbol, tf, df_qqq, vix_value)
                 if sig:
-                    msg = build_rsi2_alert(symbol, tf, sig)
-                    print(f"\n  ⚡ 信号：{symbol} {tf} 做多 [RSI2 v2]")
-                    print(msg)
-                    tg_alert(msg)
-                    found += 1
+                    dedup_key = (symbol, tf, "rsi2", "做多")
+                    if _sent_signals.get(dedup_key) == bar_date:
+                        print(f"  {symbol} {tf}: 已发送（同 bar），跳过 [RSI2 v2]")
+                    else:
+                        msg = build_rsi2_alert(symbol, tf, sig)
+                        print(f"\n  ⚡ 信号：{symbol} {tf} 做多 [RSI2 v2]")
+                        print(msg)
+                        tg_alert(msg)
+                        _sent_signals[dedup_key] = bar_date
+                        found += 1
                 else:
                     p = RSI2_PARAMS.get((symbol, tf), {})
                     print(f"  {symbol} {tf}: 无信号 [RSI2 v2 entry<{p.get('rsi2_entry', 10)}]")
