@@ -34,6 +34,7 @@
 - [x] Market Regime Score ≤ 1 时告警通知包含评分，人工判断是否执行
 - [x] 多信号优先级：消息标注标的/周期/策略，不做代码层强制去重
 - [x] **信号去重**：同一根 bar 触发的信号只发一次 Telegram，`_sent_signals` dict 记录 `(symbol, tf, strategy, direction) → bar_date`，新 bar 出现才重新判断
+- [x] **重启去重持久化**：`_sent_signals` 写入 `data/.sent_signals.json`，启动时加载（只保留当天记录），重启后不重复发送同一根 bar 的信号
 - [ ] 单标的最大风险敞口（0.75% equity）：需持仓状态，跳过（人工自律）
 - [ ] 半导体总暴露上限（≤ 45%）：同上，跳过
 
@@ -103,4 +104,4 @@ rsync -av mac-studio:/Users/congrenhan/Documents/quantrift_stock/data/ data/
 - [x] RSI2 v2 VIX 急升回落（vix_spike）：MSFT +0.075 / NVDA +0.070 / MU +0.062；ETF/META/GOOGL 无效；已集成
 - [x] **信号质量评分（0-10）**：Confluence = signal_pts(5) + adx_pts(2.5) + regime_pts(2.5)；RSI2 = rsi2_pts(4) + regime_pts(4) + vol_pts(1)；Telegram 标题显示 ⭐ N/10
 - [x] **ETF 板块轮动扫描器**：`etf_scanner.py` + `fetch_etf_data.py`，IB 数据，45 ETF，Rotation + Reversal + Weakness 三套评分，含 VIX（IB Index 合约）
-- [x] **信号去重**：`_sent_signals` dict，同一根 bar 的信号只发一次 Telegram
+- [x] **信号去重 + 重启持久化**：`_sent_signals` dict，同一根 bar 的信号只发一次 Telegram；发送后写入 `data/.sent_signals.json`，重启后仍有效（当天记录自动保留，次日自动过期）

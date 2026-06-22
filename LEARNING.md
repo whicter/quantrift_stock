@@ -660,12 +660,36 @@ MarketDataProvider (ABC)
 | Confluence | MU 1h/4h、MRVL 1h/4h、NVDA 4h、SNDK 1h、STX 1h/4h/1d、TSLA 1d |
 | RSI2 v2 | NVDA/MRVL/MU 1d、MSFT 1d/4h、GOOGL 1d/4h（1h 成本不达标已移除）、META 1h/1d、SOXX/SMH 1h/4h/1d、QQQ 1d、SPY 1d/4h、AAPL 1d |
 
+### 信号去重机制（`_sent_signals`）
+
+**问题**：重启后 `_sent_signals` 内存清空，第一次扫描发现条件仍成立，重复推送同一根 bar 的信号。
+
+**方案**：发送时写入磁盘，启动时加载。
+
+```python
+_SENT_SIGNALS_PATH = Path("data/.sent_signals.json")
+
+def _load_sent_signals():
+    # 只保留今天的记录，过期自动丢弃
+    today = datetime.now().strftime("%Y-%m-%d")
+    return {k: v for k, v in data.items() if v == today}
+
+def _save_sent_signals(signals):
+    _SENT_SIGNALS_PATH.write_text(json.dumps(signals))
+```
+
+- key 格式：`"STX|4h|confluence|做多"`（字符串，可 JSON 序列化）
+- value：bar 日期 `"2026-06-21"`
+- 每次发完信号后调用 `_save_sent_signals()`
+- 启动时 `_load_sent_signals()` 自动过滤非当天记录（次日自动失效，无需手动清理）
+
 ### 关键参数文件
 
 - `config.yaml` → 策略参数（per symbol × tf）+ `data.provider` 数据源选择
 - `data_providers.py` → 数据接入抽象层
 - `.env` → 私密凭证（tastytrade 账号，gitignore）
 - `.env.example` → 凭证模板（可提交）
+- `data/.sent_signals.json` → 信号去重持久化（自动生成，gitignore 不提交）
 - `logs/backtest_results.csv` → ConfluenceStrategy 全量回测结果
 - `logs/rsi2_v2_backtest_results.csv` → RSI2 v2 回测结果
 - `logs/rsi2_v2_optimized_params.csv` → RSI2 v2 最优参数

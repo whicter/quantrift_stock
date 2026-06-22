@@ -3,6 +3,7 @@ __pycache__/
 *.pyo
 .DS_Store
 data/*.csv
+data/.sent_signals.json
 logs/*.csv
 logs/*.log
 *.egg-info/
