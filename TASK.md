@@ -50,7 +50,7 @@
 
 ### G — 研究（低优先级）
 
-- [ ] **PEAD（财报后漂移）**：财报日期 + EPS 超预期数据（yfinance earnings calendar）
+- [ ] **PEAD（财报后漂移）**：`pead_backtest.py` 框架已完成；数据获取：`python pead_backtest.py --fetch-earnings`（yfinance 财报数据，限速时稍后重试），回测待运行
 - [x] **MAG7 周频相对强弱轮动**：`mag7_rotation.py`，最优 top=3, rs=90d, risk_off=True → Sharpe 1.066，MaxDD -34%，显著优于等权 MAG7 基准（0.802）
 - [x] ConfluenceStrategy 降维实验：3 层 vs 6 分项对比，**原始 6 分项全面胜出**，维持不变（见 LEARNING.md）
 - [x] **VIX 急升回落抄底**：vix_spike_recovery 指标（近10日 VIX>25 且当前回落）回测验证 MSFT +0.075 / NVDA +0.070 / MU +0.062；已集成 `rsi2_backtest.py --vix-spike-test` 和 `alert_engine.py`
