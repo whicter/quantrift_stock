@@ -8,3 +8,4 @@ logs/*.log
 *.egg-info/
 .venv/
 venv/
+.env

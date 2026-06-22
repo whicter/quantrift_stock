@@ -313,11 +313,13 @@ def _cd_divergence(close: pd.Series, diff: pd.Series, c_macd: pd.Series):
 # 主入口：计算所有信号
 # ══════════════════════════════════════════════════════════
 
-def compute_signals(df: pd.DataFrame, params: dict) -> pd.DataFrame:
+def compute_signals(df: pd.DataFrame, params: dict,
+                    df_qqq: pd.DataFrame | None = None) -> pd.DataFrame:
     """
     输入标准 OHLCV DataFrame（列名 Open/High/Low/Close/Volume）。
     返回追加了信号列的新 DataFrame，关键列：
       bullScore, bearScore, isChoppy, sslExit, upperk, lowerk
+    df_qqq：可选，QQQ 同周期数据，用于计算 Market Regime Score（market_score 列）
     """
     high  = df["High"]
     low   = df["Low"]
@@ -473,5 +475,28 @@ def compute_signals(df: pd.DataFrame, params: dict) -> pd.DataFrame:
     result["b5_SQZ"]   = b5.astype(float)
     result["b6_CD"]    = b6.astype(float)
     result["utTS"]     = utTS   # UT Bot 动态追踪止损线
+
+    # ── ⑩ Market Regime Score ─────────────────────────────────────────────
+    # +1 QQQ > 100SMA, +1 QQQ > 200SMA, +1 QQQ 20SMA > 50SMA,
+    # +1 QQQ 5日收益 > 0, -1 QQQ 跌破前20日低点
+    # 无 QQQ 数据时默认 4（不过滤）
+    if df_qqq is not None:
+        qqq_close  = df_qqq["Close"].reindex(df.index, method="ffill")
+        qqq_sma20  = _sma(qqq_close, 20)
+        qqq_sma50  = _sma(qqq_close, 50)
+        qqq_sma100 = _sma(qqq_close, 100)
+        qqq_sma200 = _sma(qqq_close, 200)
+        qqq_ret5   = qqq_close.pct_change(5)
+        qqq_low20  = qqq_close.rolling(20).min().shift(1)
+        market_score = (
+            (qqq_close > qqq_sma100).astype(int) +
+            (qqq_close > qqq_sma200).astype(int) +
+            (qqq_sma20  > qqq_sma50).astype(int) +
+            (qqq_ret5   > 0).astype(int)          -
+            (qqq_close  < qqq_low20).astype(int)
+        ).astype(float)
+    else:
+        market_score = pd.Series(4.0, index=close.index)
+    result["market_score"] = market_score
 
     return result

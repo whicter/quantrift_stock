@@ -31,7 +31,9 @@ symbols:
   # 弱化/待观察：RSI2 Sharpe 低，暂不纳入主策略池
   watch:       [AAPL]
 
-  # 已删除：AMZN（Sharpe 上限 0.27，任何策略均失效）
+  # 待专项研究：RSI2 失效（Sharpe 0.27），ConfluenceStrategy 待验证
+  # 备选方案："距 20 日高点回撤 5-10% + RSI 40-55"
+  pending:     [AMZN]
 
   # 半导体 ETF：RSI2（不强制 RS vs QQQ）或 MR+ATR（待重新调参）
   sector_etf:  [SOXX, SMH]
@@ -42,6 +44,7 @@ symbols:
 # ── 数据设置 ────────────────────────────────────────────────────────────
 data:
   dir: "data"
+  provider: "yfinance"     # 数据源：yfinance | tastytrade（未来）| ib（未来）
   # yfinance 下载范围
   start_1h: "2023-01-01"   # 1h 最多 730 天
   start_4h: "2023-01-01"   # 由 1h 重采样
@@ -64,6 +67,9 @@ timeframes:
     use_squeeze_mr: false
     use_staged_tp: true
     use_trend_filter: true   # B: 只在趋势方向开仓（1h 用 200期≈8周 SMA）
+    use_regime_filter: true  # Market Regime Score >= min_market_score 才开多
+    min_market_score: 2      # 分数范围 -1~4（4个正分 -1跌破20日低）
+    use_breakeven_after_tp1: false
     allow_short: true
     allow_reversal_flip: true
     # 指标参数
@@ -117,6 +123,9 @@ timeframes:
     use_squeeze_mr: false
     use_staged_tp: true
     use_trend_filter: true   # B: 只在趋势方向开仓（4h 用 100期≈50天 SMA）
+    use_regime_filter: true
+    min_market_score: 2
+    use_breakeven_after_tp1: false
     allow_short: true
     allow_reversal_flip: true
     ut_atr: 5
@@ -167,6 +176,9 @@ timeframes:
     use_squeeze_mr: false
     use_staged_tp: true
     use_trend_filter: true
+    use_regime_filter: true
+    min_market_score: 2
+    use_breakeven_after_tp1: false
     allow_short: true
     allow_reversal_flip: true
     ut_atr: 5
@@ -228,29 +240,29 @@ symbol_params:
     4h:  {adx_threshold: 20.0, ut_key: 1.5, min_score: 5}
     1d:  {adx_threshold: 15.0, ut_key: 3.0, min_score: 5}
   NVDA:
-    1h:  {adx_threshold: 30.0, ut_key: 1.0, min_score: 5}
-    4h:  {adx_threshold: 20.0, ut_key: 3.0, min_score: 5}
-    1d:  {adx_threshold: 30.0, ut_key: 2.5, min_score: 4}
+    # 1h: ConfluenceStrategy 全网格最优 Sharpe -0.72，RSI2 v2 -0.93，结构性剔除
+    4h:  {adx_threshold: 20.0, ut_key: 3.0, min_score: 5}   # Confluence Sharpe 0.60（样本不足）
+    1d:  {adx_threshold: 30.0, ut_key: 2.5, min_score: 4}   # Confluence Sharpe 0.64 → RSI2 v2 更优 Sharpe 0.867（entry=5, trail=2×, hold≤15, score≥1）
   TSLA:
-    1h:  {adx_threshold: 25.0, ut_key: 2.5, min_score: 4}
-    4h:  {adx_threshold: 30.0, ut_key: 3.0, min_score: 5}
-    1d:  {adx_threshold: 15.0, ut_key: 2.0, min_score: 4}
+    1h:  {adx_threshold: 25.0, ut_key: 2.5, min_score: 4}   # 1h 无效，不做主力
+    4h:  {adx_threshold: 30.0, ut_key: 3.0, min_score: 5}   # 样本不足（23笔），仅参考
+    1d:  {adx_threshold: 25.0, ut_key: 2.0, min_score: 4, use_breakeven_after_tp1: true}  # ut_key=2.0 → TP1后止损仍低于入场价1ATR，须保本
   SNDK:
     1h:  {adx_threshold: 15.0, ut_key: 1.5, min_score: 5}
     4h:  {adx_threshold: 15.0, ut_key: 3.0, min_score: 4}
     1d:  {adx_threshold: 30.0, ut_key: 3.0, min_score: 4}
   MU:
-    1h:  {adx_threshold: 30.0, ut_key: 2.0, min_score: 5}
-    4h:  {adx_threshold: 20.0, ut_key: 1.0, min_score: 4}
-    1d:  {adx_threshold: 15.0, ut_key: 3.0, min_score: 4}
+    1h:  {adx_threshold: 30.0, ut_key: 2.0, min_score: 5}   # Confluence Sharpe 1.58（主力）
+    4h:  {adx_threshold: 20.0, ut_key: 1.0, min_score: 4}   # Confluence Sharpe 1.04（备选：RSI2 entry=15 trail=2× Sharpe 1.67⚠️20笔）
+    1d:  {adx_threshold: 15.0, ut_key: 3.0, min_score: 4}   # Confluence 废（0.23）→ 用 RSI2 entry=5 trail=3× hold≤10 score≥3 Sharpe 0.94
   STX:
     1h:  {adx_threshold: 30.0, ut_key: 3.0, min_score: 4}
     4h:  {adx_threshold: 25.0, ut_key: 1.5, min_score: 4}
     1d:  {adx_threshold: 20.0, ut_key: 1.5, min_score: 4}
   MRVL:
-    1h:  {adx_threshold: 15.0, ut_key: 1.0, min_score: 5}
-    4h:  {adx_threshold: 30.0, ut_key: 3.0, min_score: 4}
-    1d:  {adx_threshold: 20.0, ut_key: 3.0, min_score: 4}
+    1h:  {adx_threshold: 15.0, ut_key: 1.0, min_score: 5, use_breakeven_after_tp1: true}  # Confluence Sharpe 0.94（RR 0.88，保本止损已加）
+    4h:  {adx_threshold: 30.0, ut_key: 3.0, min_score: 4}   # Confluence Sharpe 0.72（样本不足） → RSI2 4h 1.123⚠️（N=25 不可信）
+    1d:  {adx_threshold: 20.0, ut_key: 3.0, min_score: 4}   # Confluence 0.37 → 换 RSI2 v2：entry=15, trail=2×, hold≤5, score≥2, Sharpe 0.748
   SOXX:
     1h:  {adx_threshold: 15.0, ut_key: 2.5, min_score: 5}
     4h:  {adx_threshold: 15.0, ut_key: 1.0, min_score: 5}

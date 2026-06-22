@@ -60,6 +60,13 @@ class ConfluenceStrategy(Strategy):
     # ── 趋势过滤器 ────────────────────────────────────────────────
     use_trend_filter:     bool  = False
 
+    # ── Market Regime Score 过滤器（需 indicators 输出 market_score 列）───
+    use_regime_filter:    bool  = False
+    min_market_score:     int   = 2
+
+    # ── TP1 后保本止损（防止赢家变输家）──────────────────────────
+    use_breakeven_after_tp1: bool = False
+
     # ── 期货合约设置 ──────────────────────────────────────────────
     n_contracts:          int   = 0    # 0=全仓，>0=固定合约数
     contract_size:        int   = 2    # MNQ=$2/点，NQ=$20/点
@@ -69,10 +76,11 @@ class ConfluenceStrategy(Strategy):
         self._wait_sell_reset = False
         self._mr_mode         = False
         # 分批止盈状态
-        self._stage      = 0    # 0=空仓, 1=满仓, 2=已平1/3, 3=已平2/3
+        self._stage       = 0    # 0=空仓, 1=满仓, 2=已平1/3, 3=已平2/3
         self._entry_price = 0.0
         self._entry_atr   = 0.0
         self._entry_dir   = 0   # 1=多, -1=空
+        self._breakeven_stop = None   # TP1 后保本价（use_breakeven_after_tp1）
         # 固定交易 size
         self._trade_size = (self.n_contracts * self.contract_size
                             if self.n_contracts > 0 else None)
@@ -93,6 +101,7 @@ class ConfluenceStrategy(Strategy):
 
     def _reset_stage(self):
         self._stage = 0
+        self._breakeven_stop = None
         self._entry_dir = 0
 
     def next(self):
@@ -166,6 +175,12 @@ class ConfluenceStrategy(Strategy):
                 sl_price = self._entry_price - d * self.atr_sl_mult * ea
             else:
                 sl_price = float(self.data.utTS[-1])
+                # 保本止损：TP1 后 utTS 若仍低于入场价，用保本价（仅 stage>=2）
+                if self._breakeven_stop is not None:
+                    if d == 1:
+                        sl_price = max(sl_price, self._breakeven_stop)
+                    else:
+                        sl_price = min(sl_price, self._breakeven_stop)
             hit_sl = (d == 1 and close < sl_price) or (d == -1 and close > sl_price)
             if hit_sl:
                 self.position.close()
@@ -183,6 +198,16 @@ class ConfluenceStrategy(Strategy):
                 if hit_tp1:
                     self.position.close(portion=self.tp1_portion)
                     self._stage = 2
+                    # 保本止损：TP1 触发后确保 utTS >= entry_price（防赢家变输家）
+                    if self.use_breakeven_after_tp1 and d == 1:
+                        utts_now = float(self.data.utTS[-1])
+                        if utts_now < self._entry_price:
+                            # 临时存储保本价，下一个 bar 的 sl_price 用此值
+                            self._breakeven_stop = self._entry_price
+                    elif self.use_breakeven_after_tp1 and d == -1:
+                        utts_now = float(self.data.utTS[-1])
+                        if utts_now > self._entry_price:
+                            self._breakeven_stop = self._entry_price
 
             # ③ TP2：平剩余的 1/2（共约 2/3 已平）
             elif self._stage == 2:
@@ -323,6 +348,12 @@ class ConfluenceStrategy(Strategy):
 
         strong_buy  = bull_score >= min_score
         strong_sell = bear_score >= min_score
+
+        # Market Regime Score：分数不足则禁止多头入场（空头不限制）
+        if self.use_regime_filter and strong_buy:
+            ms = float(self.data.market_score[-1])
+            if ms != ms or ms < self.min_market_score:  # nan 或分数不足
+                strong_buy = False
 
         trigger_buy = (strong_buy
                        and bear_score <= self.conflict_threshold

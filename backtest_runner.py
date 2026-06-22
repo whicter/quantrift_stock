@@ -2,13 +2,15 @@
 backtest_runner.py — 批量回测所有标的 × 所有周期
 
 用法：
-  python backtest_runner.py                        # 全量
-  python backtest_runner.py --symbol NVDA          # 单标的
-  python backtest_runner.py --symbol NVDA --tf 1h  # 单标的单周期
-  python backtest_runner.py --sort sharpe          # 按指定指标排序（sharpe/dd/wr/ret）
+  python backtest_runner.py                              # 全量
+  python backtest_runner.py --symbol NVDA                # 单标的
+  python backtest_runner.py --symbol NVDA --tf 1h        # 单标的单周期
+  python backtest_runner.py --sort sharpe                # 按指定指标排序（sharpe/dd/wr/ret）
+  python backtest_runner.py --symbol TSLA --optimize     # 网格优化（adx/ut_key/min_score）
 """
 
 import argparse
+import itertools
 import warnings
 from pathlib import Path
 
@@ -28,9 +30,14 @@ with open("config.yaml") as f:
 DATA_DIR = Path(cfg["data"]["dir"])
 
 ALL_SYMBOLS = (
-    cfg["symbols"]["mag7"]
-    + cfg["symbols"]["semis"]
-    + cfg["symbols"]["etfs"]
+    cfg["symbols"].get("momentum", [])
+    + cfg["symbols"].get("high_vol", [])
+    + cfg["symbols"].get("storage", [])
+    + cfg["symbols"].get("mega_cap", [])
+    + cfg["symbols"].get("watch", [])
+    + cfg["symbols"].get("pending", [])
+    + cfg["symbols"].get("sector_etf", [])
+    + cfg["symbols"].get("broad_etf", [])
 )
 
 TIMEFRAMES = ["1h", "4h", "1d"]
@@ -59,8 +66,11 @@ def set_params(p: dict):
     _S.allow_reversal_flip   = bool(p.get("allow_reversal_flip", True))
     _S.use_fixed_initial_sl  = bool(p.get("use_fixed_initial_sl", False))
     _S.atr_sl_mult           = float(p.get("atr_sl_mult", 1.5))
-    _S.n_contracts           = int(p.get("n_contracts", 1))
-    _S.contract_size         = int(p.get("contract_size", 1))
+    _S.n_contracts               = int(p.get("n_contracts", 1))
+    _S.contract_size             = int(p.get("contract_size", 1))
+    _S.use_regime_filter         = bool(p.get("use_regime_filter", False))
+    _S.min_market_score          = int(p.get("min_market_score", 2))
+    _S.use_breakeven_after_tp1   = bool(p.get("use_breakeven_after_tp1", False))
 
 
 def load_data(symbol: str, tf: str) -> pd.DataFrame | None:
@@ -75,13 +85,14 @@ def load_data(symbol: str, tf: str) -> pd.DataFrame | None:
     return df
 
 
-def run_backtest(symbol: str, tf: str, params: dict) -> dict | None:
+def run_backtest(symbol: str, tf: str, params: dict,
+                 df_qqq: pd.DataFrame | None = None) -> dict | None:
     df_raw = load_data(symbol, tf)
     if df_raw is None or len(df_raw) < 50:
         return None
 
     try:
-        df_sig = compute_signals(df_raw, params)
+        df_sig = compute_signals(df_raw, params, df_qqq)
         set_params(params)
         bt = Backtest(
             df_sig, _S,
@@ -124,6 +135,79 @@ def print_result(r: dict):
           f"{r['dd']:>8.1f} {r['wr']:>6.1f} {r['n']:>5} {r['pf']:>5.2f} {r['rr']:>5.2f}")
 
 
+OPTIMIZE_GRID = {
+    "adx_threshold": [15.0, 20.0, 25.0, 30.0],
+    "ut_key":        [1.0, 1.5, 2.0, 2.5, 3.0],
+    "min_score":     [3, 4, 5],
+}
+
+
+def run_optimize(symbol: str, tfs: list[str]):
+    """Grid search over adx_threshold × ut_key × min_score for a single symbol."""
+    keys   = list(OPTIMIZE_GRID.keys())
+    values = list(OPTIMIZE_GRID.values())
+    combos = list(itertools.product(*values))
+    total  = len(combos) * len(tfs)
+    print(f"\n优化 {symbol}：{len(combos)} 参数组合 × {len(tfs)} 周期 = {total} 次回测\n")
+
+    all_results = []
+    done = 0
+    for tf in tfs:
+        base_params = get_params(symbol, tf)
+        df_qqq = load_data("QQQ", tf)
+        for combo in combos:
+            override = dict(zip(keys, combo))
+            params = {**base_params, **override}
+            r = run_backtest(symbol, tf, params, df_qqq)
+            done += 1
+            if done % 20 == 0:
+                print(f"  进度 {done}/{total}…")
+            if r is None:
+                continue
+            r.update(override)
+            all_results.append(r)
+
+    if not all_results:
+        print("无有效回测结果")
+        return
+
+    df = pd.DataFrame(all_results)
+    # 过滤笔数 < 10
+    df = df[df["n"] >= 10]
+
+    # 按周期分别打印 Top 5
+    for tf in tfs:
+        sub = df[df["tf"] == tf].sort_values("sharpe", ascending=False).head(5)
+        if sub.empty:
+            continue
+        print(f"\n{'═'*75}")
+        print(f"  {symbol} {tf} — Top 5 (按 Sharpe)")
+        print(f"{'═'*75}")
+        print(f"{'adx':>6} {'ut_key':>7} {'score':>6} | "
+              f"{'Sharpe':>7} {'WR%':>6} {'笔数':>5} {'PF':>5} {'RR':>5}")
+        print("─" * 75)
+        for _, row in sub.iterrows():
+            print(f"{row['adx_threshold']:>6.0f} {row['ut_key']:>7.1f} {row['min_score']:>6.0f} | "
+                  f"{row['sharpe']:>7.2f} {row['wr']:>6.1f} {row['n']:>5} {row['pf']:>5.2f} {row['rr']:>5.2f}")
+
+    # 全局最优（跨周期）
+    best = df.sort_values("sharpe", ascending=False).head(10)
+    print(f"\n{'═'*75}")
+    print(f"  {symbol} 全局 Top 10")
+    print(f"{'═'*75}")
+    print(f"{'tf':>4} {'adx':>6} {'ut_key':>7} {'score':>6} | "
+          f"{'Sharpe':>7} {'WR%':>6} {'笔数':>5} {'PF':>5} {'RR':>5}")
+    print("─" * 75)
+    for _, row in best.iterrows():
+        print(f"{row['tf']:>4} {row['adx_threshold']:>6.0f} {row['ut_key']:>7.1f} {row['min_score']:>6.0f} | "
+              f"{row['sharpe']:>7.2f} {row['wr']:>6.1f} {row['n']:>5} {row['pf']:>5.2f} {row['rr']:>5.2f}")
+
+    out_path = Path(f"logs/optimize_{symbol}.csv")
+    out_path.parent.mkdir(exist_ok=True)
+    df.to_csv(out_path, index=False)
+    print(f"\n完整结果已保存至 {out_path}")
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--symbol", help="单标的，如 NVDA")
@@ -131,15 +215,50 @@ def main():
     parser.add_argument("--sort", default="sharpe",
                         choices=["sharpe", "dd", "wr", "ret"],
                         help="最终排名排序依据")
+    parser.add_argument("--optimize", action="store_true",
+                        help="网格优化 adx_threshold / ut_key / min_score（需指定 --symbol）")
+    parser.add_argument("--cost-test", action="store_true", dest="cost_test",
+                        help="成本压力测试：在 0/5/10/20/30 bps 下跑回测（需指定 --symbol --tf）")
     args = parser.parse_args()
 
     symbols = [args.symbol.upper()] if args.symbol else ALL_SYMBOLS
     tfs     = [args.tf] if args.tf else TIMEFRAMES
 
+    if args.optimize:
+        if not args.symbol:
+            parser.error("--optimize 需要指定 --symbol")
+        run_optimize(args.symbol.upper(), tfs)
+        return
+
+    if args.cost_test:
+        if not args.symbol or not args.tf:
+            parser.error("--cost-test 需要指定 --symbol 和 --tf")
+        sym = args.symbol.upper()
+        tf  = args.tf
+        df_qqq = load_data("QQQ", tf)
+        bps_levels = [0, 5, 10, 20, 30]
+        print(f"\n{'═'*65}")
+        print(f"  成本压力测试：{sym} {tf}")
+        print(f"{'═'*65}")
+        print(f"{'bps':>5} {'Sharpe':>7} {'WR%':>6} {'笔数':>5} {'RR':>5} {'MaxDD%':>8}")
+        print("─" * 45)
+        for bps in bps_levels:
+            params = get_params(sym, tf)
+            params["commission"] = bps / 10000
+            r = run_backtest(sym, tf, params, df_qqq)
+            if r:
+                flag = "  ✅" if r["sharpe"] >= 0.7 else "  ❌"
+                print(f"{bps:>5} {r['sharpe']:>7.2f} {r['wr']:>6.1f} {r['n']:>5} "
+                      f"{r['rr']:>5.2f} {r['dd']:>8.1f}{flag}")
+            else:
+                print(f"{bps:>5}  — 信号不足")
+        return
+
     all_results = []
 
     for tf in tfs:
         tf_defaults = cfg["timeframes"][tf]
+        df_qqq = load_data("QQQ", tf)   # 用于 Market Regime Score
         print(f"\n{'═'*65}")
         print(f"  周期：{tf}  (adx≥{tf_defaults['adx_threshold']}  ut_key={tf_defaults['ut_key']}  "
               f"min_score={tf_defaults['min_score']})")
@@ -149,7 +268,7 @@ def main():
 
         for sym in symbols:
             params = get_params(sym, tf)
-            r = run_backtest(sym, tf, params)
+            r = run_backtest(sym, tf, params, df_qqq)
             if r is None:
                 print(f"{sym:<8} {tf:<5}  — 无数据或数据不足")
                 continue

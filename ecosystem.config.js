@@ -6,32 +6,46 @@
 //   pm2 restart stock-alert
 //   pm2 logs stock-alert --lines 50
 
-require("dotenv").config();   // 自动读取项目根目录的 .env
+// 手动解析 .env（不依赖 npm dotenv）
+const fs = require("fs");
+const path = require("path");
+const envPath = path.join(__dirname, ".env");
+const envVars = {};
+if (fs.existsSync(envPath)) {
+  fs.readFileSync(envPath, "utf8").split("\n").forEach((line) => {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith("#")) return;
+    const idx = trimmed.indexOf("=");
+    if (idx === -1) return;
+    envVars[trimmed.slice(0, idx).trim()] = trimmed.slice(idx + 1).trim();
+  });
+}
 
 module.exports = {
   apps: [
     {
       name: "stock-alert",
       script: "/opt/homebrew/bin/python3.11",
-      args: "alert_engine.py --port 4002",
+      args: "alert_engine.py",
       cwd: "/Users/congrenhan/Documents/quantrift_stock",
       interpreter: "none",
 
       // 环境变量（从 .env 读入，pm2 自动注入）
       env: {
-        TT_USERNAME:       process.env.TT_USERNAME       || "",
-        TT_PASSWORD:       process.env.TT_PASSWORD       || "",
-        TT_REMEMBER_TOKEN: process.env.TT_REMEMBER_TOKEN || "",
-        TG_TOKEN:          process.env.TG_TOKEN          || "",
-        TG_CHAT_ID:        process.env.TG_CHAT_ID        || "",
+        ALERT_PORT:        "4002",
+        TT_USERNAME:       envVars.TT_USERNAME       || "",
+        TT_PASSWORD:       envVars.TT_PASSWORD       || "",
+        TT_REMEMBER_TOKEN: envVars.TT_REMEMBER_TOKEN || "",
+        TG_TOKEN:          envVars.TG_TOKEN          || "",
+        TG_CHAT_ID:        envVars.TG_CHAT_ID        || "",
       },
       env_live: {
-        // pm2 start --env live 时切换实盘端口
-        TT_USERNAME:       process.env.TT_USERNAME       || "",
-        TT_PASSWORD:       process.env.TT_PASSWORD       || "",
-        TT_REMEMBER_TOKEN: process.env.TT_REMEMBER_TOKEN || "",
-        TG_TOKEN:          process.env.TG_TOKEN          || "",
-        TG_CHAT_ID:        process.env.TG_CHAT_ID        || "",
+        // pm2 start ecosystem.config.js --env live 时切换实盘端口
+        TT_USERNAME:       envVars.TT_USERNAME       || "",
+        TT_PASSWORD:       envVars.TT_PASSWORD       || "",
+        TT_REMEMBER_TOKEN: envVars.TT_REMEMBER_TOKEN || "",
+        TG_TOKEN:          envVars.TG_TOKEN          || "",
+        TG_CHAT_ID:        envVars.TG_CHAT_ID        || "",
         ALERT_PORT: "4001",
       },
 

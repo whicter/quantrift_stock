@@ -40,9 +40,11 @@ with open("config.yaml") as f:
 
 DATA_DIR   = Path(cfg["data"]["dir"])
 TIMEFRAMES = ["1h", "4h", "1d"]
-SYMBOLS    = ["MSFT", "GOOGL", "META", "AAPL", "SPY", "QQQ", "SOXX", "SMH"]
+SYMBOLS    = ["MSFT", "GOOGL", "META", "AAPL", "SPY", "QQQ", "SOXX", "SMH",
+              "MRVL", "NVDA", "MU"]
 # AMZN 已从主策略池删除（Sharpe 上限 0.27）
 # TSLA 独立处理，不在此池
+# MRVL/NVDA/MU：测试 RSI2 v2 能否补充或替代 ConfluenceStrategy 弱项周期
 
 BENCHMARK_SYMBOLS  = {"QQQ", "SPY"}    # 本身就是基准，跳过 RS 过滤
 SECTOR_ETF_SYMBOLS = {"SOXX", "SMH"}   # RS 用自身趋势（> 100SMA），不比 QQQ
@@ -455,7 +457,7 @@ def run_optimize_mode(symbols, tfs):
             print(f"    {sym} {tf}: 完成  最优 Sharpe={best_sharpe:.3f}" + " " * 20)
             if best_result:
                 bc = best_combo
-                print(f"  最优 | entry={bc['rsi2_entry']}  exit={bc['rsi2_exit']}"
+                print(f"  最优 | entry={bc['rsi2_entry']}"
                       f"  trail={bc['atr_trail_mult']}×  hold≤{bc['max_hold_bars']}"
                       f"  score≥{bc['min_market_score']}"
                       f"  → Sharpe={best_result['sharpe']:.3f}  WR={best_result['wr']:.1f}%"
@@ -468,7 +470,7 @@ def run_optimize_mode(symbols, tfs):
     print(f"\n{'═'*60}\n  优化汇总（Sharpe 降序）\n{'═'*60}")
     for _, row in df.iterrows():
         print(f"  {row['symbol']:<6} {row['tf']:<4}"
-              f"  entry={row['rsi2_entry']}  exit={row['rsi2_exit']}"
+              f"  entry={row['rsi2_entry']}"
               f"  trail={row['atr_trail_mult']}×  hold≤{int(row['max_hold_bars'])}"
               f"  score≥{int(row['min_market_score'])}"
               f"  → Sharpe={row['sharpe']:.3f}  WR={row['wr']:.1f}%  N={int(row['n'])}")
@@ -530,6 +532,8 @@ def main():
     parser.add_argument("--tf")
     parser.add_argument("--optimize",     action="store_true")
     parser.add_argument("--compare-exit", action="store_true", dest="compare_exit")
+    parser.add_argument("--cost-test",    action="store_true", dest="cost_test",
+                        help="成本压力测试：0/5/10/20/30 bps（需指定 --symbol --tf）")
     args = parser.parse_args()
 
     symbols = [args.symbol.upper()] if args.symbol else SYMBOLS
@@ -539,6 +543,33 @@ def main():
         run_optimize_mode(symbols, tfs)
     elif args.compare_exit:
         run_compare_exit_mode(symbols, tfs)
+    elif args.cost_test:
+        if not args.symbol or not args.tf:
+            parser.error("--cost-test 需要指定 --symbol 和 --tf")
+        sym = args.symbol.upper()
+        tf  = args.tf
+        df_raw = load_data(sym, tf)
+        df_qqq = load_data("QQQ", tf)
+        df_vix = load_vix()
+        if df_raw is None or len(df_raw) < 250:
+            print("数据不足")
+            return
+        is_bm, is_etf, base = _setup_sym(sym, tf, DEFAULT_PARAMS[tf])
+        bps_levels = [0, 5, 10, 20, 30]
+        print(f"\n{'═'*60}")
+        print(f"  RSI2 v2 成本压力测试：{sym} {tf}")
+        print(f"{'═'*60}")
+        print(f"{'bps':>5} {'Sharpe':>7} {'WR%':>6} {'笔数':>5} {'RR':>5} {'MaxDD%':>8}")
+        print("─" * 45)
+        for bps in bps_levels:
+            params = {**base, "commission": bps / 10000}
+            r = run_one(df_raw, params, df_qqq, df_vix, is_bm, is_etf)
+            if r:
+                flag = "  ✅" if r["sharpe"] >= 0.7 else "  ❌"
+                print(f"{bps:>5} {r['sharpe']:>7.2f} {r['wr']:>6.1f} {r['n']:>5} "
+                      f"{r['rr']:>5.2f} {r['dd']:>8.1f}{flag}")
+            else:
+                print(f"{bps:>5}  — 信号不足")
     else:
         run_backtest_mode(symbols, tfs)
 
