@@ -531,6 +531,84 @@ ADX 低但上升中意味着趋势正在形成，不是真正的震荡。
 - 文件：`mag7_rotation.py`，结果：`logs/mag7_rotation.csv`
 ---
 
+## ETF 板块轮动扫描器（2026-06，`etf_scanner.py`）
+
+### 设计目标
+
+在现有个股信号体系（RSI2 + Confluence）之外，提供**板块层面宏观扫描**：找资金流入的强势板块（追强）+ 找超跌开始修复的板块（抄底候选）。
+
+### 两套评分
+
+**Rotation Score（0-100，追强）**：
+
+| 因子 | 条件 | 分数 |
+|------|------|------|
+| 趋势 | 收盘 > 50MA | +15 |
+| 长期趋势 | 收盘 > 200MA | +15 |
+| 短期动量 | ETF 20日收益 > SPY 20日收益 | +15 |
+| 中期动量 | ETF 60日收益 > SPY 60日收益 | +15 |
+| RS 强度 | ETF/SPY > 其 20MA | +15 |
+| RS 新高 | ETF/SPY 处于 20日新高（±0.5%）| +15 |
+| 量能 | 成交量 > 20日均量 | +10 |
+
+分数 ≥ 75：强势追强候选；60-75：观察/等回踩；< 45：弱势不碰
+
+**Reversal Score（0-100，超跌反转）**：
+
+前提：RSI(14) < 40 且 收盘 < 50MA × 0.95（未满足前提 score=0）
+
+| 因子 | 条件 | 分数 |
+|------|------|------|
+| 极度超跌 | RSI < 30 | +15 |
+| 深度偏离 | 收盘 < 50MA × 0.92 | +15 |
+| 恐慌放量 | 成交量 > 1.5× 均量 | +10 |
+| 止跌 | 收盘 > 5MA | +15 |
+| 反包 | 收盘 > 前日最高价 | +15 |
+| RS 修复 | ETF/SPY 连续 3 天上升 | +15 |
+| 均线修复 | 收盘距 20MA < 5% | +15 |
+
+分数 ≥ 45："反转确认"；< 45："超跌待确认"（不是买入信号）
+
+### 市场环境判断
+
+| 环境 | 条件 | 策略建议 |
+|------|------|---------|
+| 🟢 Risk-On | SPY>200MA + 20MA>50MA + QQQ/SPY趋势↑ + VIX<25 | 追强为主 |
+| 🟡 Neutral | SPY>200MA + VIX<25，但不满足 Risk-On 全部 | 只做强势回踩 |
+| 🔴 Risk-Off | SPY<200MA 或 VIX≥25 | 观察防御板块，不追高 |
+
+### ETF 分组（45只）
+
+| 组 | ETF |
+|----|-----|
+| 大板块 | XLK 科技、XLC 通信、XLY 可选消费、XLP 必需消费、XLV 医疗、XLF 金融、XLI 工业、XLE 能源、XLB 原材料、XLU 公用事业、XLRE 房地产 |
+| 科技/AI | IGV 软件、CIBR/HACK 网络安全、SKYY/CLOU 云计算、BOTZ AI机器人、ARTY AI未来科技、AIQ AI科技 |
+| 半导体 | SMH、SOXX、XSD |
+| 金融细分 | KBE 银行、KRE 区域银行、KIE 保险 |
+| 医疗/生技 | XBI 生技等权、IBB 生技、IHI 医疗设备 |
+| 国防/运输 | ITA、XAR（航天国防）、IYT 运输 |
+| 消费/住宅 | XHB 住宅/家装、ITB 住宅、XRT 零售等权 |
+| 能源/资源 | XOP 油气、ICLN 清洁能源、TAN 太阳能、GDX 金矿、GDXJ 小型金矿 |
+| 房地产 | VNQ、IYR（REITs）、SRVR 数据中心REITs、DTCR 数字基建 |
+
+注：IRBO（已退市）→ ARTY；VPN（已退市）→ DTCR
+
+### 实盘观察结论（2026-06-21）
+
+市场环境：🟢 Risk-On，VIX 16.4
+
+**轮动强势**：SMH/SOXX（90分，vs200MA +60-77%，半导体延续强势）；XBI（100分，生技补涨）；DTCR（100分，数据中心/数字基建）；XHB（85分，住宅建筑近期最强，RS20d +11.3%）
+
+**超跌候选**：GDXJ/XOP/XLE（RSI 37-39，vs50MA -6~-9%），但 RS3↑ 全为 ✗，属"超跌待确认"，非买入信号。能源/金矿尚未出现反转确认。
+
+### 关键认知
+
+- **核心原则**：真正值得买的不是"跌得最多的 ETF"，而是**跌完后开始重新跑赢 SPY 的 ETF**
+- Rotation Score 高说明资金正在流入，可追；Reversal Score < 45 只是超跌，不是抄底信号
+- ETF/SPY 相对强度连续上升是抄底成立的必要条件
+
+---
+
 ## 系统架构（2026-06 当前状态）
 
 ### 数据接入层（data_providers.py）
@@ -547,11 +625,11 @@ MarketDataProvider (ABC)
 - 凭证：`.env` 文件（gitignore），`TT_USERNAME` / `TT_PASSWORD`
 - VIX 已集成到 alert_engine Market Regime Score（有数据时 score 范围 -1~5，无数据 0~4）
 
-**VIX 数据源调研结论**（2026-06）：
-- IB `reqHistoricalData` 需买 CBOE 订阅，报错 162/354，不划算
-- Tastytrade API：`/market-metrics?symbols=VIX` 返回的是 VIX 期权自身的 IV（~0.89），不是 VIX 指数价格；获取真实 VIX 价格需 DXLink websocket（`/api-quote-tokens` → wss 连接），实现复杂，对日线 Regime 无必要
-- yfinance `^VIX`：免费，15 分钟延时，对日线 Regime 打分完全够用，当前采用（两个 provider 均复用此实现）
-- **结论**：VIX 统一用 yfinance，TastytradeProvider.fetch_vix() 内部转发给 YFinanceProvider
+**VIX 数据源调研结论**（2026-06，已更新）：
+- **IB `Index('VIX','CBOE','USD')` ✅**：`reqHistoricalData whatToShow=TRADES` 可成功拉取 VIX 日线历史数据（2年），`fetch_etf_data.py --symbol VIX` 已实现，保存为 `data/VIX_1d.csv`。用于 ETF 扫描器市场环境判断。
+- **alert_engine VIX**：仍用 yfinance `^VIX` 实时拉取（via `data_providers.py`），15 分钟延时，对日线 Regime 打分够用，无需改动
+- Tastytrade API：`/market-metrics?symbols=VIX` 返回 VIX 期权 IV，非 VIX 指数价格；DXLink websocket 实现复杂，不必要
+- **结论**：ETF 扫描器用 IB（`fetch_etf_data.py` 预下载）；alert_engine 用 yfinance（实时单次拉取）
 
 ### alert_engine 策略路由（STRATEGY_MAP）
 
