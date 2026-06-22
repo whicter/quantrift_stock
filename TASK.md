@@ -2,8 +2,8 @@
 
 ## 进行中
 
-- [ ] 告警引擎整合到 pm2（`pm2 start alert_engine.py --name stock-alert`）
-- [ ] Telegram 告警测试（需连接 IB Gateway）
+- [ ] 告警引擎整合到 pm2（`pm2 start ecosystem.config.js`，需先连 IB Gateway）
+- [x] Telegram 告警测试 ✅（token + chat_id 已配置，测试消息发送成功）
 
 ## 待完成（优先级顺序）
 
@@ -32,8 +32,8 @@
 
 - [ ] 同标的最大风险敞口：单标的 max 0.75% equity
 - [ ] 半导体总暴露上限：SOXX + SMH + MU + MRVL + NVDA + SNDK + STX ≤ 45%
-- [ ] Market Regime Score ≤ 1 时禁止新开多仓（代码已实现，alert_engine 需加提示）
-- [ ] 多标的同时发信号时的优先级规则
+- [x] Market Regime Score 加入告警通知（Confluence + RSI2 两种格式均已加 Regime 行，含 VIX 值）
+- [x] 多标的多信号处理：每条信号独立发送，消息标题注明标的/周期/策略，无需代码层过滤
 
 ### E — MR 策略（暂缓）
 
