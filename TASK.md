@@ -53,6 +53,7 @@
 - [ ] **PEAD（财报后漂移）**：财报日期 + EPS 超预期数据（yfinance earnings calendar）
 - [ ] **MAG7 周频相对强弱轮动**：按 60 日收益排名，持最强 2-3 只，每周调仓
 - [ ] ConfluenceStrategy 降维：6 分项降为 3 层（趋势必须 + 触发信号 + 加分项）
+- [ ] **VIX 急升回落抄底**：VIX spike → 回落 + RSI2 超卖，作为第二抄底指标（回测待做）
 
 ## 已完成
 
@@ -77,3 +78,4 @@
 - [x] Tastytrade 认证实现（remember-token 模式，无需重复 OTP）
 - [x] GOOGL 1h RSI2 移除实盘候选（成本压力测试不达标）
 - [x] alert_engine pm2 实盘部署，Telegram 推送验证（STX 信号实测成功）
+- [x] RSI2 v2 成交量加分（vol_score）：回测验证 META/MSFT/GOOGL/MU 1d 各提升 +0.01~+0.05 Sharpe；已集成到 `rsi2_backtest.py` 和 `alert_engine.py`；SOXX/NVDA/MRVL 无效，未开启
