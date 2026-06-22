@@ -71,6 +71,8 @@ def set_params(p: dict):
     _S.use_regime_filter         = bool(p.get("use_regime_filter", False))
     _S.min_market_score          = int(p.get("min_market_score", 2))
     _S.use_breakeven_after_tp1   = bool(p.get("use_breakeven_after_tp1", False))
+    _S.use_simplified_scoring    = bool(p.get("use_simplified_scoring", False))
+    _S.min_simplified_score      = int(p.get("min_simplified_score", 2))
 
 
 def load_data(symbol: str, tf: str) -> pd.DataFrame | None:
@@ -219,10 +221,42 @@ def main():
                         help="网格优化 adx_threshold / ut_key / min_score（需指定 --symbol）")
     parser.add_argument("--cost-test", action="store_true", dest="cost_test",
                         help="成本压力测试：在 0/5/10/20/30 bps 下跑回测（需指定 --symbol --tf）")
+    parser.add_argument("--simplified-test", action="store_true", dest="simplified_test",
+                        help="3 层降维评分 vs 原始 6 分项对比（Confluence 主力标的）")
     args = parser.parse_args()
 
     symbols = [args.symbol.upper()] if args.symbol else ALL_SYMBOLS
     tfs     = [args.tf] if args.tf else TIMEFRAMES
+
+    if args.simplified_test:
+        # Confluence 主力标的：以已知最优 adx/ut_key 为基准，对比 original vs simplified
+        CONFLUENCE_POOL = [
+            ("MU",   "1h"),  ("MU",   "4h"),
+            ("SNDK", "1h"),
+            ("MRVL", "1h"),
+            ("STX",  "1h"),  ("STX",  "4h"), ("STX", "1d"),
+        ]
+        print(f"\n{'═'*75}")
+        print("  Confluence 3 层降维 vs 原始 6 分项  (标的以已知最优参数为基准)")
+        print(f"{'═'*75}")
+        hdr = (f"{'标的':<6} {'周期':<4} {'模式':<11} {'Sharpe':>7} "
+               f"{'WR%':>6} {'N':>5} {'RR':>5} {'MaxDD%':>8}")
+        print(hdr); print("─"*75)
+        rows = []
+        for sym, tf in CONFLUENCE_POOL:
+            df_qqq = load_data("QQQ", tf)
+            for mode, overrides in [("原始 6分", {}),
+                                     ("3层 score≥1", {"use_simplified_scoring": True, "min_simplified_score": 1}),
+                                     ("3层 score≥2", {"use_simplified_scoring": True, "min_simplified_score": 2})]:
+                p = {**get_params(sym, tf), **overrides}
+                r = run_backtest(sym, tf, p, df_qqq)
+                if r:
+                    print(f"{sym:<6} {tf:<4} {mode:<11} {r['sharpe']:>7.2f} "
+                          f"{r['wr']:>6.1f} {r['n']:>5} {r['rr']:>5.2f} {r['dd']:>8.1f}")
+                    rows.append({"symbol": sym, "tf": tf, "mode": mode, **r})
+                else:
+                    print(f"{sym:<6} {tf:<4} {mode:<11}  — 信号不足")
+        return
 
     if args.optimize:
         if not args.symbol:

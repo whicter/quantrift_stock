@@ -67,6 +67,15 @@ class ConfluenceStrategy(Strategy):
     # ── TP1 后保本止损（防止赢家变输家）──────────────────────────
     use_breakeven_after_tp1: bool = False
 
+    # ── 简化 3 层评分（降维研究，默认关闭）────────────────────
+    # Layer 1（硬必须）: ADX 过滤（复用 use_adx + adx_threshold）
+    # Layer 2（触发）: UT Bot OR SSL OR Squeeze，至少 1 个
+    # Layer 3（加分）: MACD +1，RSI(50-70) +1
+    # CD 背离降权：不计入简化分
+    # 进场：trigger ≥ 1 AND total_simplified ≥ min_simplified_score
+    use_simplified_scoring:  bool = False
+    min_simplified_score:    int  = 2    # 1=只需触发，2=触发+1个加分，3=触发+全加分
+
     # ── 期货合约设置 ──────────────────────────────────────────────
     n_contracts:          int   = 0    # 0=全仓，>0=固定合约数
     contract_size:        int   = 2    # MNQ=$2/点，NQ=$20/点
@@ -346,8 +355,33 @@ class ConfluenceStrategy(Strategy):
         if exited_this_bar or self.position:
             return
 
-        strong_buy  = bull_score >= min_score
-        strong_sell = bear_score >= min_score
+        if self.use_simplified_scoring:
+            # ── 3 层简化评分 ────────────────────────────────────────
+            # Layer 2 触发：UT Bot OR SSL OR Squeeze（取最高分项）
+            b1 = float(self.data.b1_UT[-1])
+            b2 = float(self.data.b2_SSL[-1])
+            b3 = float(self.data.b3_RSI[-1])
+            b4 = float(self.data.b4_MACD[-1])
+            b5 = float(self.data.b5_SQZ[-1])
+            s1 = 1.0 - b1  # 对应空头：UTBot bear
+            s2 = 1.0 - b2
+            s5 = 1.0 - b5
+            trigger_long  = max(b1, b2, b5)   # 1 if any trigger fires
+            trigger_short = max(s1, s2, s5)
+            bonus_long    = b3 + b4            # 0, 1, or 2
+            bonus_short   = (1.0 - b3) + (1.0 - b4)
+            simp_long  = trigger_long  + bonus_long
+            simp_short = trigger_short + bonus_short
+
+            strong_buy  = (trigger_long  >= 1 and simp_long  >= self.min_simplified_score)
+            strong_sell = (trigger_short >= 1 and simp_short >= self.min_simplified_score)
+            conflict_long  = simp_short >= self.min_simplified_score
+            conflict_short = simp_long  >= self.min_simplified_score
+        else:
+            strong_buy  = bull_score >= min_score
+            strong_sell = bear_score >= min_score
+            conflict_long  = bear_score > self.conflict_threshold
+            conflict_short = bull_score > self.conflict_threshold
 
         # Market Regime Score：分数不足则禁止多头入场（空头不限制）
         if self.use_regime_filter and strong_buy:
@@ -356,13 +390,13 @@ class ConfluenceStrategy(Strategy):
                 strong_buy = False
 
         trigger_buy = (strong_buy
-                       and bear_score <= self.conflict_threshold
+                       and not conflict_long
                        and not self._wait_buy_reset
                        and not is_choppy
                        and ok_trend and ok_vol and ok_bbmc_long and trend_ok_long)
 
         trigger_sell = (self.allow_short and strong_sell
-                        and bull_score <= self.conflict_threshold
+                        and not conflict_short
                         and not self._wait_sell_reset
                         and not is_choppy
                         and ok_trend and ok_vol and ok_bbmc_short and trend_ok_short)
