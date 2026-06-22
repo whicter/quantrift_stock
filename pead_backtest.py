@@ -50,6 +50,59 @@ COMMISSION   = 0.001
 
 # ── 数据获取 ────────────────────────────────────────────────────────────────
 
+def fetch_earnings_alphavantage(symbols: list[str], api_key: str,
+                                sleep_sec: float = 13.0) -> pd.DataFrame:
+    """
+    从 Alpha Vantage EARNINGS 端点抓取历史财报数据（免费 tier）。
+    免费限额：25 次/天，5 次/分钟 → 每次请求间隔 13 秒
+    返回列：symbol, date(报告日), eps_actual, eps_estimate, surprise_pct(小数格式)
+    注：surprise_pct 以小数存储（0.05 = 5%），与 yfinance 版本一致
+    """
+    import json
+    import urllib.request
+
+    rows = []
+    for sym in symbols:
+        url = (f"https://www.alphavantage.co/query"
+               f"?function=EARNINGS&symbol={sym}&apikey={api_key}")
+        try:
+            with urllib.request.urlopen(url, timeout=15) as resp:
+                data = json.loads(resp.read())
+
+            if "quarterlyEarnings" not in data:
+                note = data.get("Note", data.get("Information", "未知原因"))
+                print(f"  {sym}: 无数据（{note}）")
+                continue
+
+            count_before = len(rows)
+            for q in data["quarterlyEarnings"]:
+                try:
+                    eps_a = float(q["reportedEPS"])
+                    eps_e = float(q["estimatedEPS"])
+                    surp  = float(q["surprisePercentage"]) / 100.0  # 转小数格式
+                    date  = pd.Timestamp(q["reportedDate"]).normalize()
+                    rows.append({
+                        "symbol":       sym,
+                        "date":         date,
+                        "eps_actual":   eps_a,
+                        "eps_estimate": eps_e,
+                        "surprise_pct": surp,
+                    })
+                except (ValueError, KeyError):
+                    continue
+
+            print(f"  {sym}: {len(rows) - count_before} 条")
+        except Exception as e:
+            print(f"  {sym}: 获取失败 ({e})")
+
+        if sym != symbols[-1]:
+            time.sleep(sleep_sec)
+
+    if not rows:
+        return pd.DataFrame()
+    return pd.DataFrame(rows).sort_values(["symbol", "date"])
+
+
 def fetch_earnings_yfinance(symbols: list[str], sleep_sec: float = 2.0) -> pd.DataFrame:
     """
     从 yfinance 抓取历史财报数据。
@@ -215,29 +268,38 @@ def calc_stats(trades: pd.DataFrame) -> dict:
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--fetch-earnings", action="store_true", dest="fetch",
-                        help="从 yfinance 抓取财报数据并保存到 data/earnings.csv")
-    parser.add_argument("--hold",     type=int,   default=3,    help="持有天数（默认 3）")
-    parser.add_argument("--beat",     type=float, default=2.0,  help="EPS beat 阈值 %（默认 2.0）")
-    parser.add_argument("--miss",     type=float, default=-2.0, help="EPS miss 阈值 %（默认 -2.0）")
-    parser.add_argument("--no-short", action="store_true", dest="no_short",
-                        help="只做多（不做空 miss 标的）")
+                        help="从 yfinance 抓取财报数据")
+    parser.add_argument("--av-key", dest="av_key", default="",
+                        help="Alpha Vantage API Key，提供后自动用 AV 抓取（5年历史，优先于 yfinance）")
+    parser.add_argument("--hold",     type=int,   default=3)
+    parser.add_argument("--beat",     type=float, default=0.02,
+                        help="EPS beat 阈值，小数格式（默认 0.02 = 2%%）")
+    parser.add_argument("--miss",     type=float, default=-0.02,
+                        help="EPS miss 阈值，小数格式（默认 -0.02 = -2%%）")
+    parser.add_argument("--no-short", action="store_true", dest="no_short")
     parser.add_argument("--symbol",   help="只测试单只标的")
     args = parser.parse_args()
 
     symbols = [args.symbol.upper()] if args.symbol else PEAD_SYMBOLS
 
-    if args.fetch:
-        print(f"抓取 {len(symbols)} 只标的财报数据（每只间隔 2s）...")
-        df = fetch_earnings_yfinance(symbols)
+    if args.fetch or args.av_key:
+        if args.av_key:
+            print(f"Alpha Vantage 抓取 {len(symbols)} 只标的（每只间隔 13s，约 {len(symbols)*13//60+1} 分钟）...")
+            df = fetch_earnings_alphavantage(symbols, args.av_key)
+        else:
+            print(f"yfinance 抓取 {len(symbols)} 只标的（每只间隔 2s）...")
+            df = fetch_earnings_yfinance(symbols)
         if df.empty:
-            print("⚠ 未获取到任何数据（可能被限速，稍后重试）")
+            print("⚠ 未获取到任何数据")
             return
         df.to_csv(EARNINGS_CSV, index=False)
         print(f"✅ 已保存 {len(df)} 条到 {EARNINGS_CSV}")
         return
 
     if not EARNINGS_CSV.exists():
-        print(f"⚠ 无财报数据，请先运行：python pead_backtest.py --fetch-earnings")
+        print("⚠ 无财报数据，请先运行：")
+        print("  python pead_backtest.py --av-key YOUR_KEY   # 推荐，5年历史")
+        print("  python pead_backtest.py --fetch-earnings    # yfinance，仅4季度")
         return
 
     earnings_df = pd.read_csv(EARNINGS_CSV, parse_dates=["date"])

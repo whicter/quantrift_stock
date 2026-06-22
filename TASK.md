@@ -50,7 +50,7 @@
 
 ### G — 研究（低优先级）
 
-- [ ] **PEAD（财报后漂移）**：`pead_backtest.py` 框架已完成；数据获取：`python pead_backtest.py --fetch-earnings`（yfinance 财报数据，限速时稍后重试），回测待运行
+- [x] **PEAD（财报后漂移）**：`pead_backtest.py` 框架完成，已接入 Alpha Vantage 免费 API（5年历史，`--av-key KEY` 抓取）。结论：**PEAD 在本标的池不成立**（全体 WR=34.2%，avgRet=-1.58%，9只标的全部亏损）。大市值科技/半导体财报信息消化极快，当天基本 price in，无漂移空间。TSLA 同样无效（WR≈50%，avgRet≈0）。彻底放弃。
 - [x] **MAG7 周频相对强弱轮动**：`mag7_rotation.py`，最优 top=3, rs=90d, risk_off=True → Sharpe 1.066，MaxDD -34%，显著优于等权 MAG7 基准（0.802）
 - [x] ConfluenceStrategy 降维实验：3 层 vs 6 分项对比，**原始 6 分项全面胜出**，维持不变（见 LEARNING.md）
 - [x] **VIX 急升回落抄底**：vix_spike_recovery 指标（近10日 VIX>25 且当前回落）回测验证 MSFT +0.075 / NVDA +0.070 / MU +0.062；已集成 `rsi2_backtest.py --vix-spike-test` 和 `alert_engine.py`
@@ -80,3 +80,4 @@
 - [x] alert_engine pm2 实盘部署，Telegram 推送验证（STX 信号实测成功）
 - [x] RSI2 v2 成交量加分（vol_score）：回测验证 META/MSFT/GOOGL/MU 1d 各提升 +0.01~+0.05 Sharpe；已集成到 `rsi2_backtest.py` 和 `alert_engine.py`；SOXX/NVDA/MRVL 无效，未开启
 - [x] RSI2 v2 VIX 急升回落（vix_spike）：MSFT +0.075 / NVDA +0.070 / MU +0.062；ETF/META/GOOGL 无效；已集成
+- [x] **信号质量评分（0-10）**：Confluence = signal_pts(5) + adx_pts(2.5) + regime_pts(2.5)；RSI2 = rsi2_pts(4) + regime_pts(4) + vol_pts(1)；Telegram 标题显示 ⭐ N/10
