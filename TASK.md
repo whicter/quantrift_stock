@@ -2,8 +2,7 @@
 
 ## 进行中
 
-- [ ] 告警引擎整合到 pm2（`pm2 start ecosystem.config.js`，需先连 IB Gateway）
-- [x] Telegram 告警测试 ✅（token + chat_id 已配置，测试消息发送成功）
+无
 
 ## 待完成（优先级顺序）
 
@@ -13,14 +12,16 @@
 - [x] ConfluenceStrategy 告警整合（MU/MRVL/SNDK/STX）
 - [x] ALL_SYMBOLS 修复（旧字段 → 新分组名）
 - [x] Market Regime Score 实时计算（QQQ bar + VIX）
-- [ ] 同一标的多信号去重规则（MU 1h Confluence 和 MU 1d RSI2 同时触发时的优先级）
+- [x] Market Regime Score 加入告警通知（Confluence + RSI2 均已加 Regime 行，含 VIX 值）
+- [x] 多标的多信号处理：每条信号独立发送，标题注明标的/周期/策略，无需代码层过滤
 
 ### B — 数据接入
 
-- [x] **VIX 数据接入**：`data_providers.py` YFinanceProvider，`^VIX` yfinance，15 分钟延时，已集成到 alert_engine
-- [x] **数据接入层抽象**：`data_providers.py` MarketDataProvider 基类，支持 yfinance / tastytrade（占位）/ IB（占位），`config.yaml` 一行切换
-- [ ] 确认 SNDK 历史数据范围（2025-02-20 重新上市，1h 回测数据是否足够）
-- [x] **Tastytrade VIX 接入**：`TastytradeProvider.fetch_vix()` 实现完成。tastytrade REST API 无直接 VIX 指数价格端点（需 DXLink websocket），内部复用 YFinanceProvider（^VIX，15min延时，对日线 Regime 判断无影响）。remember-token 已写入 `.env`，后续无需重新登录。
+- [x] **VIX 数据接入**：YFinanceProvider `^VIX`，15 分钟延时，已集成到 alert_engine
+- [x] **数据接入层抽象**：`data_providers.py` MarketDataProvider 基类，支持 yfinance / tastytrade（已实现）/ IB（占位），`config.yaml` 一行切换
+- [x] **Tastytrade 认证**：完整 auth 流程（security question + OTP），remember-token 写入 `.env`，后续自动续期
+- [x] **Tastytrade VIX**：`TastytradeProvider.fetch_vix()` 内部转发 YFinanceProvider（REST API 无直接 VIX 价格端点，DXLink 不必要）
+- [x] SNDK 历史数据：2025-02-20 重新上市，仅用 1h 数据，`STRATEGY_MAP` 已只配 `("SNDK", "1h")`
 
 ### C — 参数稳定性验证（已完成）
 
@@ -28,19 +29,26 @@
 - [x] **参数邻域稳定性**：SOXX/META/GOOGL 1d Top-5 spread < 0.09，全部稳定
 - [x] **Walk-forward 验证**：8/9 RSI2 1d 通过，无过拟合；MSFT 测试期 N 不足（信号稀少，非过拟合）
 
-### D — 风控层（上线前）
+### D — 风控层
 
-- [ ] 同标的最大风险敞口：单标的 max 0.75% equity
-- [ ] 半导体总暴露上限：SOXX + SMH + MU + MRVL + NVDA + SNDK + STX ≤ 45%
-- [x] Market Regime Score 加入告警通知（Confluence + RSI2 两种格式均已加 Regime 行，含 VIX 值）
-- [x] 多标的多信号处理：每条信号独立发送，消息标题注明标的/周期/策略，无需代码层过滤
+- [x] Market Regime Score ≤ 1 时告警通知包含评分，人工判断是否执行
+- [x] 多信号优先级：消息标注标的/周期/策略，不做代码层强制去重
+- [ ] 单标的最大风险敞口（0.75% equity）：需持仓状态，跳过（人工自律）
+- [ ] 半导体总暴露上限（≤ 45%）：同上，跳过
 
-### E — MR 策略（暂缓）
+### E — 部署（已完成）
+
+- [x] **Telegram 配置**：token + chat_id 已写入 `.env`，测试消息发送成功
+- [x] **pm2 集成**：`stock-alert` 以 `/bin/bash -c python3.11 alert_engine.py --port 4001` 方式启动，与 `ib-bot` 模式一致，`pm2 save` 已保存
+- [x] **`restart_engine.sh`**：`PATH=/opt/homebrew/bin:$PATH pm2 restart stock-alert`
+- [x] **实盘验证**：2026-06-21 20:03 ET 扫描 15 个标的，STX 4h + 1d 做多信号触发并推送 Telegram ✅
+
+### F — MR 策略（暂缓）
 
 - [ ] MR 策略全部时间框架笔数 < 50，暂停使用
 - [ ] 如需重启：z-score 波动率自适应 + close > 100SMA + ADX slope 检查
 
-### F — 研究（低优先级）
+### G — 研究（低优先级）
 
 - [ ] **PEAD（财报后漂移）**：财报日期 + EPS 超预期数据（yfinance earnings calendar）
 - [ ] **MAG7 周频相对强弱轮动**：按 60 日收益排名，持最强 2-3 只，每周调仓
@@ -65,6 +73,7 @@
 - [x] MRVL/TSLA 保本止损（use_breakeven_after_tp1，strategy.py）
 - [x] 整理全量回测结论到 LEARNING.md（三套策略 × 全标的 × 全周期）
 - [x] 成本压力测试 + 参数邻域稳定性 + Walk-forward 验证（结论见 LEARNING.md）
-- [x] VIX 数据接入（`data_providers.py` YFinanceProvider，已集成到 alert_engine Market Regime Score）
-- [x] 数据接入层抽象（`data_providers.py`，支持多 provider 扩展，凭证用 `.env`）
+- [x] VIX 数据接入 + 数据接入层抽象（`data_providers.py`）
+- [x] Tastytrade 认证实现（remember-token 模式，无需重复 OTP）
 - [x] GOOGL 1h RSI2 移除实盘候选（成本压力测试不达标）
+- [x] alert_engine pm2 实盘部署，Telegram 推送验证（STX 信号实测成功）

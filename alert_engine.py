@@ -18,6 +18,13 @@ import argparse
 import math
 import os
 import sys
+
+# 加载 .env（脚本自持，无需 pm2 注入环境变量）
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
 import time
 import threading
 from datetime import datetime
