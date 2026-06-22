@@ -129,9 +129,33 @@ RSI2_PARAMS: dict[tuple[str, str], dict] = {
 BENCHMARK_SYMBOLS  = {"QQQ", "SPY"}
 SECTOR_ETF_SYMBOLS = {"SOXX", "SMH"}
 
-# ── 信号去重：同一根 bar 的信号只发一次 ─────────────────────────────────────
-# key: (symbol, tf, strategy, direction)  value: bar 时间戳字符串
-_sent_signals: dict[tuple, str] = {}
+# ── 信号去重：同一根 bar 的信号只发一次（持久化到磁盘，重启不丢失）────────────
+# key: "symbol|tf|strategy|direction"  value: bar 日期字符串 (YYYY-MM-DD)
+_SENT_SIGNALS_PATH = Path("data/.sent_signals.json")
+
+def _load_sent_signals() -> dict[str, str]:
+    """从磁盘加载已发信号记录，忽略读取错误。"""
+    import json
+    try:
+        if _SENT_SIGNALS_PATH.exists():
+            data = json.loads(_SENT_SIGNALS_PATH.read_text())
+            # 只保留今天的记录，过期的自动丢弃
+            today = datetime.now().strftime("%Y-%m-%d")
+            return {k: v for k, v in data.items() if v == today}
+    except Exception:
+        pass
+    return {}
+
+def _save_sent_signals(signals: dict[str, str]):
+    """持久化已发信号记录到磁盘。"""
+    import json
+    try:
+        _SENT_SIGNALS_PATH.parent.mkdir(exist_ok=True)
+        _SENT_SIGNALS_PATH.write_text(json.dumps(signals))
+    except Exception:
+        pass
+
+_sent_signals: dict[str, str] = _load_sent_signals()
 
 
 # ── Telegram ────────────────────────────────────────────────────────────
@@ -510,7 +534,7 @@ def run_scan(ib: IB):
             if strategy == "confluence":
                 sig = check_confluence_signal(df_raw, params, df_qqq, vix_value)
                 if sig:
-                    dedup_key = (symbol, tf, "confluence", sig["direction"])
+                    dedup_key = f"{symbol}|{tf}|confluence|{sig['direction']}"
                     if _sent_signals.get(dedup_key) == bar_date:
                         print(f"  {symbol} {tf}: 已发送（同 bar），跳过 [Confluence]")
                     else:
@@ -519,6 +543,7 @@ def run_scan(ib: IB):
                         print(msg)
                         tg_alert(msg)
                         _sent_signals[dedup_key] = bar_date
+                        _save_sent_signals(_sent_signals)
                         found += 1
                 else:
                     print(f"  {symbol} {tf}: 无信号 [Confluence]")
@@ -526,7 +551,7 @@ def run_scan(ib: IB):
             elif strategy == "rsi2":
                 sig = check_rsi2_signal(df_raw, symbol, tf, df_qqq, vix_value)
                 if sig:
-                    dedup_key = (symbol, tf, "rsi2", "做多")
+                    dedup_key = f"{symbol}|{tf}|rsi2|做多"
                     if _sent_signals.get(dedup_key) == bar_date:
                         print(f"  {symbol} {tf}: 已发送（同 bar），跳过 [RSI2 v2]")
                     else:
@@ -535,6 +560,7 @@ def run_scan(ib: IB):
                         print(msg)
                         tg_alert(msg)
                         _sent_signals[dedup_key] = bar_date
+                        _save_sent_signals(_sent_signals)
                         found += 1
                 else:
                     p = RSI2_PARAMS.get((symbol, tf), {})
