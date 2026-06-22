@@ -115,10 +115,10 @@ RSI2_PARAMS: dict[tuple[str, str], dict] = {
     ("GOOGL","1d"): {"rsi2_entry": 15, "atr_trail_mult": 2.0, "min_market_score": 2, "use_vol_score": True},
     ("META", "1h"): {"rsi2_entry": 5,  "atr_trail_mult": 2.0, "min_market_score": 3, "use_pullback_filter": True},
     ("META", "1d"): {"rsi2_entry": 5,  "atr_trail_mult": 2.5, "min_market_score": 2, "use_vol_score": True},
-    ("MSFT", "1d"): {"rsi2_entry": 5,  "atr_trail_mult": 2.5, "min_market_score": 1, "use_vol_score": True},
+    ("MSFT", "1d"): {"rsi2_entry": 5,  "atr_trail_mult": 2.5, "min_market_score": 1, "use_vol_score": True, "use_vix_spike": True},
     ("MSFT", "4h"): {"rsi2_entry": 15, "atr_trail_mult": 2.0, "min_market_score": 1},
-    ("NVDA", "1d"): {"rsi2_entry": 5,  "atr_trail_mult": 2.0, "min_market_score": 1},
-    ("MU",   "1d"): {"rsi2_entry": 5,  "atr_trail_mult": 3.0, "min_market_score": 3, "use_vol_score": True},
+    ("NVDA", "1d"): {"rsi2_entry": 5,  "atr_trail_mult": 2.0, "min_market_score": 1, "use_vix_spike": True},
+    ("MU",   "1d"): {"rsi2_entry": 5,  "atr_trail_mult": 3.0, "min_market_score": 3, "use_vol_score": True, "use_vix_spike": True},
     ("MRVL", "1d"): {"rsi2_entry": 15, "atr_trail_mult": 2.0, "min_market_score": 2},
     ("QQQ",  "1d"): {"rsi2_entry": 10, "atr_trail_mult": 3.0, "min_market_score": 1, "use_rs_filter": False},
     ("SPY",  "1d"): {"rsi2_entry": 15, "atr_trail_mult": 3.0, "min_market_score": 1, "use_rs_filter": False},
@@ -289,6 +289,7 @@ def check_rsi2_signal(df_raw: pd.DataFrame, symbol: str, tf: str,
     use_rs_filter  = bool(p.get("use_rs_filter",      True))
     use_pullback   = bool(p.get("use_pullback_filter", False))
     use_vol_score  = bool(p.get("use_vol_score",      False))
+    use_vix_spike  = bool(p.get("use_vix_spike",      False))
     atr_trail_mult = float(p.get("atr_trail_mult",    2.5))
 
     sma200  = _sma(close, 200)
@@ -351,6 +352,22 @@ def check_rsi2_signal(df_raw: pd.DataFrame, symbol: str, tf: str,
             vol_surge = float(volume.iloc[-1]) > float(vol_avg.iloc[-1]) * 1.5
             if vol_surge and not math.isnan(float(vol_avg.iloc[-1])):
                 market_score += 1.0
+        # VIX 急升回落加分（MSFT/NVDA/MU 专用）
+        if use_vix_spike and vix_value is not None and not math.isnan(vix_value):
+            try:
+                from datetime import timedelta
+                start_dt = (datetime.now() - timedelta(days=20)).strftime("%Y-%m-%d")
+                _provider = get_provider()
+                vix_hist = _provider.fetch_ohlcv("^VIX", "1d", start=start_dt)
+                if vix_hist is not None and len(vix_hist) >= 4:
+                    vix_close_hist = vix_hist["Close"]
+                    vix_max10 = float(vix_close_hist.rolling(min(10, len(vix_close_hist))).max().iloc[-1])
+                    vix_spiked = vix_max10 > 25.0
+                    vix_declining = vix_value < float(vix_close_hist.iloc[-4])
+                    if vix_spiked and vix_declining:
+                        market_score += 1.0
+            except Exception:
+                pass
         if math.isnan(market_score):
             market_score = 0.0
 

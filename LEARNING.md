@@ -132,13 +132,13 @@
 | **GOOGL** | 1h | **1.12** | 63.6% | 118 | — | entry=5, trail=2.5×, hold≤15, score≥1 |
 | **META** | 1d | **1.02** | 74.5% | 94 | — | entry=5, trail=2.5×, hold≤15, score≥2 |
 | **SMH** | 1d | 0.98 | 69.7% | 119 | — | entry=5, trail=2.5×, hold≤15, score≥2 |
-| **NVDA** | 1d | **0.867** | 67.8% | 115 | 1.14 | entry=5, trail=2×, hold≤15, score≥1 ✅ 优于 Confluence |
-| **MU** | 1d | **0.94** | 67.3% | 98 | 2.22 | entry=5, trail=3×, hold≤10, score≥3 |
+| **NVDA** | 1d | **0.754** | 62.3% | 130 | 1.18 | entry=5, trail=2×, hold≤15, score≥1, vix✓ ✅ 优于 Confluence |
+| **MU** | 1d | **0.896** | 66.3% | 89 | 2.18 | entry=5, trail=3×, hold≤15, score≥3, vol✓, vix✓ |
 | **MRVL** | 1d | **0.748** | 72.7% | 66 | 0.96 | entry=15, trail=2×, hold≤5, score≥2 ✅ 优于 Confluence |
 | SOXX | 1h | 0.90 | 58.4% | 125 | — | entry=5, trail=3×, hold≤15, score≥3 |
 | GOOGL | 1d | 0.89 | 67.2% | 134 | — | entry=15, trail=2×, hold≤5, score≥2 |
 | SPY | 4h | 0.79 | 63.8% | 58 | — | entry=15, trail=2.5×, hold≤15, score≥1 |
-| MSFT | 1d | 0.76 | 60.6% | 99 | — | entry=5, trail=2.5×, hold≤15, score≥1 |
+| MSFT | 1d | **0.849** | 64.5% | 110 | 1.21 | entry=5, trail=2.5×, hold≤15, score≥1, vol✓, vix✓ |
 | QQQ | 1d | 0.72 | 70.3% | 185 | — | entry=10, trail=3×, hold≤10, score≥1 |
 | SPY | 1d | 0.62 | 68.8% | 93 | — | entry=15, trail=3×, hold≤15, score≥1 |
 | AAPL | 1d | 0.60 | 65.6% | 96 | — | entry=15, trail=3×, hold≤15, score≥2 |
@@ -335,6 +335,21 @@ vol✓ = use_vol_score=True（成交量 > 20日均量 × 1.5 时 market_score +1
 
 > ⚠️ = 笔数 < 50，结果仅供参考（4h 数据历史约 2.7 年）
 > 注：优化中 `rsi2_exit` 参数对 Model C 无效（已从 GRID 移除）
+
+**VIX 急升回落（vix_spike）回测结论（2026-06）**：
+
+定义：近 10 日 VIX max > 25（恐慌触发）且当前 VIX < 3 日前（恐慌消退），market_score +1。
+
+| 标的 | vix关闭 Sharpe | vix开启 Sharpe | 提升 | 结论 |
+|------|---------------|----------------|------|------|
+| MSFT 1d | 0.774 | 0.849 | **+0.075** | ✅ 有效 |
+| NVDA 1d | 0.684 | 0.754 | **+0.070** | ✅ 有效 |
+| MU 1d | 0.834 | 0.896 | **+0.062** | ✅ 有效 |
+| SOXX 1d | 0.767 | 0.767 | — | ❌ 无效 |
+| SMH 1d | 0.644 | 0.611 | -0.033 | ❌ 略降 |
+| META/GOOGL/MRVL/QQQ/SPY/AAPL 1d | — | — | 0 | ❌ 无效 |
+
+规律：MSFT/NVDA/MU 在 VIX 急升后的恐慌回落底部信号质量更高；ETF（SOXX/SMH）流动性驱动、与 VIX 恐慌情绪脱钩；Mega-cap 中 META/GOOGL 因个股逻辑更强，VIX 对信号质量影响不显著。
 
 **成交量加分回测结论（2026-06）**：
 

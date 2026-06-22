@@ -98,6 +98,7 @@ GRID = {
     "min_market_score":    [1, 2, 3],
     "use_pullback_filter": [False, True],
     "use_vol_score":       [False, True],   # 成交量放量加分（vol > 20日均量 × 1.5）
+    # use_vix_spike 不加入主 GRID，用 --vix-spike-test 专项测试
 }
 
 # 出场模型对比（--compare-exit）
@@ -144,6 +145,19 @@ def compute_signals(df: pd.DataFrame, params: dict,
     vol_mult = float(params.get("vol_mult", 1.5))
     vol_avg = volume.rolling(vol_len).mean()
     result["vol_surge"] = (volume > vol_avg * vol_mult).astype(float).fillna(0)
+
+    # VIX 急升回落指标：近 N 日 VIX 触及阈值（恐慌发生）且当前 VIX 处于下行（恐慌消退）
+    if df_vix is not None:
+        vix_close    = df_vix["Close"].reindex(df.index, method="ffill")
+        vix_thresh   = float(params.get("vix_spike_thresh",    25.0))
+        vix_lookback = int(params.get("vix_spike_lookback",    10))
+        vix_decline_n = int(params.get("vix_decline_bars",     3))
+        vix_max_n    = vix_close.rolling(vix_lookback).max()
+        vix_spiked   = vix_max_n > vix_thresh
+        vix_declining = vix_close < vix_close.shift(vix_decline_n)
+        result["vix_spike_recovery"] = (vix_spiked & vix_declining).astype(float).fillna(0)
+    else:
+        result["vix_spike_recovery"] = 0.0
 
     # ── Market Regime Score + RS 过滤 ────────────────────────────────────
     if df_qqq is not None and not is_benchmark:
@@ -208,6 +222,7 @@ class RSI2Strategy(Strategy):
     use_pullback_filter: bool  = True
     use_split_exit:      bool  = True    # True=模型C，False=模型A
     use_vol_score:       bool  = False   # 成交量放量时 market_score +1
+    use_vix_spike:       bool  = False   # VIX 急升回落时 market_score +1
     n_contracts:         int   = 0       # 0=全仓，支持 position.close(0.5)
     contract_size:       int   = 1
 
@@ -274,11 +289,13 @@ class RSI2Strategy(Strategy):
         if rsi2 >= self.rsi2_entry:
             return
 
-        # Market Regime Score（+ 可选成交量加分）
+        # Market Regime Score（+ 可选成交量加分 + VIX 急升回落加分）
         if self.use_qqq_filter:
             score = float(self.data.market_score[-1])
             if self.use_vol_score:
                 score += float(self.data.vol_surge[-1])
+            if self.use_vix_spike:
+                score += float(self.data.vix_spike_recovery[-1])
             if math.isnan(score) or score < self.min_market_score:
                 return
 
@@ -316,6 +333,7 @@ def set_params(p: dict):
     _S.use_pullback_filter = bool(p.get("use_pullback_filter", True))
     _S.use_split_exit      = bool(p.get("use_split_exit", True))
     _S.use_vol_score       = bool(p.get("use_vol_score", False))
+    _S.use_vix_spike       = bool(p.get("use_vix_spike", False))
     _S.n_contracts         = int(p.get("n_contracts", 0))
     _S.contract_size       = int(p.get("contract_size", 1))
 
@@ -470,9 +488,10 @@ def run_optimize_mode(symbols, tfs):
             if best_result:
                 bc = best_combo
                 vol_tag = "  vol✓" if bc.get("use_vol_score") else ""
+                vix_tag = "  vix✓" if bc.get("use_vix_spike") else ""
                 print(f"  最优 | entry={bc['rsi2_entry']}"
                       f"  trail={bc['atr_trail_mult']}×  hold≤{bc['max_hold_bars']}"
-                      f"  score≥{bc['min_market_score']}{vol_tag}"
+                      f"  score≥{bc['min_market_score']}{vol_tag}{vix_tag}"
                       f"  → Sharpe={best_result['sharpe']:.3f}  WR={best_result['wr']:.1f}%"
                       f"  RR={best_result['rr']:.2f}  N={best_result['n']}")
                 all_best.append({"symbol": sym, "tf": tf, **bc, **best_result})
@@ -539,13 +558,88 @@ def run_compare_exit_mode(symbols, tfs):
         print(f"\n结果已保存至 {out}")
 
 
+def run_vix_spike_test(symbols, tfs):
+    """专项测试：VIX 急升回落指标对 RSI2 v2 的增益（以各标的已知最优参数为基准）"""
+    # 已验证最优参数（来自 LEARNING.md）
+    KNOWN_PARAMS: dict[tuple[str, str], dict] = {
+        ("SOXX", "1d"): {"rsi2_entry": 5,  "atr_trail_mult": 3.0, "min_market_score": 1},
+        ("SMH",  "1d"): {"rsi2_entry": 5,  "atr_trail_mult": 2.5, "min_market_score": 2},
+        ("GOOGL","1d"): {"rsi2_entry": 15, "atr_trail_mult": 2.0, "min_market_score": 2, "use_vol_score": True},
+        ("META", "1d"): {"rsi2_entry": 5,  "atr_trail_mult": 2.5, "min_market_score": 2, "use_vol_score": True},
+        ("MSFT", "1d"): {"rsi2_entry": 5,  "atr_trail_mult": 2.5, "min_market_score": 1, "use_vol_score": True},
+        ("NVDA", "1d"): {"rsi2_entry": 5,  "atr_trail_mult": 2.0, "min_market_score": 1},
+        ("MU",   "1d"): {"rsi2_entry": 5,  "atr_trail_mult": 3.0, "min_market_score": 3, "use_vol_score": True},
+        ("MRVL", "1d"): {"rsi2_entry": 15, "atr_trail_mult": 2.0, "min_market_score": 2},
+        ("QQQ",  "1d"): {"rsi2_entry": 10, "atr_trail_mult": 3.0, "min_market_score": 1},
+        ("SPY",  "1d"): {"rsi2_entry": 15, "atr_trail_mult": 3.0, "min_market_score": 1},
+        ("AAPL", "1d"): {"rsi2_entry": 15, "atr_trail_mult": 3.0, "min_market_score": 2},
+    }
+    df_vix = load_vix()
+    if df_vix is None:
+        print("⚠ 无 VIX 数据，跳过")
+        return
+
+    all_rows = []
+    for tf in tfs:
+        df_qqq = load_data("QQQ", tf)
+        print(f"\n{'═'*72}")
+        print(f"  VIX spike 对比（False vs True）  周期：{tf}")
+        print(f"{'═'*72}")
+        hdr = (f"{'标的':<6} {'vix':>4} {'Sharpe':>7} {'WR%':>6} {'N':>5} "
+               f"{'RR':>5} {'MaxDD%':>8}")
+        print(hdr); print("─"*72)
+        for sym in symbols:
+            df_raw = load_data(sym, tf)
+            if df_raw is None or len(df_raw) < 250:
+                continue
+            is_bm, is_etf, base = _setup_sym(sym, tf, DEFAULT_PARAMS[tf])
+            # 用已知最优参数覆盖基准
+            known = KNOWN_PARAMS.get((sym, tf), {})
+            if known:
+                base.update({
+                    "rsi2_entry":       known.get("rsi2_entry",       base["rsi2_entry"]),
+                    "atr_trail_mult":   known.get("atr_trail_mult",   base["atr_trail_mult"]),
+                    "min_market_score": known.get("min_market_score", base["min_market_score"]),
+                    "use_vol_score":    known.get("use_vol_score",    False),
+                    "use_pullback_filter": known.get("use_pullback_filter", False),
+                })
+            for flag in [False, True]:
+                params = {**base, "use_vix_spike": flag}
+                r = run_one(df_raw, params, df_qqq, df_vix, is_bm, is_etf)
+                tag = "✓" if flag else "—"
+                if r:
+                    print(f"{sym:<6} {tag:>4} {r['sharpe']:>7.3f} {r['wr']:>6.1f}"
+                          f" {r['n']:>5} {r['rr']:>5.2f} {r['dd']:>8.1f}")
+                    all_rows.append({"symbol": sym, "tf": tf, "use_vix_spike": flag, **r})
+                else:
+                    print(f"{sym:<6} {tag:>4}  — 信号不足（< {MIN_TRADES} 笔）")
+
+    if all_rows:
+        df = pd.DataFrame(all_rows)
+        print(f"\n{'═'*72}")
+        print("  Sharpe 增量摘要（vix✓ - vix—）")
+        print(f"{'═'*72}")
+        pivot = df.pivot_table(index=["symbol", "tf"], columns="use_vix_spike", values="sharpe")
+        if False in pivot.columns and True in pivot.columns:
+            pivot["delta"] = pivot[True] - pivot[False]
+            pivot.columns = ["vix_off", "vix_on", "delta"]
+            pivot_sorted = pivot.sort_values("delta", ascending=False)
+            print(pivot_sorted.round(3).to_string())
+        out = Path("logs/rsi2_vix_spike_test.csv")
+        out.parent.mkdir(exist_ok=True)
+        df.to_csv(out, index=False)
+        print(f"\n结果已保存至 {out}")
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--symbol")
     parser.add_argument("--tf")
-    parser.add_argument("--optimize",     action="store_true")
-    parser.add_argument("--compare-exit", action="store_true", dest="compare_exit")
-    parser.add_argument("--cost-test",    action="store_true", dest="cost_test",
+    parser.add_argument("--optimize",       action="store_true")
+    parser.add_argument("--compare-exit",   action="store_true", dest="compare_exit")
+    parser.add_argument("--vix-spike-test", action="store_true", dest="vix_spike_test",
+                        help="VIX 急升回落专项测试（对比 False vs True）")
+    parser.add_argument("--cost-test",      action="store_true", dest="cost_test",
                         help="成本压力测试：0/5/10/20/30 bps（需指定 --symbol --tf）")
     args = parser.parse_args()
 
@@ -556,6 +650,8 @@ def main():
         run_optimize_mode(symbols, tfs)
     elif args.compare_exit:
         run_compare_exit_mode(symbols, tfs)
+    elif args.vix_spike_test:
+        run_vix_spike_test(symbols, ["1d"] if not args.tf else tfs)
     elif args.cost_test:
         if not args.symbol or not args.tf:
             parser.error("--cost-test 需要指定 --symbol 和 --tf")
