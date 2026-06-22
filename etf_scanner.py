@@ -1,14 +1,15 @@
 """
-etf_scanner.py — ETF 板块轮动 + 超跌抄底扫描器
+etf_scanner.py — ETF 板块轮动 + 超跌抄底 + 做空候选扫描器
 
-两套信号：
+三套信号：
   1. Rotation Score (0-100)：找当前资金流入的强势板块（追强）
   2. Reversal Score (0-100)：找超跌后开始修复的板块（抄底）
+  3. Weakness Score (0-100)：找持续跑输大盘的弱势板块（做空候选）
 
 市场环境过滤（Risk-On / Neutral / Risk-Off）决定策略权重：
   Risk-On  → 轮动追强为主
   Neutral  → 只看回踩 / 相对强势板块
-  Risk-Off → 观察防御板块，不追高，只做超跌极端情况
+  Risk-Off → 观察防御板块，不追高，只做超跌极端情况；做空信号最可靠
 
 用法：
   python etf_scanner.py              # 全量扫描，控制台输出
@@ -339,6 +340,102 @@ def calc_reversal_score(sym: str, data: dict[str, pd.DataFrame]) -> dict | None:
     }
 
 
+# ── Weakness Score ────────────────────────────────────────────────────────────
+
+def calc_weakness_score(sym: str, data: dict[str, pd.DataFrame]) -> dict | None:
+    """
+    Weakness Score (0-100)：做空候选板块排名（Rotation Score 的镜像）
+
+    前提过滤：RSI(14) < 35 的超跌标的反弹风险高，跳过（不适合做空）
+
+    因子：
+      +15  收盘价 < 50MA（短期破位）
+      +15  收盘价 < 200MA（长期趋弱）
+      +15  20 日收益 < SPY 20 日收益（跑输大盘）
+      +15  60 日收益 < SPY 60 日收益（中期跑输）
+      +15  ETF/SPY 相对强度 < 其 20 日均线（RS 趋弱）
+      +15  ETF/SPY 相对强度处于 20 日新低（±0.5%）
+      +10  成交量 > 20 日均量（放量下跌，确认卖盘）
+
+    Score ≥ 60 → "做空确认"；Score ≥ 40 → "弱势观察"；否则 "弱势不足"
+    """
+    df  = data.get(sym)
+    spy = data.get(BENCHMARK)
+    if df is None or spy is None or len(df) < 65:
+        return None
+
+    close    = df["Close"]
+    vol      = df["Volume"]
+    spy_c    = spy["Close"].reindex(close.index, method="ffill")
+
+    last     = float(close.iloc[-1])
+    sma50    = float(close.rolling(50).mean().iloc[-1])
+    sma200_v = close.rolling(200).mean().iloc[-1]
+    sma200   = float(sma200_v) if not pd.isna(sma200_v) else None
+
+    ret20_e  = float(close.pct_change(20).iloc[-1])
+    ret60_e  = float(close.pct_change(60).iloc[-1])
+    ret20_s  = float(spy_c.pct_change(20).iloc[-1])
+    ret60_s  = float(spy_c.pct_change(60).iloc[-1])
+
+    rs       = close / spy_c
+    rs_now   = float(rs.iloc[-1])
+    rs_sma   = float(rs.rolling(20).mean().iloc[-1])
+    rs_lo20  = float(rs.rolling(20).min().iloc[-1])
+
+    vol_now  = float(vol.iloc[-1])
+    vol_sma  = float(vol.rolling(20).mean().iloc[-1]) if vol.rolling(20).mean().iloc[-1] > 0 else 0
+
+    # RSI(14) — 超跌则跳过
+    delta = close.diff()
+    gain  = delta.clip(lower=0).rolling(14).mean()
+    loss  = (-delta.clip(upper=0)).rolling(14).mean()
+    rsi   = float((100 - 100 / (1 + gain / (loss + 1e-9))).iloc[-1])
+
+    if rsi < 35:
+        return {
+            "symbol": sym, "score": 0, "rsi": round(rsi, 1),
+            "close": round(last, 2),
+            "vs50ma": round((last / sma50 - 1) * 100, 1) if not pd.isna(sma50) else None,
+            "vs200ma": round((last / sma200 - 1) * 100, 1) if sma200 else None,
+            "rel20d": round((ret20_e - ret20_s) * 100, 1) if not (pd.isna(ret20_e) or pd.isna(ret20_s)) else 0.0,
+            "rel60d": round((ret60_e - ret60_s) * 100, 1) if not (pd.isna(ret60_e) or pd.isna(ret60_s)) else 0.0,
+            "phase": "超跌跳过",
+        }
+
+    score = 0
+    if not pd.isna(sma50)   and last < sma50:                               score += 15
+    if sma200 and last < sma200:                                             score += 15
+    if not pd.isna(ret20_e) and not pd.isna(ret20_s) and ret20_e < ret20_s: score += 15
+    if not pd.isna(ret60_e) and not pd.isna(ret60_s) and ret60_e < ret60_s: score += 15
+    if not pd.isna(rs_sma)  and rs_now < rs_sma:                            score += 15
+    if not pd.isna(rs_lo20) and rs_lo20 > 0 and (rs_now / rs_lo20) <= 1.005: score += 15
+    if vol_sma > 0 and vol_now > vol_sma:                                    score += 10
+
+    rel20 = (ret20_e - ret20_s) * 100 if not (pd.isna(ret20_e) or pd.isna(ret20_s)) else 0.0
+    rel60 = (ret60_e - ret60_s) * 100 if not (pd.isna(ret60_e) or pd.isna(ret60_s)) else 0.0
+
+    if score >= 60:
+        phase = "做空确认"
+    elif score >= 40:
+        phase = "弱势观察"
+    else:
+        phase = "弱势不足"
+
+    return {
+        "symbol":    sym,
+        "score":     score,
+        "rsi":       round(rsi, 1),
+        "close":     round(last, 2),
+        "vs50ma":    round((last / sma50 - 1) * 100, 1)   if not pd.isna(sma50) else None,
+        "vs200ma":   round((last / sma200 - 1) * 100, 1)  if sma200 else None,
+        "rel20d":    round(rel20, 1),
+        "rel60d":    round(rel60, 1),
+        "vol_ratio": round(vol_now / vol_sma, 2) if vol_sma > 0 else None,
+        "phase":     phase,
+    }
+
+
 # ── 输出 ─────────────────────────────────────────────────────────────────────
 
 REGIME_EMOJI = {
@@ -410,6 +507,27 @@ def print_reversal_table(rows: list[dict], top_n: int):
               f"{r['phase']}")
 
 
+def print_weakness_table(rows: list[dict], top_n: int):
+    active = [r for r in rows if r.get("phase") not in ("超跌跳过", "弱势不足")]
+    if not active:
+        print("  （无弱势标的）")
+        return
+    active = sorted(active, key=lambda x: -x["score"])[:top_n]
+    hdr = f"  {'标的':<6} {'类型':<10} {'分':>4} {'RSI':>5} {'收盘':>7} {'vs50MA':>7} {'vs200MA':>8} {'RS20d':>7} {'RS60d':>7}  阶段"
+    print(hdr)
+    print("  " + "─" * 78)
+    for r in active:
+        name = ETF_NAMES.get(r["symbol"], "")[:10]
+        print(f"  {r['symbol']:<6}  {name:<10} {r['score']:>3} "
+              f"  {r['rsi']:>5.1f}"
+              f"  {r['close']:>7.2f}"
+              f"  {_fmt(r['vs50ma']):>7}"
+              f"  {_fmt(r['vs200ma']):>8}"
+              f"  {_fmt(r['rel20d']):>7}"
+              f"  {_fmt(r['rel60d']):>7}"
+              f"  {r['phase']}")
+
+
 def print_group_summary(rotation_rows: list[dict]):
     print("\n  分组 Top3（轮动）：")
     for group, syms in ETF_GROUPS.items():
@@ -423,7 +541,7 @@ def print_group_summary(rotation_rows: list[dict]):
 
 
 def build_telegram_msg(regime: dict, rotation: list[dict], reversal: list[dict],
-                       top_n: int = 5) -> str:
+                       weakness: list[dict], top_n: int = 5) -> str:
     emoji  = REGIME_EMOJI.get(regime["regime"], "⚪")
     cn     = {"risk_on": "Risk-On", "neutral": "Neutral", "risk_off": "Risk-Off"}.get(regime["regime"], "?")
     vix_s  = f"  VIX:{regime['vix']}" if regime.get("vix") else ""
@@ -457,6 +575,22 @@ def build_telegram_msg(regime: dict, rotation: list[dict], reversal: list[dict],
                 f"  {r['symbol']:<5} {name:<10}  {r['score']}/100  "
                 f"RSI:{r['rsi']:.0f}  "
                 f"vs50MA:{_fmt(r['vs50ma'],'+ .1f','%')}  "
+                f"{r['phase']}"
+            )
+
+    # 做空候选
+    weak_active = sorted(
+        [r for r in weakness if r.get("phase") not in ("超跌跳过", "弱势不足")],
+        key=lambda x: -x["score"],
+    )[:top_n]
+    if weak_active:
+        lines.append(f"\n📉 弱势做空候选 Top{top_n}")
+        for r in weak_active:
+            name = ETF_NAMES.get(r["symbol"], "")
+            lines.append(
+                f"  {r['symbol']:<5} {name:<10}  {r['score']}/100  "
+                f"RS20d:{_fmt(r['rel20d'],'+ .1f','%')}  "
+                f"RS60d:{_fmt(r['rel60d'],'+ .1f','%')}  "
                 f"{r['phase']}"
             )
 
@@ -512,13 +646,17 @@ def main():
     # 3. 计算各 ETF 分数
     rotation_rows: list[dict] = []
     reversal_rows: list[dict] = []
+    weakness_rows: list[dict] = []
     for sym in ALL_ETFS:
         rot = calc_rotation_score(sym, data)
         rev = calc_reversal_score(sym, data)
+        wk  = calc_weakness_score(sym, data)
         if rot:
             rotation_rows.append(rot)
         if rev:
             reversal_rows.append(rev)
+        if wk:
+            weakness_rows.append(wk)
 
     # 4. 轮动强势榜
     print(f"\n{'─'*65}")
@@ -546,9 +684,15 @@ def main():
                 tags = "  ".join(f"{r['symbol']}({r['score']})" for r in g)
                 print(f"    {group:<8}: {tags}")
 
-    # 7. Telegram
+    # 7. 做空候选榜
+    print(f"\n{'─'*65}")
+    print("  📉 弱势做空候选（RSI≥35 才显示，RSI<35 超跌跳过）")
+    print(f"{'─'*65}")
+    print_weakness_table(weakness_rows, args.top)
+
+    # 8. Telegram
     if args.telegram:
-        msg = build_telegram_msg(regime, rotation_rows, reversal_rows, top_n=5)
+        msg = build_telegram_msg(regime, rotation_rows, reversal_rows, weakness_rows, top_n=5)
         send_telegram(msg)
 
     print(f"\n{bar}\n")
