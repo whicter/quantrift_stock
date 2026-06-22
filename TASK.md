@@ -46,12 +46,13 @@
 
 ### H — ETF 板块轮动扫描器（已完成）
 
-- [x] **`etf_scanner.py`**：Rotation Score（0-100 追强）+ Reversal Score（0-100 超跌反转），45 只 ETF，9 个分组，含 ETF 中文名称
+- [x] **`etf_scanner.py`**：Rotation Score（0-100 追强）+ Reversal Score（0-100 超跌反转）+ Weakness Score（0-100 做空候选），45 只 ETF，9 个分组，含 ETF 中文名称
 - [x] **`fetch_etf_data.py`**：IB Gateway 日线数据抓取器（45 ETF + SPY + QQQ + VIX），`data/{ETF}_1d.csv`，2年历史
 - [x] **IB VIX**：`fetch_etf_data.py --symbol VIX` → IB `Index('VIX','CBOE','USD')` 合约，`data/VIX_1d.csv`
 - [x] **ETF 替换**：IRBO（已退市） → ARTY；VPN（已退市） → DTCR
 - [x] **市场环境判断**：SPY 200MA + 20MA>50MA + QQQ/SPY 相对趋势 + VIX，输出 Risk-On / Neutral / Risk-Off
-- [x] **Telegram 推送**：`--telegram` 参数，输出轮动 Top5 + 超跌 Top5，含 ETF 名称
+- [x] **Telegram 推送**：`--telegram` 参数，输出轮动 Top5 + 超跌 Top5 + 做空候选 Top5，含 ETF 名称
+- [x] **Weakness Score（做空候选）**：`calc_weakness_score()`，Rotation Score 镜像因子（<50MA/200MA/跑输SPY20d/60d/RS趋弱/RS新低/放量下跌），RSI<35 超跌标的自动跳过，阶段标签：做空确认(≥60) / 弱势观察(≥40)
 
 **用法**（每周更新数据 + 随时扫描）：
 ```bash
@@ -101,5 +102,5 @@ rsync -av mac-studio:/Users/congrenhan/Documents/quantrift_stock/data/ data/
 - [x] RSI2 v2 成交量加分（vol_score）：回测验证 META/MSFT/GOOGL/MU 1d 各提升 +0.01~+0.05 Sharpe；已集成到 `rsi2_backtest.py` 和 `alert_engine.py`；SOXX/NVDA/MRVL 无效，未开启
 - [x] RSI2 v2 VIX 急升回落（vix_spike）：MSFT +0.075 / NVDA +0.070 / MU +0.062；ETF/META/GOOGL 无效；已集成
 - [x] **信号质量评分（0-10）**：Confluence = signal_pts(5) + adx_pts(2.5) + regime_pts(2.5)；RSI2 = rsi2_pts(4) + regime_pts(4) + vol_pts(1)；Telegram 标题显示 ⭐ N/10
-- [x] **ETF 板块轮动扫描器**：`etf_scanner.py` + `fetch_etf_data.py`，IB 数据，45 ETF，Rotation + Reversal 双评分，含 VIX（IB Index 合约）
+- [x] **ETF 板块轮动扫描器**：`etf_scanner.py` + `fetch_etf_data.py`，IB 数据，45 ETF，Rotation + Reversal + Weakness 三套评分，含 VIX（IB Index 合约）
 - [x] **信号去重**：`_sent_signals` dict，同一根 bar 的信号只发一次 Telegram
