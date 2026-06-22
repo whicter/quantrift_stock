@@ -244,6 +244,13 @@ def check_confluence_signal(df_raw: pd.DataFrame, params: dict,
     else:
         return None
 
+    # Confluence 信号质量评分（0-10）
+    active_score  = bull_score if direction == "做多" else bear_score
+    signal_pts    = active_score / 6.0 * 5.0
+    adx_pts       = min(2.5, max(0.0, (adx / adx_threshold - 1.0) * 2.5)) if adx_threshold > 0 else 0.0
+    regime_pts    = min(2.5, max(0.0, market_score / 4.0 * 2.5))
+    quality       = round(min(10, max(0, signal_pts + adx_pts + regime_pts)))
+
     return {
         "strategy":     "Confluence",
         "direction":    direction,
@@ -257,6 +264,7 @@ def check_confluence_signal(df_raw: pd.DataFrame, params: dict,
         "sl":           sl,
         "market_score": market_score,
         "vix":          vix_value,
+        "quality":      quality,
     }
 
 
@@ -389,6 +397,16 @@ def check_rsi2_signal(df_raw: pd.DataFrame, symbol: str, tf: str,
 
     sl = last_close - atr_trail_mult * last_atr
 
+    # RSI2 信号质量评分（0-10）
+    rsi2_pts   = max(0.0, 4.0 * (1.0 - last_rsi2 / entry_thresh)) if entry_thresh > 0 else 2.0
+    regime_pts = min(4.0, max(0.0, market_score))
+    vol_pts    = 1.0 if (use_vol_score and volume is not None
+                         and not math.isnan(float(volume.iloc[-1]))
+                         and not math.isnan(float(volume.rolling(20).mean().iloc[-1]))
+                         and float(volume.iloc[-1]) > float(volume.rolling(20).mean().iloc[-1]) * 1.5) else 0.0
+    vix_pts    = 0.0  # vix_spike 在上方已计算并加入 market_score，此处不重复加
+    quality    = round(min(10, max(0, rsi2_pts + regime_pts + vol_pts + vix_pts)))
+
     return {
         "strategy":     "RSI2",
         "direction":    "做多",
@@ -399,6 +417,7 @@ def check_rsi2_signal(df_raw: pd.DataFrame, symbol: str, tf: str,
         "sma200":       last_sma200,
         "sl":           sl,
         "vix":          vix_value,
+        "quality":      quality,
     }
 
 
@@ -416,8 +435,9 @@ def build_confluence_alert(symbol: str, tf: str, sig: dict) -> str:
     d = sig["direction"]
     emoji = "📈" if d == "做多" else "📉"
     ts = datetime.now().strftime("%Y-%m-%d %H:%M")
+    quality = sig.get("quality", 0)
     return (
-        f"{emoji} {symbol} {tf} {d}信号 [Confluence]\n"
+        f"{emoji} {symbol} {tf} {d}信号 [Confluence]  ⭐ {quality}/10\n"
         f"  价格: ${sig['close']:.2f}  ATR: ${sig['atr']:.2f}\n"
         f"  Bull: {sig['bull_score']}/6  Bear: {sig['bear_score']}/6  ADX: {sig['adx']:.1f}\n"
         f"  TP1: ${sig['tp1']:.2f}  TP2: ${sig['tp2']:.2f}\n"
@@ -430,8 +450,9 @@ def build_confluence_alert(symbol: str, tf: str, sig: dict) -> str:
 def build_rsi2_alert(symbol: str, tf: str, sig: dict) -> str:
     ts = datetime.now().strftime("%Y-%m-%d %H:%M")
     p = RSI2_PARAMS.get((symbol, tf), {})
+    quality = sig.get("quality", 0)
     return (
-        f"📊 {symbol} {tf} 做多信号 [RSI2 v2]\n"
+        f"📊 {symbol} {tf} 做多信号 [RSI2 v2]  ⭐ {quality}/10\n"
         f"  价格: ${sig['close']:.2f}  ATR: ${sig['atr']:.2f}\n"
         f"  RSI2: {sig['rsi2']:.1f}  SMA200: ${sig['sma200']:.2f}\n"
         f"  SL(ATR trail ×{p.get('atr_trail_mult', 2.5)}): ${sig['sl']:.2f}\n"
