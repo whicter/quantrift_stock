@@ -112,13 +112,13 @@ RSI2_PARAMS: dict[tuple[str, str], dict] = {
     ("SMH",  "4h"): {"rsi2_entry": 5,  "atr_trail_mult": 2.5, "min_market_score": 2, "use_rs_filter": False, "use_pullback_filter": True},
     ("GOOGL","1h"): {"rsi2_entry": 5,  "atr_trail_mult": 2.5, "min_market_score": 1},
     ("GOOGL","4h"): {"rsi2_entry": 5,  "atr_trail_mult": 3.0, "min_market_score": 3},
-    ("GOOGL","1d"): {"rsi2_entry": 15, "atr_trail_mult": 2.0, "min_market_score": 2},
+    ("GOOGL","1d"): {"rsi2_entry": 15, "atr_trail_mult": 2.0, "min_market_score": 2, "use_vol_score": True},
     ("META", "1h"): {"rsi2_entry": 5,  "atr_trail_mult": 2.0, "min_market_score": 3, "use_pullback_filter": True},
-    ("META", "1d"): {"rsi2_entry": 5,  "atr_trail_mult": 2.5, "min_market_score": 2},
-    ("MSFT", "1d"): {"rsi2_entry": 5,  "atr_trail_mult": 2.5, "min_market_score": 1},
+    ("META", "1d"): {"rsi2_entry": 5,  "atr_trail_mult": 2.5, "min_market_score": 2, "use_vol_score": True},
+    ("MSFT", "1d"): {"rsi2_entry": 5,  "atr_trail_mult": 2.5, "min_market_score": 1, "use_vol_score": True},
     ("MSFT", "4h"): {"rsi2_entry": 15, "atr_trail_mult": 2.0, "min_market_score": 1},
     ("NVDA", "1d"): {"rsi2_entry": 5,  "atr_trail_mult": 2.0, "min_market_score": 1},
-    ("MU",   "1d"): {"rsi2_entry": 5,  "atr_trail_mult": 3.0, "min_market_score": 3},
+    ("MU",   "1d"): {"rsi2_entry": 5,  "atr_trail_mult": 3.0, "min_market_score": 3, "use_vol_score": True},
     ("MRVL", "1d"): {"rsi2_entry": 15, "atr_trail_mult": 2.0, "min_market_score": 2},
     ("QQQ",  "1d"): {"rsi2_entry": 10, "atr_trail_mult": 3.0, "min_market_score": 1, "use_rs_filter": False},
     ("SPY",  "1d"): {"rsi2_entry": 15, "atr_trail_mult": 3.0, "min_market_score": 1, "use_rs_filter": False},
@@ -288,6 +288,7 @@ def check_rsi2_signal(df_raw: pd.DataFrame, symbol: str, tf: str,
     min_mkt_score  = int(p.get("min_market_score",    2))
     use_rs_filter  = bool(p.get("use_rs_filter",      True))
     use_pullback   = bool(p.get("use_pullback_filter", False))
+    use_vol_score  = bool(p.get("use_vol_score",      False))
     atr_trail_mult = float(p.get("atr_trail_mult",    2.5))
 
     sma200  = _sma(close, 200)
@@ -295,6 +296,8 @@ def check_rsi2_signal(df_raw: pd.DataFrame, symbol: str, tf: str,
     sma20   = _sma(close, 20)
     rsi2    = _rsi2_series(close)
     atr_val = _atr(high, low, close, 14)
+
+    volume = df_raw["Volume"].replace(0, np.nan) if "Volume" in df_raw.columns else None
 
     last_close  = float(close.iloc[-1])
     last_rsi2   = float(rsi2.iloc[-1])
@@ -342,6 +345,12 @@ def check_rsi2_signal(df_raw: pd.DataFrame, symbol: str, tf: str,
         # VIX 分量（有数据时加入，最高分 4→5，阈值含义不变）
         if vix_value is not None and not math.isnan(vix_value):
             market_score -= float(vix_value > 20)
+        # 成交量放量加分（Mega-cap / MU 专用）
+        if use_vol_score and volume is not None:
+            vol_avg = volume.rolling(20).mean()
+            vol_surge = float(volume.iloc[-1]) > float(vol_avg.iloc[-1]) * 1.5
+            if vol_surge and not math.isnan(float(vol_avg.iloc[-1])):
+                market_score += 1.0
         if math.isnan(market_score):
             market_score = 0.0
 

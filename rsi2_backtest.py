@@ -97,6 +97,7 @@ GRID = {
     "max_hold_bars":       [5, 10, 15],
     "min_market_score":    [1, 2, 3],
     "use_pullback_filter": [False, True],
+    "use_vol_score":       [False, True],   # 成交量放量加分（vol > 20日均量 × 1.5）
 }
 
 # 出场模型对比（--compare-exit）
@@ -136,6 +137,13 @@ def compute_signals(df: pd.DataFrame, params: dict,
     result["pullback_ok"] = (
         (close > result["sma100"]) & (close < result["sma20"])
     ).astype(float)
+
+    # 成交量放量：当日量 > N 日均量 × mult（用于入场加分）
+    volume  = df["Volume"].replace(0, np.nan)
+    vol_len = int(params.get("vol_len", 20))
+    vol_mult = float(params.get("vol_mult", 1.5))
+    vol_avg = volume.rolling(vol_len).mean()
+    result["vol_surge"] = (volume > vol_avg * vol_mult).astype(float).fillna(0)
 
     # ── Market Regime Score + RS 过滤 ────────────────────────────────────
     if df_qqq is not None and not is_benchmark:
@@ -199,6 +207,7 @@ class RSI2Strategy(Strategy):
     use_rs_filter:       bool  = True
     use_pullback_filter: bool  = True
     use_split_exit:      bool  = True    # True=模型C，False=模型A
+    use_vol_score:       bool  = False   # 成交量放量时 market_score +1
     n_contracts:         int   = 0       # 0=全仓，支持 position.close(0.5)
     contract_size:       int   = 1
 
@@ -265,9 +274,11 @@ class RSI2Strategy(Strategy):
         if rsi2 >= self.rsi2_entry:
             return
 
-        # Market Regime Score
+        # Market Regime Score（+ 可选成交量加分）
         if self.use_qqq_filter:
             score = float(self.data.market_score[-1])
+            if self.use_vol_score:
+                score += float(self.data.vol_surge[-1])
             if math.isnan(score) or score < self.min_market_score:
                 return
 
@@ -304,6 +315,7 @@ def set_params(p: dict):
     _S.use_rs_filter       = bool(p.get("use_rs_filter", True))
     _S.use_pullback_filter = bool(p.get("use_pullback_filter", True))
     _S.use_split_exit      = bool(p.get("use_split_exit", True))
+    _S.use_vol_score       = bool(p.get("use_vol_score", False))
     _S.n_contracts         = int(p.get("n_contracts", 0))
     _S.contract_size       = int(p.get("contract_size", 1))
 
@@ -457,9 +469,10 @@ def run_optimize_mode(symbols, tfs):
             print(f"    {sym} {tf}: 完成  最优 Sharpe={best_sharpe:.3f}" + " " * 20)
             if best_result:
                 bc = best_combo
+                vol_tag = "  vol✓" if bc.get("use_vol_score") else ""
                 print(f"  最优 | entry={bc['rsi2_entry']}"
                       f"  trail={bc['atr_trail_mult']}×  hold≤{bc['max_hold_bars']}"
-                      f"  score≥{bc['min_market_score']}"
+                      f"  score≥{bc['min_market_score']}{vol_tag}"
                       f"  → Sharpe={best_result['sharpe']:.3f}  WR={best_result['wr']:.1f}%"
                       f"  RR={best_result['rr']:.2f}  N={best_result['n']}")
                 all_best.append({"symbol": sym, "tf": tf, **bc, **best_result})
