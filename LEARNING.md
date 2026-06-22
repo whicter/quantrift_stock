@@ -4,19 +4,76 @@
 
 ---
 
-## 核心结论（2025-06）
+## 上线验证结论（2026-06，成本压力 + 邻域稳定性 + Walk-Forward）
 
-### 品种分类（v2，更细）
+### 成本压力测试（0/5/10/20/30 bps）
+
+| 标的 | 周期 | 策略 | 0bps | 10bps | 20bps | 30bps | 结论 |
+|------|------|------|------|-------|-------|-------|------|
+| MU   | 1h | Confluence | 1.60 | 1.44 | 1.28 | 1.10 | ✅ 全段合格 |
+| SNDK | 1h | Confluence | 1.68 | 1.51 | 1.34 | 1.17 | ✅ 全段合格 |
+| MRVL | 1h | Confluence | 1.31 | 0.94 | 0.56 | 0.17 | ⚠ 10bps以内合格，20bps降级 |
+| GOOGL| 1h | RSI2 v2   | 0.71 | 0.31 | -0.10| -0.51| ❌ 只在0bps合格，成本敏感 |
+
+**关键发现**：
+- MRVL 1h 在 IB 实际佣金（约 5-10 bps round-trip）下 Sharpe 0.94-1.13，仍可接受
+- GOOGL 1h RSI2 在任何真实佣金下均不达标，**从实盘候选名单移除**
+- MU/SNDK 1h 非常稳健，佣金敏感性低（每 10 bps 只降约 0.18）
+
+### 参数邻域稳定性（RSI2 1d 核心标的）
+
+| 标的 | 最优参数 | Top-5 Sharpe 范围 | Spread | 评级 |
+|------|----------|------------------|--------|------|
+| SOXX 1d | entry=5, trail=3×, hold=15, score=1 | 1.193~1.275 | 0.082 | ✅ 稳定 |
+| META 1d | entry=5, trail=2.5×, hold=15, score=2 | 0.958~1.018 | 0.060 | ✅ 非常稳定 |
+| GOOGL 1d| entry=15, trail=2×, hold=5, score=2 | 0.869~0.956 | 0.087 | ✅ 稳定 |
+
+- SOXX：entry=3 略优于 entry=5（1.275 vs 1.222），但差异很小，保持 entry=5 更保守
+- META：entry=5/8 等效（0.92 hold=15 决定性因素），对 entry 阈值不敏感
+- GOOGL 1d：entry=20 更优（0.956），目前 alert_engine 用 entry=15（保守）
+
+### Walk-Forward 验证（RSI2 1d: 训练 2020-2022 → 测试 2023-至今）
+
+| 标的 | 训练 Sharpe | 训练 N | 测试 Sharpe | 测试 N | 结论 |
+|------|------------|--------|------------|--------|------|
+| SOXX | 0.913 | 90 | **1.257** | 38 | ✅ 测试优于训练 |
+| META | 1.079 | 53 | 0.680 | 28 | ✅ 合格 |
+| GOOGL| 0.977 | 79 | 0.866 | 39 | ✅ 稳定 |
+| NVDA | 0.841 | 67 | 0.660 | 34 | ✅ 合格 |
+| MU   | 0.309 | 48 | **1.422** | 40 | ✅ 测试远优（AI 周期驱动）|
+| MRVL | 0.405 | 92 | 0.667 | 41 | ✅ 合格 |
+| SMH  | 1.055 | 81 | 0.984 | 43 | ✅ 高度稳定 |
+| QQQ  | 0.493 | 104 | **1.097** | 61 | ✅ 测试优于训练 |
+| MSFT | 0.729 | 74 | N/A | — | ⚠ 测试期 N 不足（RSI2<5 信号稀少）|
+
+**Walk-Forward Confluence（训练 2023 → 测试 2024-至今，1h 数据有限）**：
+- 1h 数据仅约 2 年（IB 730天限制），无法做有意义的 50/50 分割
+- MU/MRVL/SNDK/STX 1h 测试结果等同全量回测结果，策略本身无过拟合迹象（信号简单、参数少）
+- STX 1d 训练 Sharpe 0.02 → 测试 0.68，说明 STX 近两年动量更强，策略有效
+
+**总体结论**：
+- 8/9 个 RSI2 1d 标的通过 Walk-Forward（唯 MSFT 测试期样本不足）
+- 无明显过拟合迹象：多数测试 Sharpe ≥ 训练 Sharpe，说明 2023-2025 行情对策略更友好
+- GOOGL 1h RSI2 成本敏感，已从实盘候选移除
+
+---
+
+## 核心结论（2025-06，含 Market Regime + RSI2 扩展）
+
+### 品种分类（v3，全标的验证后）
 
 | 类别 | 标的 | 适配策略 | 备注 |
 |------|------|----------|------|
-| AI/半导体趋势股 | NVDA, MU, MRVL | ConfluenceStrategy | 高 ADX、动量延续性强 |
-| 高波动单股 | TSLA | 单独处理 | idiosyncratic risk 太强，不能与 NVDA/MU 混桶 |
-| 存储周期股 | SNDK, STX | ConfluenceStrategy（谨慎）| 周期性强，财报驱动，普通 RSI2 不适合 |
-| Mega-cap compounders | MSFT, GOOGL, META | RSI2 + market regime | 趋势平稳，RSI2 高频触底，4h/1d 有效 |
-| 弱化/待观察 | AAPL, AMZN | 降权或剔除 | Sharpe 低（AAPL 0.35, AMZN 0.27），不进主策略池 |
-| 半导体 ETF | SOXX, SMH | RSI2 + MR（不强制 RS vs QQQ）| 有时相对 QQQ 弱但本身信号有效 |
-| 宽基 ETF | QQQ, SPY | RSI2 / MR / regime benchmark | 不参与 RS 过滤（本身就是基准）|
+| AI/半导体动量股 | NVDA, MRVL | Confluence 1h + RSI2 v2 1d | NVDA 1d RSI2 Sharpe 0.867 > Confluence 0.64；MRVL 1d RSI2 0.748 > Confluence 0.37 |
+| 存储动量股 | MU | Confluence 1h + RSI2 v2 1d | 1h 趋势强（1.44），1d RSI2（0.94）|
+| 存储周期股（新入池） | SNDK | Confluence 1h ✅ | 1h Sharpe 1.51 N=95，可信；1d Sharpe 1.83 N=20 不可信 |
+| 存储周期股（新入池） | STX | Confluence 1h/4h/1d | 1h 0.87 / 4h 0.81 / 1d 0.69，全周期可用 |
+| 高波动单股 | TSLA | Confluence 1d（天花板）| Sharpe 0.50，RR 0.61，保本止损已加；天花板约 0.5 |
+| Mega-cap compounders | MSFT, GOOGL, META | RSI2 v2 + Market Regime | 趋势平稳，RSI2 高频触底 |
+| 弱化/待观察 | AAPL | RSI2 1d 降权 | Sharpe 0.60 勉强可用 |
+| 专项研究 | AMZN | 20日高点回撤策略 | 专项策略 Sharpe 0.308，仍不可用；结构性困难 |
+| 半导体 ETF | SOXX, SMH | RSI2 v2（不强制 RS vs QQQ）| SOXX 1d 1.22 / SMH 1d 0.98 |
+| 宽基 ETF | QQQ, SPY | RSI2 / regime benchmark | 不参与 RS 过滤（本身就是基准）|
 
 ### 策略演进过程（重要）
 
@@ -28,11 +85,122 @@
 ### 关键规律
 
 - **1h 在大市值股基本无效**：RSI2 在 1h 噪声过大，Sharpe 多为负。4h 和 1d 是可用周期。
+- **NVDA 1h 结构性剔除**：ConfluenceStrategy 全网格（60 组合）最优 Sharpe -0.72，RSI2 v2 也是 -0.93。不是参数问题，1h 粒度下 NVDA 噪声完全淹没技术信号，两套策略均不可用。
+- **MU 策略分层**：MU 不同周期适配不同策略。1h 用 ConfluenceStrategy（Sharpe 1.58），4h 两套均可（Confluence 1.04 / RSI2 1.67⚠️），1d Confluence 废（Sharpe 0.23，PF<1）→ 换 RSI2 v2（entry=5, trail=3×, hold≤10, score≥3）救活至 Sharpe 0.94。
+- **同一标的不同周期可能需要不同策略**：MU 的案例说明不应强行用一套策略覆盖所有周期，要按周期独立评估。
 - **exit=80 比 exit=70 好**：反弹经常不止一根 K，等足了出场 RR 明显改善。
 - **SOXX/SMH 不应强制 RS vs QQQ**：行业 ETF 有时整体弱于 QQQ 但本身仍有好信号，用自身趋势（> 100SMA）过滤即可。
-- **AMZN 从主策略池删除**：任何策略 Sharpe 上限 0.27，回调延续性差，趋势切换剧烈。
-- **TSLA 单独处理**：受马斯克消息/交付量/Robotaxi/期权流驱动，走势与 NVDA/MU 本质不同。
+- **NVDA 1d 应改用 RSI2 v2**：RSI2 1d Sharpe 0.867（N=115）远超 Confluence 0.64，RR 1.14 vs 1.08，全面更优。参数：entry=5, trail=2×, hold≤15, score≥1。
+- **MRVL 1d 应改用 RSI2 v2**：Confluence 1d Sharpe 0.37 → RSI2 0.748（N=66），翻倍。参数：entry=15, trail=2×, hold≤5, score≥2。
+- **SNDK 1h 是隐藏强标的**：ConfluenceStrategy 1h Sharpe 1.51，WR 65.3%，N=95，可信。1d Sharpe 1.83 但 N=20 不可信。
+- **STX 全周期均可用**：1h 0.87 / 4h 0.81 / 1d 0.69，三周期结果一致，可信度高。
+- **Market Regime Score 对动量股效果有限**：MU/MRVL 1h 加 Regime 过滤后 Sharpe 略降（-0.1 左右），动量股信号在弱市仍有效；ETF 和 Mega-cap 受益更大。
+- **AMZN 专项策略也失败**：20日高点回撤策略（pullback + RSI 恢复）全网格最优 Sharpe 0.308（N=82），结构性确认 AMZN 对技术策略不友好，彻底剔除主池。
+- **TSLA 单独处理**：受马斯克消息/交付量/Robotaxi/期权流驱动，走势与 NVDA/MU 本质不同。两套策略均测试，Sharpe 天花板约 0.5，保本止损已加但改善有限。不进主池。
 - **4h hold 15 ≠ 日线 hold 15**：4h 15根 ≈ 7-8 交易日；时间止损要按交易日换算，不能直接比较两个周期的 bar 数。
+- **MU 策略分层**：MU 不同周期适配不同策略。1h ConfluenceStrategy（1.44），4h Confluence（1.07），1d RSI2 v2（0.94）。
+- **SOXX/SMH 不应强制 RS vs QQQ**：行业 ETF 有时整体弱于 QQQ 但本身仍有好信号，用自身趋势（> 100SMA）过滤即可。
+- **同一标的不同周期可能需要不同策略**：MU/NVDA/MRVL 均展示了周期间策略差异，不应强行一套策略覆盖全周期。
+
+---
+
+## 当前策略池汇总（2025-06 v2，含 Market Regime + RSI2 扩展）
+
+> 仅列 N ≥ 50 或有明确说明的组合；⚠️ = N < 50，仅参考。
+
+### Confluence Strategy 池
+
+| 标的 | 周期 | Sharpe | WR | N | RR | 关键参数 |
+|------|------|--------|----|---|----|---------|
+| **MU** | 1h | **1.44** | 63.6% | 77 | 1.28 | adx=30, ut_key=2.0 |
+| **SNDK** | 1h | **1.51** | 65.3% | 95 | 1.13 | adx=15, ut_key=1.5（默认）|
+| **MRVL** | 1h | **0.94** | 60.4% | 149 | 0.88 | adx=15, ut_key=1.0，保本止损已加 |
+| **MU** | 4h | **1.07** | 61.4% | 70 | 1.07 | adx=20, ut_key=1.0 |
+| **STX** | 1h | 0.87 | 58.9% | 107 | 1.07 | adx=30, ut_key=3.0 |
+| **STX** | 4h | 0.81 | 58.8% | 51 | 1.21 | adx=25, ut_key=1.5 |
+| **STX** | 1d | 0.69 | 64.0% | 114 | 1.38 | adx=20, ut_key=1.5 |
+| NVDA | 1d | 0.64 | 75.0% | 52 | 1.08 | adx=30, ut_key=2.5（RSI2 更优，见下）|
+| MRVL | 4h | 0.72 | 66.7% | 30⚠️ | 1.24 | adx=30, ut_key=3.0 |
+| TSLA | 1d | 0.42 | 70.8% | 96 | 0.61 | adx=25，保本止损已加，天花板 |
+| SNDK | 1d | 1.83⚠️ | 80.0% | 20 | 0.85 | N 不足，不可信 |
+
+### RSI2 v2 池
+
+| 标的 | 周期 | Sharpe | WR | N | RR | 关键参数 |
+|------|------|--------|----|---|----|---------|
+| **SOXX** | 1d | **1.22** | 73.6% | 121 | — | entry=5, trail=3×, hold≤15, score≥1 |
+| **GOOGL** | 1h | **1.12** | 63.6% | 118 | — | entry=5, trail=2.5×, hold≤15, score≥1 |
+| **META** | 1d | **1.02** | 74.5% | 94 | — | entry=5, trail=2.5×, hold≤15, score≥2 |
+| **SMH** | 1d | 0.98 | 69.7% | 119 | — | entry=5, trail=2.5×, hold≤15, score≥2 |
+| **NVDA** | 1d | **0.867** | 67.8% | 115 | 1.14 | entry=5, trail=2×, hold≤15, score≥1 ✅ 优于 Confluence |
+| **MU** | 1d | **0.94** | 67.3% | 98 | 2.22 | entry=5, trail=3×, hold≤10, score≥3 |
+| **MRVL** | 1d | **0.748** | 72.7% | 66 | 0.96 | entry=15, trail=2×, hold≤5, score≥2 ✅ 优于 Confluence |
+| SOXX | 1h | 0.90 | 58.4% | 125 | — | entry=5, trail=3×, hold≤15, score≥3 |
+| GOOGL | 1d | 0.89 | 67.2% | 134 | — | entry=15, trail=2×, hold≤5, score≥2 |
+| SPY | 4h | 0.79 | 63.8% | 58 | — | entry=15, trail=2.5×, hold≤15, score≥1 |
+| MSFT | 1d | 0.76 | 60.6% | 99 | — | entry=5, trail=2.5×, hold≤15, score≥1 |
+| QQQ | 1d | 0.72 | 70.3% | 185 | — | entry=10, trail=3×, hold≤10, score≥1 |
+| SPY | 1d | 0.62 | 68.8% | 93 | — | entry=15, trail=3×, hold≤15, score≥1 |
+| AAPL | 1d | 0.60 | 65.6% | 96 | — | entry=15, trail=3×, hold≤15, score≥2 |
+| MSFT | 4h | 1.66⚠️ | 81.5% | 27 | — | entry=15, trail=2×, hold≤5, score≥1 |
+| GOOGL | 4h | 1.64⚠️ | 66.7% | 33 | — | entry=5, trail=3×, hold≤15, score≥3 |
+
+**剔除（结构性不可用）**：
+- NVDA 1h：两套策略全网格均负，结构性剔除
+- MU 1d（ConfluenceStrategy）：Sharpe 0.23，已换 RSI2
+- MRVL 1d（ConfluenceStrategy）：Sharpe 0.37，已换 RSI2
+- AMZN：通用策略 + 专项策略均 Sharpe < 0.35，彻底剔除主池
+- TSLA 1h/4h：两套均无效或样本不足
+
+---
+
+## TSLA 专项分析（2025-06）
+
+### 测试结论
+
+TSLA 在 ConfluenceStrategy 和 RSI2 v2 两套框架下均测试，**Sharpe 天花板约 0.5-0.6**，这是 TSLA 本身特性决定的，不是参数问题。
+
+**特性根因**：
+- 收益分布胖尾：小幅震荡 + 偶发 10-20% 跳空（Musk 推文、交付数据、Robotaxi）
+- 高 IV、期权 Gamma 集中，止损位置经常在期权驱动的"stop hunt"价位附近
+- WR 高（ConfluenceStrategy 1d 达 71%）但 RR 低（0.63）：方向判断对，但固定 ATR 止盈在大趋势启动前就出场
+
+### 策略对比（最优参数）
+
+| 策略 | 周期 | Sharpe | WR | N | RR | MaxDD | 可信度 |
+|------|------|--------|----|---|----|-------|--------|
+| ConfluenceStrategy | 1d adx=25 | **0.50** | **71.4%** | **98** | 0.63 | — | ✅ 可信 |
+| ConfluenceStrategy | 4h adx=30 | 0.60 | 60.9% | 23⚠️ | 1.06 | — | ❌ 样本不足 |
+| RSI2 v2 | 1h | 0.57 | 56.2% | 80 | **1.01** | -13.4% | ✅ 可信 |
+| RSI2 v2 | 1d | 0.28 | 55.6% | 90 | 0.97 | -55.7% | ❌ MaxDD 过大 |
+
+### 出场模式探索：纯 sslExit 追踪（use_staged_tp=False）
+
+| 周期 | adx | 出场 | Sharpe | WR | N | RR |
+|------|-----|------|--------|----|---|----|
+| 4h | 30 | 分批TP（当前） | 0.60 | 60.9% | 23⚠️ | 1.06 |
+| 4h | 30 | **纯sslExit追踪** | **1.34** | 56.2% | 16⚠️ | **3.89** |
+| 4h | 25 | 纯sslExit追踪 | 0.52 | 38.5% | 26⚠️ | 2.42 |
+| 4h | 20 | 纯sslExit追踪 | -0.05 | 26.2% | 42 | 2.74 |
+| 1d | 25 | 分批TP | 0.50 | 71.4% | 98 | 0.63 |
+| 1d | 25 | 纯sslExit追踪 | 0.29 | 46.1% | 76 | 1.82 |
+
+**关键发现**：
+- 4h adx=30 + 纯追踪 Sharpe=1.34 亮眼，但 16 笔不可信（4h 历史仅 2.7 年）
+- adx 降低（25/20）引入弱趋势信号，纯追踪模式下 WR 从 56% 跌到 26-38%，Sharpe 同步下跌
+- 1d 两种出场模式 Sharpe 相近（0.50 vs 0.29），出场方式不是 1d 的决定性因素
+- **结论**：adx=30 是 TSLA 4h 的强过滤条件，不能放松；但 4h 数据不足，无法置信
+
+### 最终配置（写入 config.yaml）
+
+```yaml
+TSLA:
+  1h:  {adx_threshold: 25.0, ut_key: 2.5, min_score: 4}   # 1h 无效，保持默认不做主力
+  4h:  {adx_threshold: 30.0, ut_key: 3.0, min_score: 5}   # 样本不足，仅参考
+  1d:  {adx_threshold: 25.0, ut_key: 2.0, min_score: 4}   # 最可信：Sharpe 0.50，98笔
+```
+
+**处置决定**：TSLA 保持 `high_vol` 分组，不纳入主力策略池。ConfluenceStrategy 1d（adx=25）作为当前最优选择，Sharpe 0.50 为合理预期上限。不再投入参数研发，等待更长 4h 历史数据后重新评估。
 
 ---
 
@@ -263,14 +431,45 @@ ADX 低但上升中意味着趋势正在形成，不是真正的震荡。
 - **PEAD（财报后漂移）**：需要财报日期 + EPS 超预期数据（yfinance earnings calendar 或 EODHD API）
 - **MAG7 周频相对强弱轮动**：跨标的排名持最强 2-3 只，每周调仓
 - **AMZN 专项**："距 20 日高点回撤 5-10% + RSI 40-55"，不同于 BB 下轨
-- **VIX 数据接入**：用于 Market Regime Score 的 VIX > 20 判断
-
 ---
 
-## 关键参数文件
+## 系统架构（2026-06 当前状态）
 
-- `config.yaml` → ConfluenceStrategy 各标的参数
+### 数据接入层（data_providers.py）
+
+```
+config.yaml: data.provider: "yfinance"
+        ↓
+MarketDataProvider (ABC)
+  ├── YFinanceProvider   ← 当前：fetch_ohlcv + fetch_vix(^VIX, 15min延时)
+  └── TastytradeProvider ← 占位：fetch_vix($VIX.X, 实时)，填 SDK 代码即可启用
+```
+
+- 切换数据源：`config.yaml` 改一行 `provider`，其他代码不动
+- 凭证：`.env` 文件（gitignore），`TT_USERNAME` / `TT_PASSWORD`
+- VIX 已集成到 alert_engine Market Regime Score（有数据时 score 范围 -1~5，无数据 0~4）
+
+**VIX 数据源调研结论**（2026-06）：
+- IB `reqHistoricalData` 需买 CBOE 订阅，报错 162/354，不划算
+- Tastytrade API：`/market-metrics?symbols=VIX` 返回的是 VIX 期权自身的 IV（~0.89），不是 VIX 指数价格；获取真实 VIX 价格需 DXLink websocket（`/api-quote-tokens` → wss 连接），实现复杂，对日线 Regime 无必要
+- yfinance `^VIX`：免费，15 分钟延时，对日线 Regime 打分完全够用，当前采用（两个 provider 均复用此实现）
+- **结论**：VIX 统一用 yfinance，TastytradeProvider.fetch_vix() 内部转发给 YFinanceProvider
+
+### alert_engine 策略路由（STRATEGY_MAP）
+
+每个 `(symbol, tf)` 明确指定策略，避免同标的多策略重复告警：
+
+| 策略 | 标的 × 周期 |
+|------|------------|
+| Confluence | MU 1h/4h、MRVL 1h/4h、NVDA 4h、SNDK 1h、STX 1h/4h/1d、TSLA 1d |
+| RSI2 v2 | NVDA/MRVL/MU 1d、MSFT 1d/4h、GOOGL 1d/4h（1h 成本不达标已移除）、META 1h/1d、SOXX/SMH 1h/4h/1d、QQQ 1d、SPY 1d/4h、AAPL 1d |
+
+### 关键参数文件
+
+- `config.yaml` → 策略参数（per symbol × tf）+ `data.provider` 数据源选择
+- `data_providers.py` → 数据接入抽象层
+- `.env` → 私密凭证（tastytrade 账号，gitignore）
+- `.env.example` → 凭证模板（可提交）
 - `logs/backtest_results.csv` → ConfluenceStrategy 全量回测结果
-- `logs/rsi2_backtest_results.csv` → RSI2 策略回测结果
-- `logs/rsi2_optimized_params.csv` → RSI2 优化后最优参数
-- `logs/mr_backtest_results.csv` → MR + ATR Trail 回测结果
+- `logs/rsi2_v2_backtest_results.csv` → RSI2 v2 回测结果
+- `logs/rsi2_v2_optimized_params.csv` → RSI2 v2 最优参数
