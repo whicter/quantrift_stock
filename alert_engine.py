@@ -100,6 +100,10 @@ STRATEGY_MAP: dict[tuple[str, str], str] = {
     ("SPY",  "4h"): "rsi2",
     ("SPY",  "1d"): "rsi2",
     ("AAPL", "1d"): "rsi2",
+    # PLTR — RSI2 全周期（Confluence 全周期为负）
+    ("PLTR", "1h"): "rsi2",
+    ("PLTR", "4h"): "rsi2",
+    ("PLTR", "1d"): "rsi2",
 }
 
 # RSI2 最优参数（来自 LEARNING.md 网格优化结果）
@@ -124,6 +128,10 @@ RSI2_PARAMS: dict[tuple[str, str], dict] = {
     ("SPY",  "1d"): {"rsi2_entry": 15, "atr_trail_mult": 3.0, "min_market_score": 1, "use_rs_filter": False},
     ("SPY",  "4h"): {"rsi2_entry": 15, "atr_trail_mult": 2.5, "min_market_score": 1, "use_rs_filter": False},
     ("AAPL", "1d"): {"rsi2_entry": 15, "atr_trail_mult": 3.0, "min_market_score": 2},
+    # PLTR — 网格最优参数（2026-06，N=25/109/36）
+    ("PLTR", "1d"): {"rsi2_entry": 10, "atr_trail_mult": 2.0, "min_market_score": 1, "use_vol_score": True},
+    ("PLTR", "1h"): {"rsi2_entry": 5,  "atr_trail_mult": 3.0, "min_market_score": 3},
+    ("PLTR", "4h"): {"rsi2_entry": 10, "atr_trail_mult": 3.0, "min_market_score": 1},
 }
 
 BENCHMARK_SYMBOLS  = {"QQQ", "SPY"}

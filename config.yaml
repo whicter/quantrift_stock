@@ -26,7 +26,7 @@ symbols:
   storage:     [SNDK, STX]
 
   # Mega-cap compounders：RSI2 + Market Regime Score + RS 过滤（4h/1d）
-  mega_cap:    [MSFT, GOOGL, META]
+  mega_cap:    [MSFT, GOOGL, META, PLTR]
 
   # 弱化/待观察：RSI2 Sharpe 低，暂不纳入主策略池
   watch:       [AAPL]
@@ -279,3 +279,8 @@ symbol_params:
     1h:  {adx_threshold: 15.0, ut_key: 2.0, min_score: 5}
     4h:  {adx_threshold: 15.0, ut_key: 1.5, min_score: 5}
     1d:  {adx_threshold: 30.0, ut_key: 2.0, min_score: 4}
+  PLTR:
+    # RSI2 主力策略：1d Sharpe 0.863 / 1h 0.641 / 4h 0.606；Confluence 全周期为负
+    1h:  {adx_threshold: 20.0, ut_key: 2.0, min_score: 4}
+    4h:  {adx_threshold: 20.0, ut_key: 2.5, min_score: 4}
+    1d:  {adx_threshold: 20.0, ut_key: 2.5, min_score: 4}
