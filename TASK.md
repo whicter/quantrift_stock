@@ -34,7 +34,9 @@
 - [x] Market Regime Score ≤ 1 时告警通知包含评分，人工判断是否执行
 - [x] 多信号优先级：消息标注标的/周期/策略，不做代码层强制去重
 - [x] **信号去重**：同一根 bar 触发的信号只发一次 Telegram，`_sent_signals` dict 记录 `(symbol, tf, strategy, direction) → bar_date`，新 bar 出现才重新判断
-- [x] **重启去重持久化**：`_sent_signals` 写入 `data/.sent_signals.json`，启动时加载（只保留当天记录），重启后不重复发送同一根 bar 的信号
+- [x] **重启去重持久化**：`_sent_signals` 写入 `data/.sent_signals.json`，启动时加载（保留最近 7 天记录，覆盖周末重启场景），重启后不重复发送同一根 bar 的信号
+- [x] **做空 Regime 过滤**：`max_market_score_short: 2`（config.yaml 三周期），market_score ≥ 3 时 Confluence 做空信号被自动过滤，防止强牛市逆势做空
+- [x] **通知加持仓时间**：SL 行末追加"持仓: 最长 X"（1h=10小时，4h=2交易日，1d=3周）
 - [ ] 单标的最大风险敞口（0.75% equity）：需持仓状态，跳过（人工自律）
 - [ ] 半导体总暴露上限（≤ 45%）：同上，跳过
 
@@ -105,3 +107,49 @@ rsync -av mac-studio:/Users/congrenhan/Documents/quantrift_stock/data/ data/
 - [x] **信号质量评分（0-10）**：Confluence = signal_pts(5) + adx_pts(2.5) + regime_pts(2.5)；RSI2 = rsi2_pts(4) + regime_pts(4) + vol_pts(1)；Telegram 标题显示 ⭐ N/10
 - [x] **ETF 板块轮动扫描器**：`etf_scanner.py` + `fetch_etf_data.py`，IB 数据，45 ETF，Rotation + Reversal + Weakness 三套评分，含 VIX（IB Index 合约）
 - [x] **信号去重 + 重启持久化**：`_sent_signals` dict，同一根 bar 的信号只发一次 Telegram；发送后写入 `data/.sent_signals.json`，重启后仍有效（当天记录自动保留，次日自动过期）
+- [x] **PLTR 加入标的池**：RSI2 全三周期（1d Sharpe 0.863 / 1h 0.641 / 4h 0.606），Confluence 全周期为负，已加入 `config.yaml` + `alert_engine.py`（STRATEGY_MAP + RSI2_PARAMS），归入 `mega_cap` 组
+- [x] **信号日志 + 复盘脚本**：`alert_engine.py` 每次发 Telegram 同步写入 `logs/signal_log.csv`（永久保留）；`signal_review.py` 读日志、拉 yfinance 价格、逐条评估 TP1/TP2/SL 命中结果及 R 倍数；支持 `--add` 手动补录历史信号
+- [x] **复盘时间止损**：MAX_BARS 上限（1h=10，4h=10，1d=15），超出按收盘价时间止损（⏱）；修复做空止损 R 值符号错误（去除多余 `× -1`）
+- [x] **`fetch_ib_data.py` 分组名修复**：旧 `mag7/semis/etfs` → 当前 `momentum/high_vol/storage/mega_cap/watch/pending/sector_etf/broad_etf`，含 PLTR
+
+### I — 新策略研究（优先级顺序）
+
+- [x] **MAG7 轮动 → 实盘提醒**：`alert_engine.py` 新增 `check_mag7_rotation_signal(vix)` + `build_mag7_alert()`。每周首次扫描触发（不限周几），dedup key 用本周周一日期防重发。通知含：本周/上周持仓对比、换仓标记、VIX 分级建议（<20正常/20-25缩小/25-30减半/>30不开仓）、21天内财报警告（避免财报周卖 Put）。QQQ<200SMA 时显示空仓。pm2 启动改用 `-u` unbuffered + `--cwd` 修复工作目录问题。
+
+- [ ] **VIX 结构性择时**（优先级 2）：现有逻辑仅判断 VIX > 20（硬阈值）和 spike 回落。扩展为：每轮扫描计算 VIX 20日均线，`vix < vix_ma20` 作为 +0.5 score boost（不做硬 gate，避免错过 spike 后最佳 RSI2 入场）。需同步验证 `rsi2_backtest.py` + `backtest_runner.py`（加 `vix_structural` 参数）。
+
+- [ ] **52周高点突破**（优先级 3）：`indicators.py` 加 `high_252 = df["High"].rolling(252, min_periods=200).max()`，信号为 `close > high_252.shift(1)` 且 `isHighVol`。写 `check_breakout_signal()` 接入 `alert_engine.py`，仅日线。**须先在 `rsi2_backtest.py` / `backtest_runner.py` 回测验证再上实盘**，半导体股假突破比例高，需 2 日收盘确认逻辑。
+
+- [ ] **SMH vs SOXX 配对轮动**（优先级 4，暂缓）：计算两者 20d/60d 相对收益差，差值超过 252d 历史 2σ 时做多领先方。需新建 `smh_soxx_backtest.py` 验证再接入。预期信号频率低（6-8 周一次），两者持仓重叠 70%，优势可能有限。
+
+- [ ] **TSLA 4h 出场模式切换**：回测验证 `use_staged_tp=false` 在 4h 大幅优于 staged（Sharpe 1.29 vs 0.28，PF 3.97 vs 1.16）。但样本仅 14 笔，谨慎。待观察实盘信号质量后决定是否修改 `config.yaml`。
+
+### J — 轻量选股初筛（方案 A）
+
+目标：对纳斯达克 100 计算 5 个 WQ-style 因子，每周筛出 Top 20 进入"观察池"，再用现有 Confluence/RSI2 系统择时入场。不引入 QLib，完全复用现有基础设施。
+
+- [x] **`screener.py`**：5因子选股初筛，yfinance 1Y 日线批量下载，NDX 100 全量计算：
+  - **F1 跳期动量**：`close[-6]/close[-66]-1`（60日收益跳过最近5日，避免短期反转）
+  - **F2 相对强度**：`0.4×RS20 + 0.6×RS60 vs QQQ`（复用 etf_scanner.py 模式）
+  - **F3 量价背离（Alpha#12）**：`sign(Δvol)×(-Δclose)` 20日均值（上涨放量=积累信号）
+  - **F4 风险调整动量**：`ret_20 / std(daily_ret, 20)`（单位波动率收益，类 Sharpe）
+  - **F5 接近52周高点**：`close / rolling_max(252)`（突破强度）
+  - 5因子各自 z-score 标准化后等权相加，全域排名取 Top N
+  - `--top N`（默认20）+ `--telegram` 参数，结果追加写入 `data/screener_results.csv`
+
+- [ ] **与现有系统对接**（可选，人工决策优先）：Top 20 标的供人工参考，不自动写入 config.yaml
+
+**用法**：
+```bash
+# Mac Studio 运行（无需 IB，yfinance 直接下载）
+python3.11 screener.py                   # 终端输出 Top 20
+python3.11 screener.py --top 30          # Top 30
+python3.11 screener.py --telegram        # 推送 Telegram
+
+# 可选：每周一 5:30 AM PDT 定时运行
+# 30 5 * * 1 cd /Users/congrenhan/Documents/quantrift_stock && python3.11 screener.py --telegram >> logs/screener.log 2>&1
+```
+
+- [ ] **参考资源**：
+  - [WorldQuant 101 Formulaic Alphas](https://github.com/yli188/WorldQuant_alpha101_code)：因子公式参考
+  - [alphalens-reloaded](https://github.com/stefan-jansen/alphalens-reloaded)：因子 IC / 衰减分析工具
