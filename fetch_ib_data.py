@@ -35,10 +35,17 @@ DATA_DIR = Path(cfg["data"]["dir"])
 DATA_DIR.mkdir(exist_ok=True)
 
 ALL_SYMBOLS = (
-    cfg["symbols"]["mag7"]
-    + cfg["symbols"]["semis"]
-    + cfg["symbols"]["etfs"]
+    cfg["symbols"].get("momentum",  [])
+    + cfg["symbols"].get("high_vol", [])
+    + cfg["symbols"].get("storage",  [])
+    + cfg["symbols"].get("mega_cap", [])
+    + cfg["symbols"].get("watch",    [])
+    + cfg["symbols"].get("pending",  [])
+    + cfg["symbols"].get("sector_etf", [])
+    + cfg["symbols"].get("broad_etf",  [])
 )
+
+from universes import get_universe  # noqa: E402
 
 # IB 参数
 IB_BAR_SIZE = {"1h": "1 hour", "1d": "1 day"}
@@ -119,13 +126,27 @@ def fetch_symbol(ib: IB, symbol: str, tfs: list[str]):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--port",   type=int, default=4001)
-    parser.add_argument("--symbol", help="单标的，如 NVDA")
-    parser.add_argument("--tf",     help="单周期：1h / 4h / 1d")
+    parser.add_argument("--port",     type=int, default=4001)
+    parser.add_argument("--symbol",   help="单标的，如 NVDA")
+    parser.add_argument("--tf",       help="单周期：1h / 4h / 1d")
+    parser.add_argument("--universe", choices=["dow30", "ndx100", "sp500", "all"],
+                        help="指数成分股批量下载（仅 1d，用于 screener）")
     args = parser.parse_args()
 
-    symbols = [args.symbol.upper()] if args.symbol else ALL_SYMBOLS
-    tfs     = [args.tf] if args.tf else ["1d", "1h", "4h"]
+    if args.universe:
+        # screener 用途：仅下载日线，不需要 1h/4h
+        tickers, benchmark, label = get_universe(args.universe)
+        # 加入基准 ETF（screener 需要）
+        symbols = sorted(set(tickers + [benchmark]))
+        tfs     = ["1d"]
+        print(f"[universe={args.universe}] {label}：{len(symbols)} 个标的（含基准 {benchmark}）")
+        print(f"预计耗时约 {len(symbols) * PACING_SLEEP // 60} 分钟（IB pacing {PACING_SLEEP}s/请求）")
+    elif args.symbol:
+        symbols = [args.symbol.upper()]
+        tfs     = [args.tf] if args.tf else ["1d", "1h", "4h"]
+    else:
+        symbols = ALL_SYMBOLS
+        tfs     = [args.tf] if args.tf else ["1d", "1h", "4h"]
 
     ib = IB()
     print(f"连接 IB Gateway 127.0.0.1:{args.port} clientId=3 ...")
