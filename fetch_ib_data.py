@@ -129,7 +129,7 @@ def main():
     parser.add_argument("--port",     type=int, default=4001)
     parser.add_argument("--symbol",   help="单标的，如 NVDA")
     parser.add_argument("--tf",       help="单周期：1h / 4h / 1d")
-    parser.add_argument("--universe", choices=["dow30", "ndx100", "sp500", "all"],
+    parser.add_argument("--universe", choices=["dow30", "ndx100", "sp500", "russell2000", "all"],
                         help="指数成分股批量下载（仅 1d，用于 screener）")
     args = parser.parse_args()
 

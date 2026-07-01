@@ -85,12 +85,31 @@ SP500 = [
     "ABNB", "DASH",
 ]
 
+# ── Russell 2000（从本地文件加载，由 fetch_russell2000_tickers.py 生成）─────────
+# 文件路径：data/russell2000_tickers.txt（每行一个 ticker）
+# 生成方式：从 NASDAQ 官方 symbol 目录过滤普通股（约 2000-2500 只）
+
+def _load_russell2000() -> list[str]:
+    """读取本地 Russell 2000 ticker 列表，文件不存在时返回空列表。"""
+    from pathlib import Path
+    path = Path("data/russell2000_tickers.txt")
+    if not path.exists():
+        raise FileNotFoundError(
+            "Russell 2000 ticker 列表不存在。\n"
+            "请先运行：python3.11 fetch_russell2000_tickers.py\n"
+            f"（文件路径：{path.resolve()}）"
+        )
+    tickers = [t.strip() for t in path.read_text().splitlines() if t.strip()]
+    return sorted(set(tickers))
+
+
 # ── 指数配置 ──────────────────────────────────────────────────────────────────
 
 _CONFIGS = {
-    "dow30":  {"label": "Dow 30",      "tickers": DOW30,  "benchmark": "DIA"},
-    "ndx100": {"label": "NDX 100",     "tickers": NDX100, "benchmark": "QQQ"},
-    "sp500":  {"label": "S&P 500",     "tickers": SP500,  "benchmark": "SPY"},
+    "dow30":     {"label": "Dow 30",      "tickers": DOW30,  "benchmark": "DIA"},
+    "ndx100":    {"label": "NDX 100",     "tickers": NDX100, "benchmark": "QQQ"},
+    "sp500":     {"label": "S&P 500",     "tickers": SP500,  "benchmark": "SPY"},
+    "russell2000": {"label": "Russell 2000", "tickers": None, "benchmark": "IWM"},  # 从文件加载
     "all": {
         "label":     "NDX+SPX+Dow",
         "tickers":   None,   # 运行时合并
@@ -103,13 +122,15 @@ def get_universe(name: str) -> tuple[list[str], str, str]:
     """
     返回 (去重后的标的列表, 基准ETF代码, 显示名称)。
 
-    name: "dow30" | "ndx100" | "sp500" | "all"
+    name: "dow30" | "ndx100" | "sp500" | "russell2000" | "all"
     """
     if name not in _CONFIGS:
         raise ValueError(f"未知 universe: {name}，可选: {list(_CONFIGS)}")
     cfg = _CONFIGS[name]
     if name == "all":
         tickers = sorted(set(DOW30 + NDX100 + SP500))
+    elif name == "russell2000":
+        tickers = _load_russell2000()
     else:
         tickers = sorted(set(cfg["tickers"]))
     return tickers, cfg["benchmark"], cfg["label"]
