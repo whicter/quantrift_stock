@@ -53,6 +53,7 @@
 - [x] **`fetch_etf_data.py`**：IB Gateway 日线数据抓取器（45 ETF + SPY + QQQ + VIX），`data/{ETF}_1d.csv`，2年历史
 - [x] **IB VIX**：`fetch_etf_data.py --symbol VIX` → IB `Index('VIX','CBOE','USD')` 合约，`data/VIX_1d.csv`
 - [x] **ETF 替换**：IRBO（已退市） → ARTY；VPN（已退市） → DTCR
+- [x] **量子/太空 ETF 加入**（2026-07-02）：新增分组"量子/太空"→ QTUM（Defiance量子计算ETF）、UFO（Procure太空ETF），同步更新 `etf_scanner.py` + `fetch_etf_data.py`
 - [x] **市场环境判断**：SPY 200MA + 20MA>50MA + QQQ/SPY 相对趋势 + VIX，输出 Risk-On / Neutral / Risk-Off
 - [x] **Telegram 推送**：`--telegram` 参数，输出轮动 Top5 + 超跌 Top5 + 做空候选 Top5，含 ETF 名称
 - [x] **Weakness Score（做空候选）**：`calc_weakness_score()`，Rotation Score 镜像因子（<50MA/200MA/跑输SPY20d/60d/RS趋弱/RS新低/放量下跌），RSI<35 超跌标的自动跳过，阶段标签：做空确认(≥60) / 弱势观察(≥40)
@@ -111,44 +112,166 @@ rsync -av mac-studio:/Users/congrenhan/Documents/quantrift_stock/data/ data/
 - [x] **信号日志 + 复盘脚本**：`alert_engine.py` 每次发 Telegram 同步写入 `logs/signal_log.csv`（永久保留）；`signal_review.py` 读日志、拉 yfinance 价格、逐条评估 TP1/TP2/SL 命中结果及 R 倍数；支持 `--add` 手动补录历史信号
 - [x] **复盘时间止损**：MAX_BARS 上限（1h=10，4h=10，1d=15），超出按收盘价时间止损（⏱）；修复做空止损 R 值符号错误（去除多余 `× -1`）
 - [x] **`fetch_ib_data.py` 分组名修复**：旧 `mag7/semis/etfs` → 当前 `momentum/high_vol/storage/mega_cap/watch/pending/sector_etf/broad_etf`，含 PLTR
+- [x] **`fetch_ib_data.py` 新分组补录**（2026-07-02）：ALL_SYMBOLS 加入 `watch_candidates`、`pending_high_vol`，确保新标的随默认批量拉取不遗漏
+- [x] **watch_candidates 回测**（2026-07-02）：INTC/AMD/AMAT/KLAC/DELL 全周期 Confluence 回测。INTC 1h Sharpe 0.67 达标 → 升级 `watch` 组 + symbol_params；其余留 watch_candidates
+- [x] **财报前警告**（2026-07-02）：`_fetch_all_earnings()` 每次扫描批量查 yfinance，7日历日内有财报的标的信号消息末尾追加 `⚠️ 财报约X交易日后，谨慎开新仓`，不阻断信号
+- [x] **板块 ETF 对齐标注**（2026-07-02）：每次扫描拉 SOXX 1d 计算 MA50，半导体标的（MU/MRVL/STX/SNDK/NVDA/INTC 等）触发信号时若 SOXX < MA50 则追加 `⚠️ SOXX 弱势（< MA50），半导体板块逆风`
+- [x] **VIX 结构性择时**（2026-07-02，验证无效）：+0.5 boost 对整数阈值无效，+1 boost 仅 MU +0.035 / META 变差，整体无附加价值。框架保留在 `rsi2_backtest.py --vix-structural-test`，不集成实盘
+- [x] **选股排名联动标注**（2026-07-08）：`_load_screener_ranks()` 每次扫描读 `data/screener_results.csv` 最新 Top10，触发信号时追加 `📊 本周因子选股 #N`
 
 ### I — 新策略研究（优先级顺序）
 
 - [x] **MAG7 轮动 → 实盘提醒**：`alert_engine.py` 新增 `check_mag7_rotation_signal(vix)` + `build_mag7_alert()`。每周首次扫描触发（不限周几），dedup key 用本周周一日期防重发。通知含：本周/上周持仓对比、换仓标记、VIX 分级建议（<20正常/20-25缩小/25-30减半/>30不开仓）、21天内财报警告（避免财报周卖 Put）。QQQ<200SMA 时显示空仓。pm2 启动改用 `-u` unbuffered + `--cwd` 修复工作目录问题。
 
-- [ ] **VIX 结构性择时**（优先级 2）：现有逻辑仅判断 VIX > 20（硬阈值）和 spike 回落。扩展为：每轮扫描计算 VIX 20日均线，`vix < vix_ma20` 作为 +0.5 score boost（不做硬 gate，避免错过 spike 后最佳 RSI2 入场）。需同步验证 `rsi2_backtest.py` + `backtest_runner.py`（加 `vix_structural` 参数）。
+#### 高性价比（有回测支撑，改动小，优先实施）
 
-- [ ] **52周高点突破**（优先级 3）：`indicators.py` 加 `high_252 = df["High"].rolling(252, min_periods=200).max()`，信号为 `close > high_252.shift(1)` 且 `isHighVol`。写 `check_breakout_signal()` 接入 `alert_engine.py`，仅日线。**须先在 `rsi2_backtest.py` / `backtest_runner.py` 回测验证再上实盘**，半导体股假突破比例高，需 2 日收盘确认逻辑。
+- [x] **财报前警告**（2026-07-02）：`_fetch_all_earnings()` 批量查询所有非ETF标的，7日历日内有财报则信号消息追加 `⚠️ 财报约X交易日后，谨慎开新仓`。不阻断信号，仅警示。扫描日志示例：`查询财报日期... 无近期财报`
 
-- [ ] **SMH vs SOXX 配对轮动**（优先级 4，暂缓）：计算两者 20d/60d 相对收益差，差值超过 252d 历史 2σ 时做多领先方。需新建 `smh_soxx_backtest.py` 验证再接入。预期信号频率低（6-8 周一次），两者持仓重叠 70%，优势可能有限。
+- [x] **板块 ETF 对齐标注**（2026-07-02）：每次扫描开始时拉取 SOXX 1d，计算 MA50，SOXX < MA50 则对 `SEMI_SYMBOLS`（MU/MRVL/STX/SNDK/NVDA/INTC/AMD/AMAT/KLAC）的信号追加 `⚠️ SOXX 弱势（< MA50），半导体板块逆风`。扫描日志示例：`SOXX 1d: $599.70  MA50: $542.72  强势 ✅`
 
-- [ ] **TSLA 4h 出场模式切换**：回测验证 `use_staged_tp=false` 在 4h 大幅优于 staged（Sharpe 1.29 vs 0.28，PF 3.97 vs 1.16）。但样本仅 14 笔，谨慎。待观察实盘信号质量后决定是否修改 `config.yaml`。
+- [x] **VIX 结构性择时**（2026-07-02，已验证无效，不集成）：回测结论：
+  - **+0.5 boost**：delta 全为 0.0。根本原因：`min_market_score` 是整数阈值（1/2/3），+0.5 永远无法跨越整数边界，在当前 score 结构下数学上无效。
+  - **+1 boost**：MU +0.035（微弱），META 反而变差（Sharpe -0.308），其余全部 delta=0。
+  - 结论：VIX < VIX_MA20 作为 score boost 对 RSI2 v2 无附加价值。代码框架已加入 `rsi2_backtest.py`（`--vix-structural-test`），不集成到 `alert_engine.py`。
+
+#### 中性价比（逻辑扎实，需一定实现成本）
+
+- [x] **选股排名联动标注**（2026-07-02）：`_load_screener_ranks()` 每次扫描读 `data/screener_results.csv` 最新 Top10，触发信号时追加 `📊 本周因子选股 #N`。文件不存在时静默跳过。screener_results.csv 需定期同步至 Mac Studio。
+
+- [ ] **TP1 后追加（Pyramiding）**（优先级 4）：TP1 触达后下一根 bar 若继续创新高，允许在 TP1 价位补回减掉的半仓，止损上移至 TP1。强趋势行情（如 MU 大涨段）直接提升盈亏比。难点：需要在 `alert_engine.py` 记录持仓状态（目前无持仓跟踪），实现成本较高，需设计持仓状态机。
+
+- [ ] **52周高点突破**（优先级 5）：`indicators.py` 加 `high_252 = df["High"].rolling(252, min_periods=200).max()`，信号为 `close > high_252.shift(1)` 且 `isHighVol`。写 `check_breakout_signal()` 接入 `alert_engine.py`，仅日线。**须先在 `rsi2_backtest.py` / `backtest_runner.py` 回测验证再上实盘**，半导体股假突破比例高，需 2 日收盘确认逻辑。
+
+#### 图形形态识别（研究结论，2026-07-02）
+
+两类形态需区分：
+- **K线组合**（锤子/吞没/十字星）：TA-Lib / pandas-ta 够用
+- **图形结构形态**（头肩/楔形/三角/旗形）：需基于局部高低点 + 趋势线 + 斜率 + 突破确认自己写规则
+
+推荐库（按优先级）：
+1. `BennyThadikaran/stock-pattern`：最成熟的 CLI scanner，支持 common chart patterns + harmonic patterns
+2. `white07S/TradingPatternScanner`：有 PyPI 包 `tradingpattern`，支持头肩/三角/楔形/通道，含 Savitzky-Golay 去噪版头肩算法
+3. `zeta-zetra/chart_patterns`：轻量 API，支持头肩/旗形/三角/pennant
+4. `neurotrader888/TechnicalAnalysisAutomation`：头肩算法写得系统化（时间对称/颈线/早期/确认检测）
+
+正确使用姿势（只做 candidate generator，不直接当信号）：
+- 局部极值层 → 几何规则层 → 成交量层 → 趋势背景层 → 突破确认层 → 回测验证层
+- **lookahead bias 风险**：只允许在突破颈线那根 bar 入场，不能用识别后的历史数据拟合
+- 对本系统最有价值的形态：旗形/三角旗形（RSI2 回调）、上升/下降三角（Confluence 突破）
+- 头肩顶/底优先级低（与 RSI2 关系弱），楔形误判多（暂缓）
+
+- [ ] **图形形态识别**（低优先级，待高优先项完成后研究）：先用 stock-pattern 跑现有标的池验证识别质量，再考虑接入 alert_engine.py
+
+#### 低性价比（暂缓）
+
+- [ ] **SMH vs SOXX 配对轮动**（暂缓）：计算两者 20d/60d 相对收益差，差值超过 252d 历史 2σ 时做多领先方。需新建 `smh_soxx_backtest.py` 验证再接入。预期信号频率低（6-8 周一次），两者持仓重叠 70%，优势可能有限。
+
+- [ ] **TSLA 4h 出场模式切换**（暂缓）：回测验证 `use_staged_tp=false` 在 4h 大幅优于 staged（Sharpe 1.29 vs 0.28，PF 3.97 vs 1.16）。但样本仅 14 笔，谨慎。待观察实盘信号质量后决定是否修改 `config.yaml`。
+
+#### 新标的候选（已加入 config.yaml，待回测验证）
+
+已于 2026-07-02 加入 config.yaml，分组如下：
+
+**`watch_candidates`**（选股初筛 Top5，半导体/科技，参数适配性待验证）：
+
+回测结果（2026-07-02，Confluence 默认参数）：
+
+| 标的 | 1h | 4h | 1d | 结论 |
+|------|----|----|-----|------|
+| INTC | **0.67** ✅ | 0.11 | 0.56 | 升级 watch；1h 95笔主力 |
+| AMD  | -0.75 | 0.13 | 0.52 | 留 watch_candidates |
+| AMAT | -0.81 | 0.12 | 0.36 | 留 watch_candidates |
+| KLAC | -0.11 | -1.08 | 0.05 | 留 watch_candidates |
+| DELL | -0.07 | -0.24 | 0.26 | 留 watch_candidates |
+
+- [x] **INTC**：1h Sharpe 0.67（95笔）≥ 0.6，已升级至 `watch`，symbol_params 已加
+- [ ] **AMD**：1d Sharpe 0.52，未达 0.6，继续观察选股排名
+- [ ] **AMAT**：1d Sharpe 0.36，未达标
+- [ ] **KLAC**：全周期不合格（1d 0.05），不适合本策略框架
+- [ ] **DELL**：全周期不合格（1d 0.26），不适合本策略框架
+
+**`pending_high_vol`**（高波动/新兴，需专项研究）：
+- [ ] **RKLB**（Rocket Lab）：太空/火箭，高 beta，上市时间较短，需专项参数搜索
+- [ ] **NBIS**（Nebius Group）：AI 基础设施前 Yandex，流动性和波动性待评估
+- [ ] **IREN**（Iris Energy）：AI算力/比特币矿，强周期性，需特殊 regime 过滤
 
 ### J — 轻量选股初筛（方案 A）
 
-目标：对纳斯达克 100 计算 5 个 WQ-style 因子，每周筛出 Top 20 进入"观察池"，再用现有 Confluence/RSI2 系统择时入场。不引入 QLib，完全复用现有基础设施。
+目标：对多个指数（NDX100 / S&P 500 / Dow 30 / Russell 2000）计算 5 个 WQ-style 因子，每周筛出 Top 20-30 进入"观察池"，再用现有 Confluence/RSI2 系统择时入场。
 
-- [x] **`screener.py`**：5因子选股初筛，yfinance 1Y 日线批量下载，NDX 100 全量计算：
-  - **F1 跳期动量**：`close[-6]/close[-66]-1`（60日收益跳过最近5日，避免短期反转）
-  - **F2 相对强度**：`0.4×RS20 + 0.6×RS60 vs QQQ`（复用 etf_scanner.py 模式）
-  - **F3 量价背离（Alpha#12）**：`sign(Δvol)×(-Δclose)` 20日均值（上涨放量=积累信号）
-  - **F4 风险调整动量**：`ret_20 / std(daily_ret, 20)`（单位波动率收益，类 Sharpe）
-  - **F5 接近52周高点**：`close / rolling_max(252)`（突破强度）
-  - 5因子各自 z-score 标准化后等权相加，全域排名取 Top N
-  - `--top N`（默认20）+ `--telegram` 参数，结果追加写入 `data/screener_results.csv`
+**核心文件**：
 
-- [ ] **与现有系统对接**（可选，人工决策优先）：Top 20 标的供人工参考，不自动写入 config.yaml
+- [x] **`universes.py`**：各指数成分股列表统一管理，`screener.py` 和 `fetch_ib_data.py` 共用
+  - DOW30（30只，硬编码）、NDX100（~85只，硬编码）、SP500（~360只，硬编码）
+  - Russell 2000（~2200只，从 `data/russell2000_tickers.txt` 动态加载）
+  - `get_universe(name)` → `(tickers, benchmark_etf, label)`
+  - 每年6月 Russell 重组后重跑 `fetch_russell2000_tickers.py` 更新
 
-**用法**：
+- [x] **`fetch_russell2000_tickers.py`**：从 NASDAQ 官方 symbol 目录构建 Russell 2000 近似成分列表
+  - 数据源：`nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt`（官方每日更新，免费）
+  - 过滤：纯字母 ticker + 排除 ETF/权证/优先股/单位 + 排除已知大型股
+  - 输出：`data/russell2000_tickers.txt`（约 2200 只普通股）
+
+- [x] **`screener.py`**：多指数周频因子选股，`--universe ndx100/sp500/dow30/russell2000/all`
+  - **数据优先级**：`data/{SYM}_1d.csv`（IB数据）→ yfinance fallback（IB缺数据时）
+  - **5个因子**（仅用 OHLCV）：
+    - F1 跳期动量：`close[-6]/close[-66]-1`（60日，跳过最近5日避免反转）
+    - F2 相对强度：`0.4×RS20 + 0.6×RS60 vs 基准ETF`（QQQ/SPY/DIA/IWM）
+    - F3 量价背离（Alpha#12）：`sign(Δvol)×(-Δclose)` 20日均值
+    - F4 风险调整动量：`ret_20 / std(daily_ret, 20)`（类 Sharpe）
+    - F5 接近52周高点：`close / rolling_max(252)`
+  - z-score 标准化后等权合成，全域排名取 Top N
+  - `--top N`（默认20）+ `--telegram` + `--no-save` 参数
+  - 结果追加写入 `data/screener_results.csv`（含 universe 列）
+  - **交易参考价位**（每只股票输出）：
+    - 入场：当前价（立即追）/ 等回踩（见支撑位）
+    - TP1 = 入场价 + 2.0×ATR14；TP2 = +3.5×ATR14；SL = -1.5×ATR14
+    - **多级别支撑位**：[大] MA200 / 季低（60日Low）；[中] MA50；[小] MA20 / 1M低 / MA10 / 2W低
+    - 只显示低于当前价的支撑（高于当前价的为阻力，不显示）
+    - Telegram 每只标的三行：综合得分+标签 / TP1·TP2·SL / 支撑位分级
+
+- [x] **`fetch_ib_data.py`**：新增 `--universe ndx100/sp500/dow30/russell2000`
+  - 仅拉日线（screener 不需要 1h/4h），含基准 ETF（QQQ/SPY/DIA/IWM）
+  - IB pacing 说明：串行最优（并行会叠加请求数超过 60次/10分钟限制）
+
+**IB 数据状态**（2026-07-01）：
+- [x] NDX100：~86只，已完成
+- [x] SP500：364只，已完成（logs/fetch_screener.log）
+- [x] Russell 2000：~2187只，已完成（logs/fetch_screener_russell.log，clientId=3）
+
+**首次运行记录**（2026-07-01）：NDX/SP500/Russell 2000 三池选股已全部跑通并推送 Telegram，支撑位输出正常。
+
+**标准工作流**（每周一）：
 ```bash
-# Mac Studio 运行（无需 IB，yfinance 直接下载）
-python3.11 screener.py                   # 终端输出 Top 20
-python3.11 screener.py --top 30          # Top 30
-python3.11 screener.py --telegram        # 推送 Telegram
+# 1. 更新数据（Mac Studio，IB Gateway 须开启，clientId=3）
+ssh mac-studio "cd /Users/congrenhan/Documents/quantrift_stock && /opt/homebrew/bin/python3.11 fetch_ib_data.py --universe ndx100 --port 4001"   # ~9分钟
+ssh mac-studio "cd /Users/congrenhan/Documents/quantrift_stock && /opt/homebrew/bin/python3.11 fetch_ib_data.py --universe sp500 --port 4001"    # ~36分钟
+# Russell 2000 数据更新（每周可选，或仅每年6月重组后）
+ssh mac-studio "cd /Users/congrenhan/Documents/quantrift_stock && /opt/homebrew/bin/python3.11 fetch_ib_data.py --universe russell2000 --port 4001"  # ~3.6小时
 
-# 可选：每周一 5:30 AM PDT 定时运行
-# 30 5 * * 1 cd /Users/congrenhan/Documents/quantrift_stock && python3.11 screener.py --telegram >> logs/screener.log 2>&1
+# 2. 运行选股并推送 Telegram（Mac Studio 上直接跑，无需同步数据到本机）
+ssh mac-studio "cd /Users/congrenhan/Documents/quantrift_stock && /opt/homebrew/bin/python3.11 screener.py --universe ndx100    --top 15 --telegram"
+ssh mac-studio "cd /Users/congrenhan/Documents/quantrift_stock && /opt/homebrew/bin/python3.11 screener.py --universe sp500     --top 15 --telegram"
+ssh mac-studio "cd /Users/congrenhan/Documents/quantrift_stock && /opt/homebrew/bin/python3.11 screener.py --universe russell2000 --top 15 --telegram"
+
+# 3.（可选）同步数据到本机查看
+rsync -av mac-studio:/Users/congrenhan/Documents/quantrift_stock/data/ data/
+
+# Russell 2000 成分更新（每年 6 月重组后）
+ssh mac-studio "cd /Users/congrenhan/Documents/quantrift_stock && /opt/homebrew/bin/python3.11 fetch_russell2000_tickers.py"
 ```
+
+**选股输出说明**（每只股票）：
+- 综合得分 + 标签（动量↑ / RS强 / 近高点）
+- 入场：当前价（追强）/ 等回踩支撑
+- 目标：TP1（+2ATR）、TP2（+3.5ATR）、SL（-1.5ATR）
+- 支撑分级：[大] MA200/季低 → [中] MA50 → [小] MA20/1M低/MA10/2W低（只显示低于当前价的）
+- ATR% 衡量波动：>8% 需缩小仓位
+
+**Russell 2000 使用提示**：小票噪声大，优先看市值较大（价格 >$20）、ATR% < 8% 的标的；低价股高 ATR% 排名靠前多为流动性噪声，参考价值低。
+
+**IB pacing 限制**：60次请求/10分钟（gateway全局）。串行 6s/次 ≈ 10次/分钟略超但IB有容忍；
+并行两进程会叠加到 20次/分钟 → 大量 Error 162 取消，总耗时反而更长（需改 20s/次 → 12小时）。
 
 - [ ] **参考资源**：
   - [WorldQuant 101 Formulaic Alphas](https://github.com/yli188/WorldQuant_alpha101_code)：因子公式参考
