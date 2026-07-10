@@ -41,6 +41,22 @@ ssh mac-studio "cd /Users/congrenhan/Documents/quantrift_stock && /opt/homebrew/
 # 单标的单周期
 ssh mac-studio "cd /Users/congrenhan/Documents/quantrift_stock && /opt/homebrew/bin/python3.11 fetch_ib_data.py --symbol NVDA --tf 1h"
 
+# IB 不可用时用 yfinance 拉新标的数据（直接在 Mac Studio 跑）
+ssh mac-studio "cd /Users/congrenhan/Documents/quantrift_stock && /opt/homebrew/bin/python3.11 -c \"
+import yfinance as yf, pandas as pd
+from pathlib import Path
+for sym in ['RKLB']:
+    for tf, period, interval in [('1d','3y','1d'),('1h','60d','1h'),('4h','60d','1h')]:
+        raw = yf.Ticker(sym).history(period=period, interval=interval, auto_adjust=True)
+        df = raw[['Open','High','Low','Close','Volume']].rename(columns=str.lower)
+        df.index.name = 'date'
+        if df.index.tz: df.index = df.index.tz_convert('America/New_York').tz_localize(None)
+        if tf == '4h':
+            df = df.resample('4h',label='right',closed='right').agg({'open':'first','high':'max','low':'min','close':'last','volume':'sum'}).dropna(subset=['close'])
+        df.to_csv(f'data/{sym}_{tf}.csv')
+        print(f'{sym} {tf}: {len(df)} bars')
+\""
+
 # 数据同步回本机
 rsync -av mac-studio:/Users/congrenhan/Documents/quantrift_stock/data/ /Users/cohan/Documents/quantrift_stock/data/
 
@@ -48,8 +64,8 @@ rsync -av mac-studio:/Users/congrenhan/Documents/quantrift_stock/data/ /Users/co
 cd /Users/cohan/Documents/quantrift_stock && .venv/bin/python backtest_runner.py
 cd /Users/cohan/Documents/quantrift_stock && .venv/bin/python backtest_runner.py --symbol NVDA --tf 1h
 
-# 启动告警引擎（前台）
-ssh mac-studio "cd /Users/congrenhan/Documents/quantrift_stock && /opt/homebrew/bin/python3.11 alert_engine.py --port 4002"
+# 启动告警引擎（前台，--port 参数已不使用，保留兼容性）
+ssh mac-studio "cd /Users/congrenhan/Documents/quantrift_stock && /opt/homebrew/bin/python3.11 alert_engine.py"
 
 # 查看告警引擎状态
 ssh mac-studio "PATH=/opt/homebrew/bin:$PATH pm2 status"
@@ -71,8 +87,11 @@ ssh -A mac-studio "cd /Users/congrenhan/Documents/quantrift_stock && git push"
 - **核心文件**：`alert_engine.py`（信号监控）、`strategy.py`（ConfluenceStrategy）、`indicators.py`（compute_signals）、`config.yaml`（参数）
 - **品种**：见 `config.yaml` symbols 列表
 - **周期**：1h / 4h / 1d，三周期独立信号
+- **策略路由**：`STRATEGY_MAP` 按 `(symbol, tf)` 路由到 confluence / rsi2 / breakout
+- **52周突破**：`BREAKOUT_PARAMS` 独立配置（NVDA/MU/MSFT/PLTR/TSLA/AAPL），仅日线
 - **出场模式**：`use_staged_tp=True`，止损用 utTS，TP1/TP2 固定 ATR 倍数
-- **clientId**：固定 2，不能与期货引擎（clientId=1）冲突
+- **数据源**：`fetch_bars()` 使用 **yfinance**（无 IB pacing 限制，15 分钟延时，够用）
+- **clientId**：IB 连接已从 alert_engine 移除，clientId=2 仅 fetch_ib_data.py 使用
 
 ## 告警格式
 
