@@ -122,6 +122,8 @@ BREAKOUT_PARAMS: dict[str, dict] = {
     "MSFT": {"confirm_days": 1, "atr_trail_mult": 2.5, "atr_sl_mult": 1.5, "max_hold_bars": 20, "use_vol_filter": False},
     "PLTR": {"confirm_days": 1, "atr_trail_mult": 2.5, "atr_sl_mult": 1.5, "max_hold_bars": 20, "use_vol_filter": False},
     "TSLA": {"confirm_days": 1, "atr_trail_mult": 2.5, "atr_sl_mult": 1.5, "max_hold_bars": 10, "use_vol_filter": False},
+    # AAPL: Sharpe 1.161（9笔，样本偏少），confirm=2 过滤假突破，vol 放量确认
+    "AAPL": {"confirm_days": 2, "atr_trail_mult": 2.0, "atr_sl_mult": 1.5, "max_hold_bars": 20, "use_vol_filter": True},
 }
 
 # RSI2 最优参数（来自 LEARNING.md 网格优化结果）

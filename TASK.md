@@ -140,7 +140,8 @@ rsync -av mac-studio:/Users/congrenhan/Documents/quantrift_stock/data/ data/
 
 - [ ] **TP1 后追加（Pyramiding）**（优先级 4）：TP1 触达后下一根 bar 若继续创新高，允许在 TP1 价位补回减掉的半仓，止损上移至 TP1。强趋势行情（如 MU 大涨段）直接提升盈亏比。难点：需要在 `alert_engine.py` 记录持仓状态（目前无持仓跟踪），实现成本较高，需设计持仓状态机。
 
-- [ ] **52周高点突破**（优先级 5）：`indicators.py` 加 `high_252 = df["High"].rolling(252, min_periods=200).max()`，信号为 `close > high_252.shift(1)` 且 `isHighVol`。写 `check_breakout_signal()` 接入 `alert_engine.py`，仅日线。**须先在 `rsi2_backtest.py` / `backtest_runner.py` 回测验证再上实盘**，半导体股假突破比例高，需 2 日收盘确认逻辑。
+- [x] **52周高点突破**（2026-07-08完成）：`breakout_backtest.py` 新建，网格优化 36 组合。接入 `alert_engine.py`（`check_breakout_signal` + `build_breakout_alert`），`BREAKOUT_PARAMS` 含 NVDA/MU/MSFT/PLTR/TSLA/AAPL（2026-07-09 加入）。数据源从 IB 切换至 yfinance（解决 IB pacing 限制）。
+  - NVDA 0.761 / MU 0.843 / PLTR 0.825 / TSLA 0.935 / MSFT 0.628 / AAPL 1.161（9笔样本少）
 
 #### 图形形态识别（研究结论，2026-07-02）
 
@@ -190,10 +191,19 @@ rsync -av mac-studio:/Users/congrenhan/Documents/quantrift_stock/data/ data/
 - [ ] **KLAC**：全周期不合格（1d 0.05），不适合本策略框架
 - [ ] **DELL**：全周期不合格（1d 0.26），不适合本策略框架
 
-**`pending_high_vol`**（高波动/新兴，需专项研究）：
-- [ ] **RKLB**（Rocket Lab）：太空/火箭，高 beta，上市时间较短，需专项参数搜索
-- [ ] **NBIS**（Nebius Group）：AI 基础设施前 Yandex，流动性和波动性待评估
-- [ ] **IREN**（Iris Energy）：AI算力/比特币矿，强周期性，需特殊 regime 过滤
+**`pending_high_vol`**（高波动/新兴，已回测 2026-07-09）：
+
+回测结果（Confluence + 突破，默认参数）：
+
+| 标的 | Confluence 1h | 4h | 1d | 突破最优 | 结论 |
+|------|--------------|-----|-----|---------|------|
+| RKLB | -0.74 | -0.33 | 0.75 | **0.934**（13笔） | 突破有信号，样本偏少，留 watch |
+| NBIS | -2.37 | 0.10 | 0.57 | 无有效结果 | 数据不足（1.7年），暂缓 |
+| IREN | **1.09** | 0.72 | -0.64 | 无有效结果 | 1h 仅11笔，不稳定，暂缓 |
+
+- [ ] **RKLB**：突破策略有效（Sharpe 0.934），但 13 笔样本不足。继续观察至 2026 年底积累更多数据再决定接入
+- [ ] **NBIS**：全策略不达标，数据仅 429 日线 bar。维持 pending，待 2 年以上数据
+- [ ] **IREN**：1h Confluence 1.09 但仅 11 笔，1d 负值，强周期性需专项参数。维持 pending
 
 ### J — 轻量选股初筛（方案 A）
 
