@@ -69,7 +69,7 @@
 | 存储周期股（新入池） | SNDK | Confluence 1h ✅ | 1h Sharpe 1.51 N=95，可信；1d Sharpe 1.83 N=20 不可信 |
 | 存储周期股（新入池） | STX | Confluence 1h/4h/1d | 1h 0.87 / 4h 0.81 / 1d 0.69，全周期可用 |
 | 高波动单股 | TSLA | Confluence 1d（天花板）| Sharpe 0.50，RR 0.61，保本止损已加；天花板约 0.5 |
-| Mega-cap compounders | MSFT, GOOGL, META | RSI2 v2 + Market Regime | 趋势平稳，RSI2 高频触底 |
+| Mega-cap compounders | MSFT, GOOGL, META, PLTR | RSI2 v2 + Market Regime | 趋势平稳，RSI2 高频触底；PLTR Confluence 全周期为负，RSI2 1d 0.863 / 1h 0.641 |
 | 弱化/待观察 | AAPL | RSI2 1d 降权 | Sharpe 0.60 勉强可用 |
 | 专项研究 | AMZN | 20日高点回撤策略 | 专项策略 Sharpe 0.308，仍不可用；结构性困难 |
 | 半导体 ETF | SOXX, SMH | RSI2 v2（不强制 RS vs QQQ）| SOXX 1d 1.22 / SMH 1d 0.98 |
@@ -142,6 +142,9 @@
 | QQQ | 1d | 0.72 | 70.3% | 185 | — | entry=10, trail=3×, hold≤10, score≥1 |
 | SPY | 1d | 0.62 | 68.8% | 93 | — | entry=15, trail=3×, hold≤15, score≥1 |
 | AAPL | 1d | 0.60 | 65.6% | 96 | — | entry=15, trail=3×, hold≤15, score≥2 |
+| **PLTR** | 1d | **0.863** | 72.0% | 25⚠️ | — | entry=10, trail=2×, hold≤15, score≥1, vol✓ |
+| **PLTR** | 1h | **0.641** | 62.4% | 109 | — | entry=5, trail=3×, hold≤10, score≥3 |
+| **PLTR** | 4h | 0.606 | 58.3% | 36⚠️ | — | entry=10, trail=3×, hold≤10, score≥1 |
 | MSFT | 4h | 1.66⚠️ | 81.5% | 27 | — | entry=15, trail=2×, hold≤5, score≥1 |
 | GOOGL | 4h | 1.64⚠️ | 66.7% | 33 | — | entry=5, trail=3×, hold≤15, score≥3 |
 
@@ -151,6 +154,7 @@
 - MRVL 1d（ConfluenceStrategy）：Sharpe 0.37，已换 RSI2
 - AMZN：通用策略 + 专项策略均 Sharpe < 0.35，彻底剔除主池
 - TSLA 1h/4h：两套均无效或样本不足
+- PLTR（ConfluenceStrategy 全周期）：1h -0.47 / 4h -0.21 / 1d 0.60（N=36 不可信），ADX 长期偏低，结构性失效，全部改用 RSI2
 
 ---
 
@@ -658,7 +662,7 @@ MarketDataProvider (ABC)
 | 策略 | 标的 × 周期 |
 |------|------------|
 | Confluence | MU 1h/4h、MRVL 1h/4h、NVDA 4h、SNDK 1h、STX 1h/4h/1d、TSLA 1d |
-| RSI2 v2 | NVDA/MRVL/MU 1d、MSFT 1d/4h、GOOGL 1d/4h（1h 成本不达标已移除）、META 1h/1d、SOXX/SMH 1h/4h/1d、QQQ 1d、SPY 1d/4h、AAPL 1d |
+| RSI2 v2 | NVDA/MRVL/MU 1d、MSFT 1d/4h、GOOGL 1d/4h（1h 成本不达标已移除）、META 1h/1d、PLTR 1h/4h/1d、SOXX/SMH 1h/4h/1d、QQQ 1d、SPY 1d/4h、AAPL 1d |
 
 ### 信号去重机制（`_sent_signals`）
 
@@ -690,6 +694,113 @@ def _save_sent_signals(signals):
 - `.env` → 私密凭证（tastytrade 账号，gitignore）
 - `.env.example` → 凭证模板（可提交）
 - `data/.sent_signals.json` → 信号去重持久化（自动生成，gitignore 不提交）
+- `logs/signal_log.csv` → 实盘信号日志（永久保留，用于复盘）
 - `logs/backtest_results.csv` → ConfluenceStrategy 全量回测结果
 - `logs/rsi2_v2_backtest_results.csv` → RSI2 v2 回测结果
 - `logs/rsi2_v2_optimized_params.csv` → RSI2 v2 最优参数
+
+### 信号日志与复盘（`signal_review.py`）
+
+每次 Telegram 告警发出时，`alert_engine.py` 同步追加一行到 `logs/signal_log.csv`：
+
+| 字段 | 说明 |
+|------|------|
+| timestamp | 信号发出时间 |
+| bar_date | 触发信号的 bar 日期 |
+| symbol / tf / strategy / direction | 标的、周期、策略、方向 |
+| entry_price / atr | 入场价、ATR |
+| tp1 / tp2 | TP 目标价（RSI2 为 0，无固定目标）|
+| sl | 止损价（信号时刻固定值）|
+| market_score / vix / quality | Regime 评分、VIX、信号质量 |
+
+复盘用法：
+
+```bash
+# 复盘所有信号
+python signal_review.py
+
+# 只看最近 30 天 / 某标的 / 某周期
+python signal_review.py --days 30 --symbol STX --tf 4h
+
+# 手动补录历史 notification（早于日志功能上线的信号）
+python signal_review.py --add
+```
+
+评估逻辑：
+- Confluence（有 tp1/tp2/sl）：逐 bar 判断哪个先被触及，SL 优先（保守）
+- RSI2（只有 sl）：判断是否触及初始止损，否则显示当前浮盈 R 值
+- 1h/4h 信号用 1h K 线评估，1d 信号用日线
+
+时间止损上限（与策略 hold 参数对齐）：
+
+| 周期 | 最大 bar 数 | 对应时间 |
+|------|------------|---------|
+| 1h | 10 | 约 10 小时（1 交易日内） |
+| 4h | 10 | 约 2 交易日 |
+| 1d | 15 | 约 3 周 |
+
+---
+
+## 核心指标公式
+
+### True Range（TR）
+
+每根 bar 的真实波动幅度，取以下三值最大：
+
+```
+TR = max(
+    High - Low,                    # 本 bar 内幅度
+    |High - Prev_Close|,           # 含跳空高开
+    |Low  - Prev_Close|            # 含跳空低开
+)
+```
+
+### ATR（Average True Range）
+
+使用 **RMA**（Wilder 平滑移动平均），递推公式：
+
+```
+RMA[0]  = 前 N 根 bar 的 TR 简单平均（初始值）
+RMA[t]  = RMA[t-1] × (N-1)/N + TR[t] × 1/N
+```
+
+- Confluence：`ut_atr = 8`（最近 8 根 bar）
+- RSI2：`atr_len = 14`（最近 14 根 bar）
+
+RMA 权重（`1/N`）比 EMA 的 `2/(N+1)` 更小，对新数据反应更慢、更平滑，不会因单根异常 bar 剧烈跳动。
+
+### utTS（UT Bot 追踪止损线）
+
+```
+基准线[t] = Close[t] - ut_key × ATR[t]   （做多方向）
+基准线[t] = Close[t] + ut_key × ATR[t]   （做空方向）
+
+utTS[t] = max(基准线[t], utTS[t-1])      （做多：只升不降）
+utTS[t] = min(基准线[t], utTS[t-1])      （做空：只降不升）
+```
+
+`ut_key` 按标的调参（1h 默认 1.5，参见 `config.yaml symbol_params`）。
+
+utTS 同时作为**信号触发线**：收盘价从下方穿越 utTS 向上 → 做多信号；从上方穿越向下 → 做空信号。
+
+### Confluence 目标价计算
+
+```
+TP1 = 入场价 ± atr_tp1_mult × ATR    （1x ATR，所有周期一致）
+TP2 = 入场价 ± atr_tp2_mult × ATR    （1h: 4x，4h/1d: 3x）
+SL  = 信号时刻的 utTS 值（静态快照）
+```
+
+`±` 做多用加，做空用减。
+
+### 实盘与回测的偏差
+
+| 偏差来源 | 回测 | 实盘 |
+|---------|------|------|
+| 入场价 | 信号 bar **收盘价** | 下一根 bar **开盘价**（含跳空）|
+| 止损机制 | utTS **追踪**（每 bar 更新）| 通知给固定值，需手动跟踪 |
+| TP 判定 | 收盘价**穿越** TP | 高/低点**触及** TP（复盘脚本更宽松）|
+
+影响程度：1h < 4h < 1d（周期越长，隔夜跳空越大）。
+
+TP2（3-4 ATR）回测和实盘命中率均极低，**TP1 是实际可操作的目标**，TP2 作为趋势延续参考价。

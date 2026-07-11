@@ -29,11 +29,20 @@ symbols:
   mega_cap:    [MSFT, GOOGL, META, PLTR]
 
   # 弱化/待观察：RSI2 Sharpe 低，暂不纳入主策略池
-  watch:       [AAPL]
+  # INTC：1h Confluence Sharpe 0.67（95笔），2026-07-02 从 watch_candidates 升级
+  watch:       [AAPL, INTC]
+
+  # 选股初筛发现的候选（连续 Top5 SP500/NDX），待 backtest_runner 验证参数后升级
+  # AMD/AMAT/KLAC/DELL：回测最优 Sharpe 0.52/0.36/0.05/0.26，未达 0.6 门槛（2026-07-02）
+  watch_candidates: [AMD, AMAT, KLAC, DELL]
 
   # 待专项研究：RSI2 失效（Sharpe 0.27），ConfluenceStrategy 待验证
   # 备选方案："距 20 日高点回撤 5-10% + RSI 40-55"
   pending:     [AMZN]
+
+  # 高波动/新兴标的：波动大、上市时间短或流动性较低，需专项回测后决定策略
+  # RKLB：太空/火箭；NBIS：AI基础设施（前Yandex）；IREN：AI算力/比特币矿
+  pending_high_vol: [RKLB, NBIS, IREN]
 
   # 半导体 ETF：RSI2（不强制 RS vs QQQ）或 MR+ATR（待重新调参）
   sector_etf:  [SOXX, SMH]
@@ -71,6 +80,7 @@ timeframes:
     min_market_score: 2      # 分数范围 -1~4（4个正分 -1跌破20日低）
     use_breakeven_after_tp1: false
     allow_short: true
+    max_market_score_short: 2  # 只有 Regime <= 2 才做空（≥3 为强牛市，禁空）
     allow_reversal_flip: true
     # 指标参数
     ut_atr: 8
@@ -127,6 +137,7 @@ timeframes:
     min_market_score: 2
     use_breakeven_after_tp1: false
     allow_short: true
+    max_market_score_short: 2  # 只有 Regime <= 2 才做空（≥3 为强牛市，禁空）
     allow_reversal_flip: true
     ut_atr: 5
     ut_key: 2.0
@@ -180,6 +191,7 @@ timeframes:
     min_market_score: 2
     use_breakeven_after_tp1: false
     allow_short: true
+    max_market_score_short: 2  # 只有 Regime <= 2 才做空（≥3 为强牛市，禁空）
     allow_reversal_flip: true
     ut_atr: 5
     ut_key: 3.0
@@ -284,3 +296,8 @@ symbol_params:
     1h:  {adx_threshold: 20.0, ut_key: 2.0, min_score: 4}
     4h:  {adx_threshold: 20.0, ut_key: 2.5, min_score: 4}
     1d:  {adx_threshold: 20.0, ut_key: 2.5, min_score: 4}
+  INTC:
+    # Confluence 1h Sharpe 0.67（95笔），1d 0.56；4h 无效（0.11）
+    1h:  {adx_threshold: 25.0, ut_key: 1.5, min_score: 5}
+    4h:  {adx_threshold: 25.0, ut_key: 2.0, min_score: 5}
+    1d:  {adx_threshold: 20.0, ut_key: 3.0, min_score: 4}

@@ -176,11 +176,42 @@ def compute_factors(data: dict[str, pd.DataFrame], benchmark: str) -> pd.DataFra
             window = min(252, n)
             f5 = close.iloc[-1] / close.iloc[-window:].max() if window >= 20 else np.nan
 
+            # ── ATR14 ────────────────────────────────────────────────────
+            high, low = df["High"], df["Low"]
+            tr = pd.concat([
+                high - low,
+                (high - close.shift(1)).abs(),
+                (low  - close.shift(1)).abs(),
+            ], axis=1).max(axis=1)
+            atr14   = tr.rolling(14).mean().iloc[-1]
+            px      = close.iloc[-1]
+            atr_pct = round(atr14 / px * 100, 1)
+
+            # ── 支撑位（大级别 → 小级别）────────────────────────────────
+            ma200 = round(close.rolling(200).mean().iloc[-1], 2) if n >= 200 else np.nan
+            ma50  = round(close.rolling(50).mean().iloc[-1],  2) if n >= 50  else np.nan
+            ma20  = round(close.rolling(20).mean().iloc[-1],  2) if n >= 20  else np.nan
+            ma10  = round(close.rolling(10).mean().iloc[-1],  2) if n >= 10  else np.nan
+            # 近期摆动低点（用 Low 列）
+            low_qtr  = round(low.iloc[-60:].min(), 2)  if n >= 60  else np.nan  # 季度低
+            low_1m   = round(low.iloc[-20:].min(), 2)  if n >= 20  else np.nan  # 1月低
+            low_2w   = round(low.iloc[-10:].min(), 2)  if n >= 10  else np.nan  # 2周低
+
+            # TP1/TP2/SL 基于当前价 + ATR
+            tp1 = round(px + 2.0 * atr14, 2)
+            tp2 = round(px + 3.5 * atr14, 2)
+            sl  = round(px - 1.5 * atr14, 2)
+
             rows.append({
-                "symbol": sym,
-                "close":  round(close.iloc[-1], 2),
+                "symbol":   sym,
+                "close":    round(px, 2),
                 "F1_mom": f1, "F2_rs": f2, "F3_pv_div": f3,
                 "F4_risk_adj": f4, "F5_hi52": f5,
+                # 支撑位
+                "ma200": ma200, "ma50": ma50, "ma20": ma20, "ma10": ma10,
+                "low_qtr": low_qtr, "low_1m": low_1m, "low_2w": low_2w,
+                # 交易参考
+                "atr_pct": atr_pct, "tp1": tp1, "tp2": tp2, "sl": sl,
             })
         except Exception as e:
             print(f"  [跳过] {sym}: {e}")
@@ -200,33 +231,104 @@ def compute_factors(data: dict[str, pd.DataFrame], benchmark: str) -> pd.DataFra
 
 # ── 输出 ──────────────────────────────────────────────────────────────────────
 
+def _support_str(row: pd.Series) -> str:
+    """把支撑位格式化为可读字符串，只显示低于当前价的支撑。"""
+    px = row["close"]
+    def fp(v, label):
+        if pd.isna(v) or v >= px:
+            return None
+        return f"{label}${v:.2f}"
+    parts = []
+    # 大级别
+    s = fp(row.get("ma200"), "MA200 ")
+    if s: parts.append(("大", s))
+    s = fp(row.get("low_qtr"), "季低 ")
+    if s: parts.append(("大", s))
+    # 中级别
+    s = fp(row.get("ma50"), "MA50 ")
+    if s: parts.append(("中", s))
+    # 小级别
+    s = fp(row.get("ma20"), "MA20 ")
+    if s: parts.append(("小", s))
+    s = fp(row.get("low_1m"), "1M低 ")
+    if s: parts.append(("小", s))
+    s = fp(row.get("ma10"), "MA10 ")
+    if s: parts.append(("小", s))
+    s = fp(row.get("low_2w"), "2W低 ")
+    if s: parts.append(("小", s))
+    if not parts:
+        return "  支撑: 各均线均在当前价上方（价格正在突破）"
+    big = " | ".join(v for k, v in parts if k == "大")
+    mid = " | ".join(v for k, v in parts if k == "中")
+    sml = " | ".join(v for k, v in parts if k == "小")
+    line = "  支撑: "
+    segments = []
+    if big: segments.append(f"[大] {big}")
+    if mid: segments.append(f"[中] {mid}")
+    if sml: segments.append(f"[小] {sml}")
+    return line + "  ".join(segments)
+
+
 def format_terminal(df: pd.DataFrame, top_n: int, label: str, benchmark: str, run_date: str) -> None:
-    print(f"\n{'─'*68}")
+    w = 88
+    print(f"\n{'─'*w}")
     print(f"  ⭐ {label} 周频因子选股 Top {top_n}   基准:{benchmark}   {run_date}")
-    print(f"{'─'*68}")
-    print(f"  {'#':>3}  {'标的':<6}  {'收盘':>8}  {'综合':>7}  {'动量F1':>7}  {'RS F2':>7}  {'量价F3':>7}  {'风调F4':>7}  {'52WF5':>6}")
-    print(f"  {'─'*3}  {'─'*6}  {'─'*8}  {'─'*7}  {'─'*7}  {'─'*7}  {'─'*7}  {'─'*7}  {'─'*6}")
+    print(f"{'─'*w}")
     for i, (sym, row) in enumerate(df.head(top_n).iterrows(), 1):
-        def fmt(v):
-            return f"{v:+.3f}" if pd.notna(v) else "   n/a"
-        print(f"  {i:>3}. {sym:<6}  ${row['close']:>7.2f}  {fmt(row['composite'])}  "
-              f"{fmt(row['F1_mom'])}  {fmt(row['F2_rs'])}  {fmt(row['F3_pv_div'])}  "
-              f"{fmt(row['F4_risk_adj'])}  {fmt(row['F5_hi52'])}")
-    print(f"{'─'*68}\n")
+        score = f"{row['composite']:+.2f}" if pd.notna(row["composite"]) else "n/a"
+        tags = []
+        if pd.notna(row["F1_mom"]) and row["F1_mom"] > 0.05:   tags.append("动量↑")
+        if pd.notna(row["F2_rs"]) and row["F2_rs"] > 0.02:     tags.append("RS强")
+        if pd.notna(row["F5_hi52"]) and row["F5_hi52"] > 0.95: tags.append("近高点")
+        tag_str = " [" + "/".join(tags) + "]" if tags else ""
+        atr_str = f"ATR {row['atr_pct']:.1f}%" if pd.notna(row.get("atr_pct")) else ""
+        def p(v): return f"${v:.2f}" if pd.notna(v) else "n/a"
+        print(f"\n  {i:>2}. {sym:<5}  综合 {score}{tag_str}   收盘 {p(row['close'])}  {atr_str}")
+        print(f"  {'':>4}入场: {p(row['close'])}(立即追) / 等回踩见下方支撑")
+        print(f"  {'':>4}目标: TP1 {p(row.get('tp1'))}  TP2 {p(row.get('tp2'))}  SL {p(row.get('sl'))}")
+        print(_support_str(row))
+    print(f"\n{'─'*w}")
+    print(f"  支撑级别: [大]=MA200/季低  [中]=MA50  [小]=MA20/1M低/MA10/2W低")
+    print(f"  TP1=+2ATR  TP2=+3.5ATR  SL=-1.5ATR（日线ATR14，仅供参考）")
+    print(f"{'─'*w}\n")
 
 
 def format_telegram(df: pd.DataFrame, top_n: int, label: str, benchmark: str, run_date: str) -> str:
     n = min(top_n, 20)
     lines = [f"⭐ {label} 因子选股 Top {n}", f"📅 {run_date}  基准:{benchmark}", ""]
     for i, (sym, row) in enumerate(df.head(n).iterrows(), 1):
+        px   = row["close"]
         score = f"{row['composite']:+.2f}" if pd.notna(row["composite"]) else "n/a"
         tags = []
         if pd.notna(row["F1_mom"]) and row["F1_mom"] > 0.05:   tags.append("动量↑")
         if pd.notna(row["F2_rs"]) and row["F2_rs"] > 0.02:     tags.append("RS强")
         if pd.notna(row["F5_hi52"]) and row["F5_hi52"] > 0.95: tags.append("近高点")
         tag_str = " " + "/".join(tags) if tags else ""
-        lines.append(f"  {i:>2}. {sym:<5} {score}{tag_str}")
-    lines += ["", "因子: 60d动量·RS·量价背离·风险调整动量·52W高点", "仅供参考，非交易建议"]
+        def fp(v): return f"${v:.2f}" if pd.notna(v) else "n/a"
+
+        # 支撑位（只取低于当前价的，各级别最近的一个）
+        sup_big, sup_mid, sup_sml = None, None, None
+        for v, lbl in [(row.get("ma200"), "MA200"), (row.get("low_qtr"), "季低")]:
+            if pd.notna(v) and v < px and sup_big is None:
+                sup_big = f"{lbl} {fp(v)}"
+        if pd.notna(row.get("ma50")) and row["ma50"] < px:
+            sup_mid = f"MA50 {fp(row['ma50'])}"
+        for v, lbl in [(row.get("ma20"), "MA20"), (row.get("low_1m"), "1M低"),
+                       (row.get("ma10"), "MA10"), (row.get("low_2w"), "2W低")]:
+            if pd.notna(v) and v < px and sup_sml is None:
+                sup_sml = f"{lbl} {fp(v)}"
+
+        sup_parts = [s for s in [sup_big, sup_mid, sup_sml] if s]
+        sup_line = "支撑: " + " | ".join(sup_parts) if sup_parts else "支撑: 各MA均在价格上方(突破中)"
+
+        atr_str = f"ATR {row['atr_pct']:.1f}%" if pd.notna(row.get("atr_pct")) else ""
+        lines += [
+            f"{i:>2}. {sym:<5} {score}{tag_str}  {fp(px)}  {atr_str}",
+            f"    TP1 {fp(row.get('tp1'))}  TP2 {fp(row.get('tp2'))}  SL {fp(row.get('sl'))}",
+            f"    {sup_line}",
+            "",
+        ]
+    lines += ["大=MA200/季低  中=MA50  小=MA20/1M低", "仅供参考，非交易建议"]
     return "\n".join(lines)
 
 
@@ -251,8 +353,8 @@ def save_csv(df: pd.DataFrame, top_n: int, universe: str, run_date: str) -> None
 def main():
     parser = argparse.ArgumentParser(description="多指数周频因子选股初筛")
     parser.add_argument("--universe", default="ndx100",
-                        choices=["ndx100", "sp500", "dow30", "all"],
-                        help="股票池：ndx100 / sp500 / dow30 / all（默认 ndx100）")
+                        choices=["ndx100", "sp500", "dow30", "russell2000", "all"],
+                        help="股票池：ndx100 / sp500 / dow30 / russell2000 / all（默认 ndx100）")
     parser.add_argument("--top",      type=int, default=20, help="输出 Top N（默认 20）")
     parser.add_argument("--telegram", action="store_true",  help="推送 Telegram")
     parser.add_argument("--no-save",  action="store_true",  help="不写 CSV")

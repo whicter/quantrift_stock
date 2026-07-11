@@ -35,14 +35,16 @@ DATA_DIR = Path(cfg["data"]["dir"])
 DATA_DIR.mkdir(exist_ok=True)
 
 ALL_SYMBOLS = (
-    cfg["symbols"].get("momentum",  [])
-    + cfg["symbols"].get("high_vol", [])
-    + cfg["symbols"].get("storage",  [])
-    + cfg["symbols"].get("mega_cap", [])
-    + cfg["symbols"].get("watch",    [])
-    + cfg["symbols"].get("pending",  [])
-    + cfg["symbols"].get("sector_etf", [])
-    + cfg["symbols"].get("broad_etf",  [])
+    cfg["symbols"].get("momentum",         [])
+    + cfg["symbols"].get("high_vol",       [])
+    + cfg["symbols"].get("storage",        [])
+    + cfg["symbols"].get("mega_cap",       [])
+    + cfg["symbols"].get("watch",          [])
+    + cfg["symbols"].get("watch_candidates", [])
+    + cfg["symbols"].get("pending",        [])
+    + cfg["symbols"].get("pending_high_vol", [])
+    + cfg["symbols"].get("sector_etf",     [])
+    + cfg["symbols"].get("broad_etf",      [])
 )
 
 from universes import get_universe  # noqa: E402
@@ -127,6 +129,7 @@ def fetch_symbol(ib: IB, symbol: str, tfs: list[str]):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--port",     type=int, default=4001)
+    parser.add_argument("--clientId", type=int, default=3)
     parser.add_argument("--symbol",   help="单标的，如 NVDA")
     parser.add_argument("--tf",       help="单周期：1h / 4h / 1d")
     parser.add_argument("--universe", choices=["dow30", "ndx100", "sp500", "russell2000", "all"],
@@ -149,8 +152,8 @@ def main():
         tfs     = [args.tf] if args.tf else ["1d", "1h", "4h"]
 
     ib = IB()
-    print(f"连接 IB Gateway 127.0.0.1:{args.port} clientId=3 ...")
-    ib.connect("127.0.0.1", args.port, clientId=3)
+    print(f"连接 IB Gateway 127.0.0.1:{args.port} clientId={args.clientId} ...")
+    ib.connect("127.0.0.1", args.port, clientId=args.clientId)
     print("✅ 已连接\n")
     print(f"下载 {len(symbols)} 个标的 × {tfs}（每次请求间隔 {PACING_SLEEP}s）")
 

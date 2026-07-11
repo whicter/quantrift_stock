@@ -37,6 +37,7 @@ ETF_GROUPS = {
     "大板块":    ["XLK", "XLC", "XLY", "XLP", "XLV", "XLF", "XLI", "XLE", "XLB", "XLU", "XLRE"],
     "科技/AI":   ["IGV", "CIBR", "HACK", "SKYY", "CLOU", "BOTZ", "ARTY", "AIQ"],
     "半导体":    ["SMH", "SOXX", "XSD"],
+    "量子/太空": ["QTUM", "UFO"],
     "金融细分":  ["KBE", "KRE", "KIE"],
     "医疗/生技": ["XBI", "IBB", "IHI"],
     "国防/运输": ["ITA", "XAR", "IYT"],
@@ -147,16 +148,18 @@ def fetch_symbol(ib: IB, symbol: str):
 
 def main():
     parser = argparse.ArgumentParser(description="从 IB 拉取 ETF 日线数据")
-    parser.add_argument("--port",   type=int, default=4001,
+    parser.add_argument("--port",     type=int, default=4001,
                         help="IB Gateway 端口（默认 4001 实盘）")
+    parser.add_argument("--clientId", type=int, default=3,
+                        help="IB clientId（默认 3，冲突时改 10/11 等）")
     parser.add_argument("--symbol", help="只下载单个 ETF，如 XLK")
     args = parser.parse_args()
 
     symbols = [args.symbol.upper()] if args.symbol else ALL_SYMBOLS
 
     ib = IB()
-    print(f"连接 IB Gateway 127.0.0.1:{args.port} clientId=3 ...")
-    ib.connect("127.0.0.1", args.port, clientId=3)
+    print(f"连接 IB Gateway 127.0.0.1:{args.port} clientId={args.clientId} ...")
+    ib.connect("127.0.0.1", args.port, clientId=args.clientId)
     print(f"✅ 已连接\n")
     print(f"下载 {len(symbols)} 个 ETF 日线数据（每次间隔 {PACING_SLEEP}s，约 {len(symbols)*PACING_SLEEP//60+1} 分钟）")
 
