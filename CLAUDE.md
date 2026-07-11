@@ -19,18 +19,43 @@
 
 ## 代码同步工作流
 
+### 场景 A：本机改了代码 → 推送到 Mac Studio + GitHub
+
 ```bash
-# 1. 把本机代码拷贝到 Mac Studio
-rsync -av --exclude='.git' \
+# 1. 本机 → Mac Studio（排除 data/logs/.venv 等大目录）
+rsync -av --exclude='.git' --exclude='data/' --exclude='logs/' --exclude='.venv/' --exclude='__pycache__/' \
   /Users/cohan/Documents/quantrift_stock/ \
   mac-studio:/Users/congrenhan/Documents/quantrift_stock/
 
-# 2. Mac Studio push 到 GitHub
-ssh -A mac-studio "cd /Users/congrenhan/Documents/quantrift_stock && git push"
-
-# 3. 本机 pull GitHub repo
-cd /Users/cohan/Documents/quantrift_stock && git pull origin master
+# 2. Mac Studio commit + push（必须用 -A 转发 SSH agent）
+ssh -A mac-studio "cd /Users/congrenhan/Documents/quantrift_stock && \
+  git add -A && \
+  git commit -m 'your message' && \
+  git push"
 ```
+
+### 场景 B：Mac Studio 有独立改动 → 同步回本机
+
+```bash
+# 1. 先看 Mac Studio 有哪些改动
+ssh mac-studio "cd /Users/congrenhan/Documents/quantrift_stock && git status --short"
+
+# 2. 把改动的文件同步回本机（按实际文件名替换）
+rsync -av \
+  mac-studio:/Users/congrenhan/Documents/quantrift_stock/文件1.py \
+  mac-studio:/Users/congrenhan/Documents/quantrift_stock/文件2.py \
+  /Users/cohan/Documents/quantrift_stock/
+
+# 3. Mac Studio commit + push
+ssh -A mac-studio "cd /Users/congrenhan/Documents/quantrift_stock && \
+  git add 文件1.py 文件2.py && \
+  git commit -m 'your message' && \
+  git push"
+```
+
+### 注意
+- 本机**没有 GitHub SSH 权限**，所有 git push 必须通过 Mac Studio
+- `git push` 必须用 `ssh -A`（SSH agent forwarding），否则报权限错误
 
 ## 常用命令
 
