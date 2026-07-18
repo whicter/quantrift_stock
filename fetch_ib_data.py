@@ -210,6 +210,9 @@ def main():
         tfs     = [args.tf] if args.tf else ["1d", "1h", "4h"]
 
     ib = IB()
+    # qualifyContracts() also performs a Gateway request; apply the same bound
+    # as historical bars so an unavailable API cannot stall the entire batch.
+    ib.RequestTimeout = REQUEST_TIMEOUT
     print(f"连接 IB Gateway 127.0.0.1:{args.port} clientId={args.clientId} ...")
     ib.connect("127.0.0.1", args.port, clientId=args.clientId)
     print("✅ 已连接\n")
