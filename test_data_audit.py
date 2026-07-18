@@ -6,6 +6,7 @@ from unittest.mock import patch
 import pandas as pd
 
 import data_audit
+import fetch_ib_data
 from fetch_ib_data import merge_bars
 
 
@@ -30,6 +31,20 @@ class DataAuditTests(unittest.TestCase):
         new = pd.DataFrame({"Close": [12.0, 13.0]}, index=pd.to_datetime(["2026-01-02", "2026-01-03"]))
         merged = merge_bars(old, new)
         self.assertEqual(merged["Close"].tolist(), [10.0, 12.0, 13.0])
+
+    def test_ib_request_has_a_bounded_timeout(self):
+        class FakeIB:
+            def qualifyContracts(self, contract):
+                return [contract]
+
+            def reqHistoricalData(self, contract, **kwargs):
+                self.kwargs = kwargs
+                return []
+
+        ib = FakeIB()
+        with patch.object(fetch_ib_data, "Stock", return_value=object()), patch.object(fetch_ib_data.time, "sleep"):
+            self.assertIsNone(fetch_ib_data.fetch_bars(ib, "TEST", "1d"))
+        self.assertEqual(ib.kwargs["timeout"], fetch_ib_data.REQUEST_TIMEOUT)
 
 
 if __name__ == "__main__":

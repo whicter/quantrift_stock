@@ -56,6 +56,7 @@ from universes import get_universe  # noqa: E402
 IB_BAR_SIZE = {"1h": "1 hour", "1d": "1 day"}
 IB_DURATION  = {"1h": "2 Y",   "1d": "10 Y"}
 PACING_SLEEP = 6  # 每次请求后等待秒数
+REQUEST_TIMEOUT = 45  # Gateway 无响应时跳过，不能阻塞整个补拉批次
 
 
 def resample_4h(df_1h: pd.DataFrame) -> pd.DataFrame:
@@ -112,20 +113,24 @@ def save_bars(path: Path, df: pd.DataFrame, symbol: str, tf: str, merge: bool):
 
 
 def fetch_bars(ib: IB, symbol: str, tf: str) -> pd.DataFrame | None:
-    contract = Stock(symbol, "SMART", "USD")
-    ib.qualifyContracts(contract)
-
     print(f"  [{tf}] 请求中...", end="", flush=True)
-    bars = ib.reqHistoricalData(
-        contract,
-        endDateTime="",
-        durationStr=IB_DURATION[tf],
-        barSizeSetting=IB_BAR_SIZE[tf],
-        whatToShow="ADJUSTED_LAST",
-        useRTH=True,
-        formatDate=1,
-        keepUpToDate=False,
-    )
+    try:
+        contract = Stock(symbol, "SMART", "USD")
+        ib.qualifyContracts(contract)
+        bars = ib.reqHistoricalData(
+            contract,
+            endDateTime="",
+            durationStr=IB_DURATION[tf],
+            barSizeSetting=IB_BAR_SIZE[tf],
+            whatToShow="ADJUSTED_LAST",
+            useRTH=True,
+            formatDate=1,
+            keepUpToDate=False,
+            timeout=REQUEST_TIMEOUT,
+        )
+    except Exception as exc:
+        print(f" ❌ 请求失败：{exc}")
+        return None
     time.sleep(PACING_SLEEP)
 
     if not bars:
@@ -177,7 +182,7 @@ def fetch_symbol(ib: IB, symbol: str, tfs: list[str], merge: bool = False):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--port",     type=int, default=4001)
-    parser.add_argument("--clientId", type=int, default=3)
+    parser.add_argument("--clientId", type=int, default=2)
     parser.add_argument("--symbol",   help="单标的，如 NVDA")
     parser.add_argument("--tf",       help="单周期：1h / 4h / 1d")
     parser.add_argument("--universe", choices=["dow30", "ndx100", "sp500", "russell2000", "all"],
