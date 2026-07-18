@@ -61,6 +61,12 @@ def _load_local_csv(symbol: str, interval: str) -> pd.DataFrame | None:
         for col in ["Open", "High", "Low", "Close"]:
             if col not in df.columns:
                 return None
+        # A stale local IB snapshot cannot resolve a newer signal.  Returning it
+        # would silently mark the signal as pending and suppress the network
+        # fallback, which is worse than an explicit download failure.
+        latest_expected = pd.Timestamp.now().tz_localize(None).normalize() - pd.Timedelta(days=3)
+        if df.index.max() < latest_expected:
+            return None
         return df
     except Exception:
         return None
@@ -345,6 +351,9 @@ def main():
     OUTCOME_ICON = {
         "TP2命中": "✅✅",
         "TP1命中": "✅ ",
+        "SSL追踪出场": "✅ ",
+        "ATR追踪出场": "✅ ",
+        "RSI出场": "✅ ",
         "止损":    "❌ ",
         "时间止损": "⏱ ",
         "未决":    "⏳ ",
@@ -389,7 +398,7 @@ def main():
     print(f"  TP2命中: {tp2_n}  TP1命中: {tp1_n}  止损: {sl_n}  时间止损: {tsl_n}  未决: {pen_n}")
 
     if len(decided) > 0:
-        win_rate = (tp1_n + tp2_n) / len(decided) * 100
+        win_rate = (pd.to_numeric(decided["r_mult"], errors="coerce") > 0).mean() * 100
         avg_r    = decided["r_mult"].dropna().mean()
         print(f"  已决胜率: {win_rate:.1f}%  平均 R（已决）: {avg_r:+.2f}R")
 
@@ -406,7 +415,7 @@ def main():
         pen = sub[sub["outcome"] == "未决"]
         line = f"  [{strat}] 共{len(sub)}条"
         if len(dec) > 0:
-            wins = len(dec[dec["outcome"].isin(["TP1命中", "TP2命中"])])
+            wins = int((pd.to_numeric(dec["r_mult"], errors="coerce") > 0).sum())
             wr   = wins / len(dec) * 100
             ar   = dec["r_mult"].dropna().mean()
             line += f"  已决{len(dec)}条 胜率{wr:.0f}% 均R{ar:+.2f}R"

@@ -296,7 +296,7 @@ ssh mac-studio "cd /Users/congrenhan/Documents/quantrift_stock && /opt/homebrew/
 - [x] **复盘状态机对齐实盘出场逻辑**：新增 `review_core.py`，按 close-driven 实盘规则回放 Confluence 34%/33%/33% staged TP、utTS/sslExit，以及 RSI2 ATR trail/RSI 半仓/时间止损，输出加权 R。
 - [x] **同 bar 内 SL/TP 判定精细化**：记录 Open 跳空的确定顺序；OHLC 双触达时明确写入不可判序标记，而非伪装成 SL 优先的确定结果。
 - [x] **Quality 分数校准**：`signal_review.py` 输出 0-4/5-7/8-10 三桶的已决胜率和均 R。
-- [x] **复盘自动化**：新增 `run_weekly_review.sh` 和 `crontab.example`，周日复盘 90 天、更新监控并推送 Telegram 摘要。
+- [x] **复盘自动化**：`stock-weekly-review` 由 PM2 每周日 18:15 触发，执行 90 天复盘、更新监控并推送 Telegram 摘要；保留 `run_weekly_review.sh` 供手动执行。
 
 #### Phase 2 — 影子信号流（Shadow Signals，已完成）
 

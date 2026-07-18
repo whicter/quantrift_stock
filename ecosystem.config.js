@@ -60,5 +60,23 @@ module.exports = {
       merge_logs: true,
       log_date_format: "YYYY-MM-DD HH:mm:ss",
     },
+    {
+      // Runs once per scheduled restart; no order or broker interface involved.
+      name: "stock-weekly-review",
+      script: "/bin/zsh",
+      args: "run_weekly_review.sh",
+      cwd: "/Users/congrenhan/Documents/quantrift_stock",
+      interpreter: "none",
+      autorestart: false,
+      cron_restart: "15 18 * * 0",
+      env: {
+        TG_TOKEN: envVars.TG_TOKEN || "",
+        TG_CHAT_ID: envVars.TG_CHAT_ID || "",
+      },
+      out_file: "logs/weekly_review_pm2_out.log",
+      error_file: "logs/weekly_review_pm2_err.log",
+      merge_logs: true,
+      log_date_format: "YYYY-MM-DD HH:mm:ss",
+    },
   ],
 };
