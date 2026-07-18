@@ -7,6 +7,7 @@ coverage first so a separate, explicit IB fetch can fill only verified gaps.
 from __future__ import annotations
 
 import argparse
+import json
 from datetime import datetime, timedelta
 from pathlib import Path
 
@@ -31,6 +32,15 @@ def configured_symbols() -> list[str]:
     return sorted(symbols)
 
 
+def source_for(symbol: str, tf: str) -> str:
+    manifest_path = DATA_DIR / ".data_sources.json"
+    try:
+        manifest = json.loads(manifest_path.read_text()) if manifest_path.exists() else {}
+    except (OSError, json.JSONDecodeError):
+        return "legacy_unknown"
+    return str(manifest.get(f"{symbol}|{tf}", {}).get("source") or "legacy_unknown")
+
+
 def audit_symbol(symbol: str, tf: str, now: pd.Timestamp) -> dict:
     path = DATA_DIR / f"{symbol}_{tf}.csv"
     row = {"symbol": symbol, "tf": tf, "path": str(path), "exists": path.exists()}
@@ -49,8 +59,7 @@ def audit_symbol(symbol: str, tf: str, now: pd.Timestamp) -> dict:
             "start": index.min().strftime("%Y-%m-%d"),
             "end": end.strftime("%Y-%m-%d"),
             "status": "fresh" if end >= stale_after else "needs_ib_refresh",
-            # Existing CSV predates source manifests, so provenance is unknown.
-            "source": "legacy_unknown",
+            "source": source_for(symbol, tf),
         }
     except Exception as exc:
         return {**row, "bars": 0, "start": "", "end": "", "status": f"invalid: {exc}", "source": "unknown"}

@@ -11,6 +11,8 @@ fetch_data.py — 下载所有标的历史数据（via yfinance）
 """
 
 import argparse
+import json
+import os
 import sys
 import time
 from pathlib import Path
@@ -28,11 +30,20 @@ with open("config.yaml") as f:
 
 DATA_DIR = Path(cfg["data"]["dir"])
 DATA_DIR.mkdir(exist_ok=True)
+SOURCE_MANIFEST = DATA_DIR / ".data_sources.json"
+REQUEST_TIMEOUT = 20
 
 ALL_SYMBOLS = (
-    cfg["symbols"]["mag7"]
-    + cfg["symbols"]["semis"]
-    + cfg["symbols"]["etfs"]
+    cfg["symbols"].get("momentum", [])
+    + cfg["symbols"].get("high_vol", [])
+    + cfg["symbols"].get("storage", [])
+    + cfg["symbols"].get("mega_cap", [])
+    + cfg["symbols"].get("watch", [])
+    + cfg["symbols"].get("watch_candidates", [])
+    + cfg["symbols"].get("pending", [])
+    + cfg["symbols"].get("pending_high_vol", [])
+    + cfg["symbols"].get("sector_etf", [])
+    + cfg["symbols"].get("broad_etf", [])
 )
 
 
@@ -52,8 +63,12 @@ def resample_4h(df_1h: pd.DataFrame) -> pd.DataFrame:
 
 
 def download_1d(symbol: str, start: str) -> pd.DataFrame:
-    df = yf.download(symbol, start=start, interval="1d",
-                     auto_adjust=True, progress=False)
+    try:
+        df = yf.download(symbol, start=start, interval="1d", auto_adjust=True,
+                         progress=False, timeout=REQUEST_TIMEOUT)
+    except Exception as exc:
+        print(f"  [1d] ❌ yfinance 请求失败：{exc}")
+        return pd.DataFrame()
     if df.empty:
         return df
     df = df[["Open", "High", "Low", "Close", "Volume"]].copy()
@@ -64,8 +79,12 @@ def download_1d(symbol: str, start: str) -> pd.DataFrame:
 
 def download_1h(symbol: str, start: str) -> pd.DataFrame:
     # yfinance 1h 最多 730 天
-    df = yf.download(symbol, start=start, interval="1h",
-                     auto_adjust=True, progress=False)
+    try:
+        df = yf.download(symbol, period="729d", interval="1h", auto_adjust=True,
+                         progress=False, timeout=REQUEST_TIMEOUT)
+    except Exception as exc:
+        print(f"  [1h] ❌ yfinance 请求失败：{exc}")
+        return pd.DataFrame()
     if df.empty:
         return df
     df = df[["Open", "High", "Low", "Close", "Volume"]].copy()
@@ -77,7 +96,40 @@ def download_1h(symbol: str, start: str) -> pd.DataFrame:
     return df
 
 
-def fetch_symbol(symbol: str, tfs: list[str]):
+def merge_bars(existing: pd.DataFrame | None, incoming: pd.DataFrame) -> pd.DataFrame:
+    if existing is None or existing.empty:
+        return incoming.sort_index()
+    merged = pd.concat([existing, incoming])
+    merged.index = pd.to_datetime(merged.index)
+    return merged[~merged.index.duplicated(keep="last")].sort_index()
+
+
+def save_bars(path: Path, frame: pd.DataFrame, symbol: str, tf: str, merge: bool) -> pd.DataFrame:
+    existing = None
+    if merge and path.exists():
+        existing = pd.read_csv(path, index_col=0, parse_dates=True)
+        existing.columns = [column.capitalize() for column in existing.columns]
+    output = merge_bars(existing, frame) if merge else frame
+    temporary = path.with_suffix(".tmp")
+    output.to_csv(temporary)
+    os.replace(temporary, path)
+    try:
+        manifest = json.loads(SOURCE_MANIFEST.read_text()) if SOURCE_MANIFEST.exists() else {}
+    except (OSError, json.JSONDecodeError):
+        manifest = {}
+    manifest[f"{symbol}|{tf}"] = {
+        "source": "yfinance",
+        "fetched_at": pd.Timestamp.now(tz="America/Los_Angeles").isoformat(),
+        "bars": len(output),
+        "path": str(path),
+    }
+    temporary_manifest = SOURCE_MANIFEST.with_suffix(".tmp")
+    temporary_manifest.write_text(json.dumps(manifest, indent=2, sort_keys=True))
+    os.replace(temporary_manifest, SOURCE_MANIFEST)
+    return output
+
+
+def fetch_symbol(symbol: str, tfs: list[str], merge: bool = False):
     print(f"\n{'─'*40}")
     print(f"  {symbol}")
     print(f"{'─'*40}")
@@ -105,8 +157,8 @@ def fetch_symbol(symbol: str, tfs: list[str]):
             time.sleep(2)
             continue
 
-        df.to_csv(out_path)
-        print(f"  [{tf}] ✅ {len(df)} 行  →  {out_path}")
+        saved = save_bars(out_path, df, symbol, tf, merge)
+        print(f"  [{tf}] ✅ {len(saved)} 行  →  {out_path}")
         time.sleep(2)
 
 
@@ -114,14 +166,15 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--symbol", help="单标的，如 NVDA")
     parser.add_argument("--tf", help="单周期，如 1h / 4h / 1d")
+    parser.add_argument("--merge", action="store_true", help="与已有 CSV 合并，保留旧历史并覆盖重复时间戳")
     args = parser.parse_args()
 
-    symbols = [args.symbol.upper()] if args.symbol else ALL_SYMBOLS
+    symbols = [args.symbol.upper()] if args.symbol else list(dict.fromkeys(ALL_SYMBOLS))
     tfs = [args.tf] if args.tf else ["1d", "1h", "4h"]
 
     print(f"下载 {len(symbols)} 个标的 × {tfs} 周期")
     for sym in symbols:
-        fetch_symbol(sym, tfs)
+        fetch_symbol(sym, tfs, merge=args.merge)
 
     print("\n✅ 全部完成")
 

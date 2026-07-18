@@ -125,7 +125,10 @@ until at least 150 resolved signals exist.
 ```
 
 This is read-only. It writes a coverage report and an IB refresh plan under
-`logs/`; use `fetch_ib_data.py --merge` only after reviewing that plan.
+`logs/`. On 2026-07-18, the IB plan could not run because `ushmds` was
+offline; `fetch_data.py --merge` refreshed all 72 configured `symbol × tf`
+files through yfinance instead. The audit now reports all 72 files as fresh
+through 2026-07-17 and records `source=yfinance` in `data/.data_sources.json`.
 
 ### Current IB Status (2026-07-18)
 
@@ -143,6 +146,15 @@ Its effectiveness has not yet been verified. After restart, verify the farm
 status with a single NVDA request, then run `--merge`, rerun
 `data_audit.py --write`, and finally rerun `historical_backfill.py --write`.
 
+While the farm remains offline, refresh the local research dataset safely with:
+
+```bash
+/opt/homebrew/bin/python3.11 fetch_data.py --merge
+```
+
+It preserves older bars, updates duplicate timestamps from yfinance, records
+the source manifest, and limits every yfinance request to 20 seconds.
+
 ## Historical Backfill
 
 ```bash
@@ -156,3 +168,7 @@ to IB. The paper ledger fixes 0.75% dollar risk when each position opens,
 allows at most 10 simultaneous positions, and records semiconductor-exposure
 warnings. It intentionally does not simulate Pyramiding until that state
 machine is implemented and verified.
+
+The latest replay (2026-07-18, refreshed yfinance CSVs through 2026-07-17)
+contains 6,285 candidates, including 1,813 shadow candidates. It is historical
+simulation data, not live-signal evidence.

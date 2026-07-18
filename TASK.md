@@ -340,13 +340,14 @@ ssh mac-studio "cd /Users/congrenhan/Documents/quantrift_stock && /opt/homebrew/
 #### 数据与账本边界
 
 - [x] **文档状态修正**：I 节 Pyramiding 保持未完成；K / Phase 3 改为“代码存在，未完成运行验证”，不得将人工提示或未触发的实现等同于完成。
-- [x] **历史数据覆盖审计**：`data_audit.py --write` 输出全部主策略及影子候选的 `symbol × tf` CSV 起止时间、缺口与数据来源报告。2026-07-18 审计：主池多数文件覆盖约两年/十年，但最新 bar 普遍停在 2026-06-18；生成 48 个 IB 原始周期补拉计划（4h 由 1h 重采样）。
+- [x] **历史数据覆盖审计**：`data_audit.py --write` 输出全部主策略及影子候选的 `symbol × tf` CSV 起止时间、缺口与数据来源报告。2026-07-18 初审生成 48 个 IB 原始周期补拉计划；IB 的 US HMDS 断连后，已通过 yfinance 合并补拉全部 72 个 `symbol × tf` 文件。复审：全部 `fresh`，覆盖至 2026-07-17，来源 `yfinance`。
 - [ ] **IB 历史数据补拉**：现有 CSV 不足时由 IB 补拉；1h 约两年、4h 由 1h 重采样、1d 更长历史。保留拉取时间、来源与合并记录；IB 无法覆盖的缺口才使用 yfinance，并标记来源。已确认阻塞：Gateway API 连接、服务器时间和 NVDA 合约解析都成功；Gateway 返回 `2105: HMDS data farm connection is broken: ushmds`，NVDA 5 日历史请求超时无 bar。此为 US 历史数据 farm 断连；下一项待验证的恢复动作是在不影响期货 bot 的维护窗口重启 Gateway，单标的验证成功后再执行 `fetch_ib_data.py --merge`。
+- [x] **yfinance 历史回补**：IB HMDS 断连期间，`fetch_data.py --merge` 已为全部 24 个配置标的刷新 1d、1h 与 4h（由 1h 重采样），共 72 个文件；保留旧历史、覆盖重复 bar、写入 `data/.data_sources.json`，并为每次请求设置 20 秒上限。
 
 #### 历史回放
 
-- [x] **独立历史信号账本**：`historical_backfill.py --write` 已生成 `logs/backfill_signal_log.csv`；逐 bar 回放 Confluence、RSI2 与 Breakout，不写入实时 `logs/signal_log.csv`。当前基于本地旧快照，最新数据普遍止于 2026-06-18，IB 补拉后需重跑。
-- [x] **影子策略历史回填**：TSLA 4h sslExit、MRVL 1h 宽出场、RKLB Breakout、RSI2 + IBS 已分别写入独立影子记录。当前首次回放 3,311 条候选，其中影子 841 条；IB 补拉后需重跑。
+- [x] **独立历史信号账本**：`historical_backfill.py --write` 已生成 `logs/backfill_signal_log.csv`；逐 bar 回放 Confluence、RSI2 与 Breakout，不写入实时 `logs/signal_log.csv`。已在 yfinance 数据刷新后重跑，当前 6,285 条候选，数据末端为 2026-07-17。
+- [x] **影子策略历史回填**：TSLA 4h sslExit、MRVL 1h 宽出场、RKLB Breakout、RSI2 + IBS 已分别写入独立影子记录。最新回放包含 1,813 条影子候选；仅作为历史模拟，不能替代实时样本。
 - [ ] **历史虚拟组合回填**：按回填信号时间顺序模拟开仓、TP1、止损、追踪出场、纸面 Pyramiding，输出 `logs/backfill_paper_equity.csv`，统计半导体暴露、单标的风险、净值与回撤。
 
 #### 复盘与转正门槛

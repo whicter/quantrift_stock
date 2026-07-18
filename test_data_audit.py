@@ -18,6 +18,14 @@ class DataAuditTests(unittest.TestCase):
             row = data_audit.audit_symbol("TEST", "1d", pd.Timestamp("2026-07-18"))
             self.assertEqual(row["status"], "needs_ib_refresh")
 
+    def test_audit_reads_recorded_data_source(self):
+        with TemporaryDirectory() as directory, patch.object(data_audit, "DATA_DIR", Path(directory)):
+            path = Path(directory) / "TEST_1d.csv"
+            pd.DataFrame({"Close": [100]}, index=pd.to_datetime(["2026-07-17"])).to_csv(path)
+            (Path(directory) / ".data_sources.json").write_text('{"TEST|1d": {"source": "yfinance"}}')
+            row = data_audit.audit_symbol("TEST", "1d", pd.Timestamp("2026-07-18"))
+            self.assertEqual(row["source"], "yfinance")
+
     def test_four_hour_is_excluded_from_ib_requests(self):
         audit = pd.DataFrame([
             {"symbol": "TEST", "tf": "1h", "status": "needs_ib_refresh", "start": "", "end": ""},

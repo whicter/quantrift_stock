@@ -67,7 +67,7 @@ stage 3（持33%）→ sslExit 跟踪止盈（吃大趋势）
 - **离线历史回测/回填**：优先使用 `data/{SYMBOL}_{TF}.csv`；IB Gateway 仅用于显式补拉并合并，4h 由 1h 重采样
 - **4h**：由 1h 重采样（OHLCV 聚合规则：O=first, H=max, L=min, C=last, V=sum）
 - **数据存储**：`data/{SYMBOL}_{TF}.csv`；用 `data_audit.py --write` 查看覆盖、陈旧度和补拉计划
-- **2026-07-18 运行状态**：IB Gateway 的 US 历史数据 farm `ushmds` 断开，不能补拉；历史回填当前仅覆盖到本地 CSV 的末端（多数为 2026-06-18）
+- **2026-07-18 运行状态**：IB Gateway 的 US 历史数据 farm `ushmds` 断开，IB 补拉仍不可用；已改用 yfinance 合并更新全部配置数据，72 个 `symbol × tf` 文件均覆盖至 2026-07-17 并标记来源
 - **SNDK**：2025-02-20 重新上市，历史数据有限（约1年）
 
 ## 告警格式

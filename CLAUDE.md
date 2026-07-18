@@ -72,6 +72,7 @@ ssh mac-studio "cd /Users/congrenhan/Documents/quantrift_stock && /opt/homebrew/
 /opt/homebrew/bin/python3.11 data_audit.py --write
 /opt/homebrew/bin/python3.11 fetch_ib_data.py --symbol NVDA --tf 1d --merge
 /opt/homebrew/bin/python3.11 fetch_ib_data.py --merge
+/opt/homebrew/bin/python3.11 fetch_data.py --merge  # IB HMDS 断连时的 yfinance 备用回补
 /opt/homebrew/bin/python3.11 historical_backfill.py --write
 
 # IB 不可用时用 yfinance 拉新标的数据（直接在 Mac Studio 跑）
@@ -131,6 +132,7 @@ ssh -A mac-studio "cd /Users/congrenhan/Documents/quantrift_stock && git push"
 - 已证实：Gateway API 可连接、`reqCurrentTime()` 成功、NVDA 合约可解析。
 - 已证实：Gateway 返回 `2105: HMDS data farm connection is broken: ushmds`，NVDA 5 日历史请求超时无 bar。不要将此诊断改写为 pacing、clientId 或合约问题。
 - `fetch_ib_data.py` 对合约解析和历史请求均设 45 秒上限。下一项待验证恢复动作是：在维护窗口重启 Gateway（会影响同机期货 bot）→ 单标的验证 → `--merge` → `data_audit.py --write` → `historical_backfill.py --write`。未经用户明确批准，不得重启 Gateway。
+- 2026-07-18 已完成 yfinance 备用回补：`fetch_data.py --merge` 更新 24 个配置标的的 72 个文件，审计全部为 fresh、末端 2026-07-17；数据来源已写入 `data/.data_sources.json`。该路径用于研究/回填，实时告警仍独立使用 yfinance 拉取。
 
 ## 告警格式
 
