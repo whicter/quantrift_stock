@@ -117,6 +117,20 @@ until at least 150 resolved signals exist.
 
 This is read-only. It writes a coverage report and an IB refresh plan under
 `logs/`; use `fetch_ib_data.py --merge` only after reviewing that plan.
+
+## Historical Backfill
+
+```bash
+.venv/bin/python historical_backfill.py --write
+```
+
+This replays only local OHLCV into the isolated
+`logs/backfill_signal_log.csv` and `logs/backfill_paper_equity.csv` ledgers.
+It never sends Telegram messages, writes to the live signal ledger, or connects
+to IB. The paper ledger fixes 0.75% dollar risk when each position opens,
+allows at most 10 simultaneous positions, and records semiconductor-exposure
+warnings. It intentionally does not simulate Pyramiding until that state
+machine is implemented and verified.
 📊 NVDA 1h 做多信号
   价格: $887.5  ATR: $18.2
   Bull得分: 5/6  ADX: 32.4

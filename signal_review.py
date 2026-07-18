@@ -34,7 +34,7 @@ SIGNAL_LOG = Path("logs/signal_log.csv")
 LOG_FIELDS = [
     "timestamp", "bar_date", "symbol", "tf", "strategy", "direction",
     "entry_price", "atr", "tp1", "tp2", "sl",
-    "market_score", "vix", "quality", "signal_id", "is_shadow", "source_strategy",
+    "market_score", "vix", "quality", "signal_id", "source", "is_shadow", "source_strategy",
     "params_json", "sector_aligned", "screener_rank", "market_regime",
 ]
 
@@ -154,6 +154,7 @@ def add_signal_manually():
     row["market_score"] = input("Regime 评分 (可空): ").strip()
     row["vix"]          = input("VIX 值 (可空): ").strip()
     row["quality"]      = input("信号质量 0-10 (可空): ").strip() or "0"
+    row["source"]       = "live"
 
     SIGNAL_LOG.parent.mkdir(exist_ok=True)
     write_header = not SIGNAL_LOG.exists()
@@ -248,6 +249,12 @@ def main():
     if df.empty:
         print("信号日志为空。")
         return
+
+    # Entries written before source separation were all live alert records.
+    if "source" not in df:
+        df["source"] = "live"
+    else:
+        df["source"] = df["source"].fillna("live").replace("", "live")
 
     df["timestamp"] = pd.to_datetime(df["timestamp"])
     df["tp1"] = pd.to_numeric(df["tp1"], errors="coerce").fillna(0)
@@ -429,7 +436,9 @@ def main():
     if args.monitor:
         _monitor(rdf)
     if args.train_meta:
-        print(f"\n🤖 Meta-label: {train_meta_model(rdf).get('reason') or '模型已训练'}")
+        live = rdf[rdf["source"] == "live"]
+        result = train_meta_model(live)
+        print(f"\n🤖 Meta-label（仅 live 样本）: {result.get('reason') or '模型已训练'}")
     if args.telegram:
         _telegram_summary(rdf)
 

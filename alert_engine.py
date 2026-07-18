@@ -198,7 +198,7 @@ _SIGNAL_LOG_PATH = Path("logs/signal_log.csv")
 
 _LOG_FIELDS = [
     "timestamp", "bar_date", "symbol", "tf", "strategy", "direction", "entry_price", "atr", "tp1", "tp2", "sl",
-    "market_score", "vix", "quality", "signal_id", "is_shadow", "source_strategy", "params_json",
+    "market_score", "vix", "quality", "signal_id", "source", "is_shadow", "source_strategy", "params_json",
     "sector_aligned", "screener_rank", "market_regime",
 ]
 
@@ -215,7 +215,7 @@ def _ensure_log_schema():
         writer = csv.DictWriter(fh, fieldnames=_LOG_FIELDS)
         writer.writeheader()
         for old in rows:
-            writer.writerow({field: old.get(field, "") for field in _LOG_FIELDS})
+            writer.writerow({field: old.get(field, "live" if field == "source" else "") for field in _LOG_FIELDS})
 
 def _log_signal(symbol: str, tf: str, bar_date: str, sig: dict, *, params: dict | None = None,
                 is_shadow: bool = False, source_strategy: str = "", sector_aligned: bool | None = None,
@@ -240,6 +240,7 @@ def _log_signal(symbol: str, tf: str, bar_date: str, sig: dict, *, params: dict 
         "vix":          round(float(sig["vix"]), 2) if sig.get("vix") is not None else "",
         "quality":      sig.get("quality", 0),
         "signal_id":    f"{symbol}|{tf}|{strategy}|{bar_date}|{sig.get('direction','')}",
+        "source":       "shadow" if is_shadow else "live",
         "is_shadow":    int(is_shadow),
         "source_strategy": source_strategy,
         "params_json":  json.dumps(params or {}, sort_keys=True),

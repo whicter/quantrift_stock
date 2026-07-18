@@ -114,11 +114,15 @@ def eval_confluence(row: pd.Series | dict, price: pd.DataFrame, max_bars: int) -
 
     # Historical logs lack utTS/sslExit.  Recompute when enough raw data exists.
     data = price.copy()
-    try:
-        from indicators import compute_signals
-        data = compute_signals(data, params) if params else data
-    except Exception:
-        pass
+    # Historical backfill may supply a precomputed indicator frame.  Reusing it
+    # keeps replay deterministic and avoids recomputing years of indicators per
+    # historical event.
+    if not {"utTS", "sslExit"}.issubset(data.columns):
+        try:
+            from indicators import compute_signals
+            data = compute_signals(data, params) if params else data
+        except Exception:
+            pass
     data.index = pd.to_datetime(data.index).tz_localize(None)
     future = data[data.index > pd.to_datetime(row.get("bar_date") or row.get("timestamp"))].head(max_bars)
     stage, realized, ambiguity = 1, 0.0, None

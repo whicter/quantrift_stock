@@ -345,12 +345,12 @@ ssh mac-studio "cd /Users/congrenhan/Documents/quantrift_stock && /opt/homebrew/
 
 #### 历史回放
 
-- [ ] **独立历史信号账本**：新建 `logs/backfill_signal_log.csv`，逐 bar 回放 Confluence、RSI2 与 Breakout。不得写入实时 `logs/signal_log.csv`。
-- [ ] **影子策略历史回填**：TSLA 4h sslExit、MRVL 1h 宽出场、RKLB Breakout、RSI2 + IBS 分别写入独立影子回填记录。
+- [x] **独立历史信号账本**：`historical_backfill.py --write` 已生成 `logs/backfill_signal_log.csv`；逐 bar 回放 Confluence、RSI2 与 Breakout，不写入实时 `logs/signal_log.csv`。当前基于本地旧快照，最新数据普遍止于 2026-06-18，IB 补拉后需重跑。
+- [x] **影子策略历史回填**：TSLA 4h sslExit、MRVL 1h 宽出场、RKLB Breakout、RSI2 + IBS 已分别写入独立影子记录。当前首次回放 3,311 条候选，其中影子 841 条；IB 补拉后需重跑。
 - [ ] **历史虚拟组合回填**：按回填信号时间顺序模拟开仓、TP1、止损、追踪出场、纸面 Pyramiding，输出 `logs/backfill_paper_equity.csv`，统计半导体暴露、单标的风险、净值与回撤。
 
 #### 复盘与转正门槛
 
-- [ ] **复盘来源分层**：所有报告明确区分 `live` / `historical_backfill` / `shadow`；Meta-label 默认仅用 live 已决样本。
+- [x] **复盘来源分层**：实时日志新增 `source=live/shadow`；历史回填固定为 `historical_backfill` 并隔离存储；Meta-label 默认仅用 `live` 已决样本。
 - [ ] **Pyramiding 完整验证**：明确仅 Telegram 人工提示或完整纸面加仓状态；若后者，TP1 后创新高时补回半仓、保护止损移至 TP1，并由历史回放验证。
 - [ ] **持续收集复核**：确认新实时信号可创建 `data/.paper_positions.json` 与 `logs/paper_equity.csv`；定期审查影子样本数量，达到统计门槛后才转正。
