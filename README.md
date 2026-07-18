@@ -87,6 +87,9 @@ IB Gateway :4001 (real) / :4002 (paper)
 | `fetch_ib_data.py` | Download OHLCV data via IB Gateway |
 | `backtest_runner.py` | Batch backtest (ConfluenceStrategy) |
 | `alert_engine.py` | Live signal monitor, Telegram-only |
+| `review_core.py` | 与实盘状态机对齐的逐 bar 复盘引擎 |
+| `paper_portfolio.py` | 虚拟持仓、暴露警示与净值账本（无下单） |
+| `signal_review.py` | 信号复盘、质量校准、衰减监控与 Meta-label 训练 |
 | `CLAUDE.md` | Claude Code instructions |
 | `TASK.md` | Pending tasks |
 | `LEARNING.md` | Backtest observations and strategy findings |
@@ -94,6 +97,17 @@ IB Gateway :4001 (real) / :4002 (paper)
 ## Alert Format
 
 ```
+
+## Review Loop
+
+```bash
+.venv/bin/python signal_review.py --days 90 --monitor
+.venv/bin/python signal_review.py --days 90 --monitor --train-meta
+```
+
+`run_weekly_review.sh` is the scheduled entry point; install the line in
+`crontab.example` on Mac Studio. Meta-label training is intentionally blocked
+until at least 150 resolved signals exist.
 📊 NVDA 1h 做多信号
   价格: $887.5  ATR: $18.2
   Bull得分: 5/6  ADX: 32.4

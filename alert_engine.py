@@ -15,6 +15,8 @@ alert_engine.py — 股票信号监控引擎（仅告警，不下单）
 """
 
 import argparse
+import csv
+import json
 import math
 import os
 import sys
@@ -37,7 +39,8 @@ import yaml
 try:
     from ib_insync import IB, Stock, util
 except ImportError:
-    sys.exit("请安装 ib_insync：pip install ib_insync")
+    # The live scanner is yfinance/provider based; IB remains an optional type hint.
+    IB = Stock = util = None
 
 try:
     import yfinance as yf
@@ -48,6 +51,8 @@ from indicators import compute_signals, _sma, _atr
 from param_loader import get_params
 from data_providers import get_provider
 from mag7_rotation import run_rotation
+from meta_label import suggest as meta_label_suggest
+from paper_portfolio import open_position as paper_open_position, risk_warnings as paper_risk_warnings, update as paper_update
 
 with open("config.yaml") as f:
     cfg = yaml.safe_load(f)
@@ -191,16 +196,40 @@ _sent_signals: dict[str, str] = _load_sent_signals()
 # ── 信号日志（永久保留，用于复盘） ────────────────────────────────────────
 _SIGNAL_LOG_PATH = Path("logs/signal_log.csv")
 
-def _log_signal(symbol: str, tf: str, bar_date: str, sig: dict):
+_LOG_FIELDS = [
+    "timestamp", "bar_date", "symbol", "tf", "strategy", "direction", "entry_price", "atr", "tp1", "tp2", "sl",
+    "market_score", "vix", "quality", "signal_id", "is_shadow", "source_strategy", "params_json",
+    "sector_aligned", "screener_rank", "market_regime",
+]
+
+def _ensure_log_schema():
+    """Upgrade the append-only ledger without losing older signal rows."""
+    if not _SIGNAL_LOG_PATH.exists():
+        return
+    with open(_SIGNAL_LOG_PATH, newline="") as fh:
+        rows = list(csv.DictReader(fh))
+        existing = list(rows[0].keys()) if rows else []
+    if set(_LOG_FIELDS).issubset(existing):
+        return
+    with open(_SIGNAL_LOG_PATH, "w", newline="") as fh:
+        writer = csv.DictWriter(fh, fieldnames=_LOG_FIELDS)
+        writer.writeheader()
+        for old in rows:
+            writer.writerow({field: old.get(field, "") for field in _LOG_FIELDS})
+
+def _log_signal(symbol: str, tf: str, bar_date: str, sig: dict, *, params: dict | None = None,
+                is_shadow: bool = False, source_strategy: str = "", sector_aligned: bool | None = None,
+                screener_rank: int | None = None, market_regime: str = "") -> dict:
     """将信号追加写入 logs/signal_log.csv（永久保留，不自动清理）。"""
-    import csv
     _SIGNAL_LOG_PATH.parent.mkdir(exist_ok=True)
+    _ensure_log_schema()
+    strategy = str(sig.get("strategy", "")) + ("_shadow" if is_shadow else "")
     row = {
         "timestamp":    datetime.now().strftime("%Y-%m-%d %H:%M"),
         "bar_date":     bar_date,
         "symbol":       symbol,
         "tf":           tf,
-        "strategy":     sig.get("strategy", ""),
+        "strategy":     strategy,
         "direction":    sig.get("direction", ""),
         "entry_price":  round(float(sig.get("close", 0)), 4),
         "atr":          round(float(sig.get("atr", 0)), 4),
@@ -210,13 +239,21 @@ def _log_signal(symbol: str, tf: str, bar_date: str, sig: dict):
         "market_score": sig.get("market_score", ""),
         "vix":          round(float(sig["vix"]), 2) if sig.get("vix") is not None else "",
         "quality":      sig.get("quality", 0),
+        "signal_id":    f"{symbol}|{tf}|{strategy}|{bar_date}|{sig.get('direction','')}",
+        "is_shadow":    int(is_shadow),
+        "source_strategy": source_strategy,
+        "params_json":  json.dumps(params or {}, sort_keys=True),
+        "sector_aligned": sector_aligned if sector_aligned is not None else "",
+        "screener_rank": screener_rank if screener_rank is not None else "",
+        "market_regime": market_regime,
     }
     write_header = not _SIGNAL_LOG_PATH.exists()
     with open(_SIGNAL_LOG_PATH, "a", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=list(row.keys()))
+        writer = csv.DictWriter(f, fieldnames=_LOG_FIELDS)
         if write_header:
             writer.writeheader()
         writer.writerow(row)
+    return row
 
 
 # ── Telegram ────────────────────────────────────────────────────────────
@@ -550,6 +587,7 @@ def build_confluence_alert(symbol: str, tf: str, sig: dict) -> str:
         f"  TP1: ${sig['tp1']:.2f}  TP2: ${sig['tp2']:.2f}\n"
         f"  SL(utTS): ${sig['sl']:.2f}  持仓: {hold}\n"
         + _regime_line(sig["market_score"], sig.get("vix")) + "\n"
+        + _vix_position_hint(sig.get("vix")) + "\n"
         + f"  时间: {ts} ET"
     )
 
@@ -565,6 +603,7 @@ def build_rsi2_alert(symbol: str, tf: str, sig: dict) -> str:
         f"  RSI2: {sig['rsi2']:.1f}  SMA200: ${sig['sma200']:.2f}\n"
         f"  SL(ATR trail ×{p.get('atr_trail_mult', 2.5)}): ${sig['sl']:.2f}  持仓: {hold}\n"
         + _regime_line(sig["market_score"], sig.get("vix")) + "\n"
+        + _vix_position_hint(sig.get("vix")) + "\n"
         + f"  时间: {ts} ET"
     )
 
@@ -657,6 +696,7 @@ def build_breakout_alert(symbol: str, sig: dict) -> str:
         f"  SL(初始 ×{p.get('atr_sl_mult',1.5)}): ${sig['sl']:.2f}"
         f"  持仓: 最长 {p.get('max_hold_bars',20)} 交易日\n"
         + _regime_line(4.0, sig.get("vix")) + "\n"
+        + _vix_position_hint(sig.get("vix")) + "\n"
         + f"  时间: {ts} ET"
     )
 
@@ -732,6 +772,37 @@ def _extra_warnings(symbol: str, earnings_days: dict[str, int],
     return "\n".join(lines)
 
 
+def _portfolio_context(sig: dict, symbol: str) -> str:
+    lines = paper_risk_warnings(symbol)
+    probability = meta_label_suggest(sig)
+    if probability is not None:
+        size = "正常" if probability >= .60 else ("减半" if probability >= .45 else "观察")
+        lines.append(f"🤖 Meta-label 胜率估计 {probability:.0%}，建议{size}仓位")
+    return "\n".join(f"  {line}" if not line.startswith("  ") else line for line in lines)
+
+
+def _log_shadow(symbol: str, tf: str, bar_date: str, sig: dict, params: dict, name: str,
+                *, sector_aligned: bool | None, screener_rank: int | None, market_regime: str) -> None:
+    """Record a candidate without Telegram delivery or any execution action."""
+    shadow = dict(sig)
+    shadow["strategy"] = name
+    key = f"{symbol}|{tf}|{name}_shadow|{shadow.get('direction','做多')}"
+    if _sent_signals.get(key) == bar_date:
+        return
+    _log_signal(symbol, tf, bar_date, shadow, params=params, is_shadow=True,
+                source_strategy=sig.get("strategy", ""), sector_aligned=sector_aligned,
+                screener_rank=screener_rank, market_regime=market_regime)
+    _sent_signals[key] = bar_date
+    _save_sent_signals(_sent_signals)
+    print(f"  {symbol} {tf}: 记录影子信号 [{name}]")
+
+
+def _ibs(df_raw: pd.DataFrame) -> float:
+    last = df_raw.iloc[-1]
+    width = float(last["High"] - last["Low"])
+    return (float(last["Close"] - last["Low"]) / width) if width > 0 else 1.0
+
+
 # ── MAG7 轮动 ───────────────────────────────────────────────────────────
 
 def _fetch_earnings_dates(symbols: list[str], within_days: int = 21) -> dict[str, str]:
@@ -771,6 +842,39 @@ def _vix_put_spread_hint(vix: float | None) -> str:
         return f"  VIX {vix:.1f} 🔴 规模减半，价差收窄至 $5 内"
     else:
         return f"  VIX {vix:.1f} ❌ 不开新仓，平现有仓位"
+
+
+def _vix_position_hint(vix: float | None) -> str:
+    if vix is None:
+        return ""
+    if vix < 20:
+        return f"  仓位建议: 正常（VIX {vix:.1f}）"
+    if vix < 25:
+        return f"  仓位建议: 缩小（VIX {vix:.1f}）"
+    if vix < 30:
+        return f"  仓位建议: 减半（VIX {vix:.1f}）"
+    return f"  仓位建议: 不开新仓（VIX {vix:.1f}）"
+
+
+def _scan_market_regime(ib, vix_value: float | None) -> tuple[str, bool]:
+    """Use the ETF scanner's definitions; the bool denotes risk-on chop."""
+    try:
+        spy = fetch_bars(ib, "SPY", "1d")
+        qqq = fetch_bars(ib, "QQQ", "1d")
+        if spy is None or qqq is None or len(spy) < 200:
+            return "unknown", False
+        close = spy["Close"]
+        above_200 = float(close.iloc[-1]) > float(close.rolling(200).mean().iloc[-1])
+        bull_ma = float(close.rolling(20).mean().iloc[-1]) > float(close.rolling(50).mean().iloc[-1])
+        rs = qqq["Close"].reindex(close.index, method="ffill") / close
+        rs_up = float(rs.iloc[-1]) > float(rs.rolling(20).mean().iloc[-1])
+        calm = vix_value is None or vix_value < 25
+        regime = "risk_on" if above_200 and bull_ma and rs_up and calm else ("neutral" if above_200 and calm else "risk_off")
+        qqq_adx = compute_signals(qqq, get_params("QQQ", "1d")).iloc[-1].get("adx", 0)
+        return regime, bool(regime == "risk_on" and float(qqq_adx) < 20)
+    except Exception as exc:
+        print(f"  市场状态: 获取失败 ({exc})")
+        return "unknown", False
 
 
 def check_mag7_rotation_signal(vix: float | None = None) -> dict | None:
@@ -842,6 +946,8 @@ def run_scan(ib=None):
     """扫描所有标的 × 所有周期，发告警。"""
     print(f"\n[{datetime.now().strftime('%H:%M')}] 开始扫描 {len(ALL_SYMBOLS)} 个标的...")
     found = 0
+    scan_signals: dict[str, list[str]] = {}
+    price_cache: dict[tuple[str, str], pd.DataFrame] = {}
 
     # 每次扫描前拉一次 VIX（数据源由 config.yaml data.provider 决定）
     try:
@@ -854,6 +960,9 @@ def run_scan(ib=None):
     except Exception as e:
         print(f"  VIX: 获取异常 ({e})，跳过该分量")
         vix_value = None
+
+    market_regime, risk_on_chop = _scan_market_regime(ib, vix_value)
+    print(f"  市场状态: {market_regime}{'（趋势弱，追随策略降级）' if risk_on_chop else ''}")
 
     # ── MAG7 周频轮动────────────────────────────────────────────────────
     mag7_sig = check_mag7_rotation_signal(vix=vix_value)
@@ -931,6 +1040,7 @@ def run_scan(ib=None):
             if df_raw is None:
                 print(f"  {symbol} {tf}: 无数据")
                 continue
+            price_cache[(symbol, tf)] = df_raw
 
             if tf == "1d":
                 df_1d_cache[symbol] = df_raw  # 缓存日线数据供 breakout 扫描复用
@@ -938,8 +1048,15 @@ def run_scan(ib=None):
             strategy = STRATEGY_MAP.get((symbol, tf), "confluence")
             bar_date = str(df_raw.index[-1].date())
 
+            # Risk-off keeps this alert-only system focused on ETF pullbacks.
+            if market_regime == "risk_off" and symbol not in (BENCHMARK_SYMBOLS | SECTOR_ETF_SYMBOLS):
+                print(f"  {symbol} {tf}: Risk-Off，仅保留 ETF 深度回调候选")
+                continue
+
             if strategy == "confluence":
                 sig = check_confluence_signal(df_raw, params, df_qqq, vix_value)
+                if sig and risk_on_chop:
+                    sig["quality"] = max(0, int(sig.get("quality", 0)) - 1)
                 if sig and sig["direction"] == "做空":
                     max_short = cfg["timeframes"][tf].get("max_market_score_short", 4)
                     score = sig.get("market_score") or 0
@@ -951,14 +1068,34 @@ def run_scan(ib=None):
                     if _sent_signals.get(dedup_key) == bar_date:
                         print(f"  {symbol} {tf}: 已发送（同 bar），跳过 [Confluence]")
                     else:
-                        msg = build_confluence_alert(symbol, tf, sig)
                         extra = _extra_warnings(symbol, earnings_days, soxx_below_ma50, screener_ranks)
+                        resonance = scan_signals.setdefault(symbol, [])
+                        if resonance:
+                            sig["quality"] = min(10, int(sig.get("quality", 0)) + 1)
+                            extra = "\n".join(filter(None, [extra, "  📈 多周期/多策略共振"] ))
+                        resonance.append(f"{tf}:confluence")
+                        portfolio = _portfolio_context(sig, symbol)
+                        msg = build_confluence_alert(symbol, tf, sig)
                         if extra:
                             msg += "\n" + extra
+                        if portfolio:
+                            msg += "\n" + portfolio
                         print(f"\n  ⚡ 信号：{symbol} {tf} {sig['direction']} [Confluence]")
                         print(msg)
                         tg_alert(msg)
-                        _log_signal(symbol, tf, bar_date, sig)
+                        row = _log_signal(symbol, tf, bar_date, sig, params=params,
+                                          sector_aligned=not soxx_below_ma50 if symbol in SEMI_SYMBOLS else None,
+                                          screener_rank=screener_ranks.get(symbol), market_regime=market_regime)
+                        paper_open_position(row)
+                        if (symbol, tf) == ("TSLA", "4h"):
+                            shadow_p = {**params, "exit_variant": "ssl_exit"}
+                            _log_shadow(symbol, tf, bar_date, sig, shadow_p, "TSLA_SSLTrail",
+                                        sector_aligned=None, screener_rank=screener_ranks.get(symbol), market_regime=market_regime)
+                        if (symbol, tf) == ("MRVL", "1h"):
+                            shadow_p = {**params, "atr_tp2_mult": float(params.get("atr_tp2_mult", 3)) + 1.0}
+                            shadow_sig = {**sig, "tp2": sig["close"] + (1 if sig["direction"] == "做多" else -1) * shadow_p["atr_tp2_mult"] * sig["atr"]}
+                            _log_shadow(symbol, tf, bar_date, shadow_sig, shadow_p, "MRVL_WideExit",
+                                        sector_aligned=not soxx_below_ma50, screener_rank=screener_ranks.get(symbol), market_regime=market_regime)
                         _sent_signals[dedup_key] = bar_date
                         _save_sent_signals(_sent_signals)
                         found += 1
@@ -966,20 +1103,37 @@ def run_scan(ib=None):
                     print(f"  {symbol} {tf}: 无信号 [Confluence]")
 
             elif strategy == "rsi2":
+                p = RSI2_PARAMS.get((symbol, tf), {})
                 sig = check_rsi2_signal(df_raw, symbol, tf, df_qqq, vix_value)
                 if sig:
                     dedup_key = f"{symbol}|{tf}|rsi2|做多"
                     if _sent_signals.get(dedup_key) == bar_date:
                         print(f"  {symbol} {tf}: 已发送（同 bar），跳过 [RSI2 v2]")
                     else:
-                        msg = build_rsi2_alert(symbol, tf, sig)
                         extra = _extra_warnings(symbol, earnings_days, soxx_below_ma50, screener_ranks)
+                        resonance = scan_signals.setdefault(symbol, [])
+                        if resonance:
+                            sig["quality"] = min(10, int(sig.get("quality", 0)) + 1)
+                            extra = "\n".join(filter(None, [extra, "  📈 多周期/多策略共振"] ))
+                        resonance.append(f"{tf}:rsi2")
+                        portfolio = _portfolio_context(sig, symbol)
+                        msg = build_rsi2_alert(symbol, tf, sig)
                         if extra:
                             msg += "\n" + extra
+                        if portfolio:
+                            msg += "\n" + portfolio
                         print(f"\n  ⚡ 信号：{symbol} {tf} 做多 [RSI2 v2]")
                         print(msg)
                         tg_alert(msg)
-                        _log_signal(symbol, tf, bar_date, sig)
+                        row = _log_signal(symbol, tf, bar_date, sig, params=p,
+                                          sector_aligned=not soxx_below_ma50 if symbol in SEMI_SYMBOLS else None,
+                                          screener_rank=screener_ranks.get(symbol), market_regime=market_regime)
+                        paper_open_position(row)
+                        if _ibs(df_raw) < 0.2:
+                            shadow_p = {**p, "use_ibs_filter": True}
+                            _log_shadow(symbol, tf, bar_date, sig, shadow_p, "RSI2_IBS",
+                                        sector_aligned=not soxx_below_ma50 if symbol in SEMI_SYMBOLS else None,
+                                        screener_rank=screener_ranks.get(symbol), market_regime=market_regime)
                         _sent_signals[dedup_key] = bar_date
                         _save_sent_signals(_sent_signals)
                         found += 1
@@ -1003,18 +1157,49 @@ def run_scan(ib=None):
             if _sent_signals.get(dedup_key) == bar_date:
                 print(f"  {symbol} 1d: 已发送（同 bar），跳过 [Breakout]")
             else:
+                resonance = scan_signals.setdefault(symbol, [])
+                if resonance:
+                    sig["quality"] = min(10, int(sig.get("quality", 7)) + 1)
+                else:
+                    sig.setdefault("quality", 7)
+                resonance.append("1d:breakout")
                 msg   = build_breakout_alert(symbol, sig)
                 extra = _extra_warnings(symbol, earnings_days, soxx_below_ma50, screener_ranks)
+                if len(resonance) > 1:
+                    extra = "\n".join(filter(None, [extra, "  📈 多周期/多策略共振"]))
+                portfolio = _portfolio_context(sig, symbol)
                 if extra:
                     msg += "\n" + extra
+                if portfolio:
+                    msg += "\n" + portfolio
                 print(f"\n  🚀 突破信号：{symbol} 1d [Breakout52W]")
                 print(msg)
                 tg_alert(msg)
+                row = _log_signal(symbol, "1d", bar_date, sig, params=BREAKOUT_PARAMS.get(symbol, {}),
+                                  sector_aligned=not soxx_below_ma50 if symbol in SEMI_SYMBOLS else None,
+                                  screener_rank=screener_ranks.get(symbol), market_regime=market_regime)
+                paper_open_position(row)
                 _sent_signals[dedup_key] = bar_date
                 _save_sent_signals(_sent_signals)
                 found += 1
         else:
             print(f"  {symbol} 1d: 无突破信号 [Breakout52W]")
+
+    # RKLB remains a shadow-only breakout candidate until its sample is adequate.
+    rklb = fetch_bars(ib, "RKLB", "1d")
+    if rklb is not None:
+        rklb_sig = check_breakout_signal(rklb, "RKLB", vix_value)
+        if rklb_sig:
+            rklb_sig["quality"] = 7
+            _log_shadow("RKLB", "1d", str(rklb.index[-1].date()), rklb_sig,
+                        {"atr_trail_mult": 3.0, "atr_sl_mult": 1.5, "max_hold_bars": 20},
+                        "RKLB_Breakout", sector_aligned=None, screener_rank=screener_ranks.get("RKLB"),
+                        market_regime=market_regime)
+
+    for event in paper_update(price_cache, {"1h": 10, "4h": 10, "1d": 15}):
+        print(f"  虚拟持仓平仓: {event['symbol']} {event['outcome']} {event['r_mult']:+.2f}R")
+        if event["type"] == "pyramid":
+            tg_alert(f"➕ {event['symbol']} 虚拟持仓 TP1 后继续创新高\n  纸面策略提示：可考虑补回已减半仓位，保护止损上移至 TP1。\n  仅提示，不执行任何下单。")
 
     print(f"\n扫描完成，发现 {found} 个信号")
     if found == 0:

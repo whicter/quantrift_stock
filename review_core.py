@@ -1,0 +1,204 @@
+"""Shared, deterministic signal replay used by review and paper portfolio.
+
+This module deliberately models alerts only.  It never sends orders or talks to
+IB; its job is to make the post-alert accounting match the strategy rules.
+"""
+
+from __future__ import annotations
+
+import json
+import math
+from typing import Any
+
+import numpy as np
+import pandas as pd
+
+
+STAGED_PORTIONS = (0.34, 0.33, 0.33)
+
+
+def _num(value: Any, default: float = 0.0) -> float:
+    try:
+        result = float(value)
+        return result if math.isfinite(result) else default
+    except (TypeError, ValueError):
+        return default
+
+
+def signal_params(row: pd.Series | dict) -> dict:
+    """Use the immutable alert snapshot when present, then fall back safely."""
+    raw = row.get("params_json", "")
+    if raw:
+        try:
+            return json.loads(raw)
+        except (TypeError, json.JSONDecodeError):
+            pass
+    return {}
+
+
+def _future_bars(row: pd.Series | dict, price: pd.DataFrame, max_bars: int) -> pd.DataFrame:
+    timestamp = pd.to_datetime(row.get("bar_date") or row.get("timestamp"))
+    index = pd.to_datetime(price.index).tz_localize(None)
+    data = price.copy()
+    data.index = index
+    return data[data.index > timestamp].head(max_bars)
+
+
+def _r(entry: float, exit_price: float, atr: float, direction: str) -> float:
+    if atr <= 0:
+        return 0.0
+    return ((exit_price - entry) / atr) * (1 if direction == "做多" else -1)
+
+
+def _atr(price: pd.DataFrame, length: int = 14) -> pd.Series:
+    high, low, close = price["High"], price["Low"], price["Close"]
+    tr = pd.concat([high - low, (high - close.shift()).abs(), (low - close.shift()).abs()], axis=1).max(axis=1)
+    return tr.rolling(length).mean()
+
+
+def _rsi2(close: pd.Series) -> pd.Series:
+    delta = close.diff()
+    gain = delta.clip(lower=0).rolling(2).mean()
+    loss = (-delta.clip(upper=0)).rolling(2).mean()
+    return 100 - 100 / (1 + gain / loss.replace(0, np.nan))
+
+
+def intrabar_bounds(entry: float, sl: float, tp: float, bar: pd.Series, direction: str) -> tuple[str, float, float] | None:
+    """Return explicit lower/upper R bounds when a bar touches both levels.
+
+    Open gaps establish a known first event.  For the remaining intrabar path
+    OHLC cannot establish order, so the result stays an honest range.
+    """
+    open_, high, low = map(float, (bar["Open"], bar["High"], bar["Low"]))
+    if direction == "做多":
+        hit_sl, hit_tp = low <= sl, high >= tp
+        if not (hit_sl and hit_tp):
+            return None
+        if open_ <= sl:
+            value = _r(entry, sl, abs(entry - sl), direction)
+            return "开盘跳空止损", value, value
+        if open_ >= tp:
+            value = _r(entry, tp, abs(entry - sl), direction)
+            return "开盘跳空止盈", value, value
+    else:
+        hit_sl, hit_tp = high >= sl, low <= tp
+        if not (hit_sl and hit_tp):
+            return None
+        if open_ >= sl:
+            value = _r(entry, sl, abs(entry - sl), direction)
+            return "开盘跳空止损", value, value
+        if open_ <= tp:
+            value = _r(entry, tp, abs(entry - sl), direction)
+            return "开盘跳空止盈", value, value
+    # Range is reported separately; live strategies are close-driven.
+    risk = abs(entry - sl)
+    return "同bar双触达（OHLC无法判序）", _r(entry, sl, risk, direction), _r(entry, tp, risk, direction)
+
+
+def eval_confluence(row: pd.Series | dict, price: pd.DataFrame, max_bars: int) -> dict:
+    """Replay staged exits using the same close-driven state transitions as strategy.py."""
+    entry, atr = _num(row.get("entry_price")), _num(row.get("atr"))
+    direction = str(row.get("direction", "做多"))
+    if entry <= 0 or atr <= 0:
+        return {"outcome": "数据失败", "r_mult": None, "bars": 0}
+    params = signal_params(row)
+    tp1 = _num(row.get("tp1"), entry + atr)
+    tp2 = _num(row.get("tp2"), entry + 3 * atr)
+    fixed_sl = _num(row.get("sl"), entry - atr)
+    use_fixed = bool(params.get("use_fixed_initial_sl", True))
+    breakeven = bool(params.get("use_breakeven_after_tp1", False))
+    ssl_only = params.get("exit_variant") == "ssl_exit"
+    future = _future_bars(row, price, max_bars)
+    if future.empty:
+        return {"outcome": "未决", "r_mult": None, "bars": 0, "exit_model": "close"}
+
+    # Historical logs lack utTS/sslExit.  Recompute when enough raw data exists.
+    data = price.copy()
+    try:
+        from indicators import compute_signals
+        data = compute_signals(data, params) if params else data
+    except Exception:
+        pass
+    data.index = pd.to_datetime(data.index).tz_localize(None)
+    future = data[data.index > pd.to_datetime(row.get("bar_date") or row.get("timestamp"))].head(max_bars)
+    stage, realized, ambiguity = 1, 0.0, None
+    prev_close = None
+    for n, (_, bar) in enumerate(future.iterrows(), 1):
+        close = float(bar["Close"])
+        utts = _num(bar.get("utTS"), fixed_sl)
+        ssl = _num(bar.get("sslExit"), close)
+        stop = fixed_sl if use_fixed and stage == 1 else utts
+        if stage >= 2 and breakeven:
+            stop = max(stop, entry) if direction == "做多" else min(stop, entry)
+        bound = intrabar_bounds(entry, stop, tp1 if stage == 1 else tp2, bar, direction)
+        if bound and ambiguity is None:
+            ambiguity = bound[0]
+
+        hit_stop = (direction == "做多" and close < stop) or (direction == "做空" and close > stop)
+        if hit_stop:
+            remaining = 1 - sum(STAGED_PORTIONS[:stage - 1])
+            realized += remaining * _r(entry, stop, atr, direction)
+            return {"outcome": "止损", "r_mult": round(realized, 3), "bars": n, "exit_model": "close", "ambiguity": ambiguity}
+        if ssl_only and prev_close is not None:
+            crossed = (direction == "做多" and prev_close > ssl and close <= ssl) or (direction == "做空" and prev_close < ssl and close >= ssl)
+            if crossed:
+                return {"outcome": "SSL追踪出场", "r_mult": round(_r(entry, close, atr, direction), 3), "bars": n, "exit_model": "close", "ambiguity": ambiguity}
+            prev_close = close
+            continue
+        if stage == 1 and ((direction == "做多" and close >= tp1) or (direction == "做空" and close <= tp1)):
+            realized += STAGED_PORTIONS[0] * _r(entry, tp1, atr, direction)
+            stage = 2
+        elif stage == 2 and ((direction == "做多" and close >= tp2) or (direction == "做空" and close <= tp2)):
+            realized += STAGED_PORTIONS[1] * _r(entry, tp2, atr, direction)
+            stage = 3
+        if stage == 3 and prev_close is not None:
+            crossed = (direction == "做多" and prev_close > ssl and close <= ssl) or (direction == "做空" and prev_close < ssl and close >= ssl)
+            if crossed:
+                realized += STAGED_PORTIONS[2] * _r(entry, close, atr, direction)
+                return {"outcome": "SSL追踪出场", "r_mult": round(realized, 3), "bars": n, "exit_model": "close", "ambiguity": ambiguity}
+        prev_close = close
+    remaining = 1 - sum(STAGED_PORTIONS[:stage - 1])
+    realized += remaining * _r(entry, float(future["Close"].iloc[-1]), atr, direction)
+    return {"outcome": "时间止损", "r_mult": round(realized, 3), "bars": len(future), "exit_model": "close", "ambiguity": ambiguity}
+
+
+def eval_rsi2(row: pd.Series | dict, price: pd.DataFrame, max_bars: int) -> dict:
+    """Replay RSI2 model C: ATR trail, RSI half exit, then time exit."""
+    entry, atr = _num(row.get("entry_price")), _num(row.get("atr"))
+    if entry <= 0 or atr <= 0:
+        return {"outcome": "数据失败", "r_mult": None, "bars": 0}
+    p = signal_params(row)
+    trail_mult = _num(p.get("atr_trail_mult"), 2.5)
+    sl_mult = _num(p.get("atr_sl_mult"), 1.5)
+    half_exit = _num(p.get("rsi2_half_exit"), 80.0)
+    split = bool(p.get("use_split_exit", True))
+    data = price.copy()
+    data["_atr"] = _atr(data)
+    data["_rsi2"] = _rsi2(data["Close"])
+    future = _future_bars(row, data, max_bars)
+    if future.empty:
+        return {"outcome": "未决", "r_mult": None, "bars": 0, "exit_model": "close"}
+    trail, half_closed, realized = entry - sl_mult * atr, False, 0.0
+    for n, (_, bar) in enumerate(future.iterrows(), 1):
+        close, current_atr = float(bar["Close"]), _num(bar.get("_atr"), atr)
+        trail = max(trail, close - trail_mult * current_atr)
+        rsi = _num(bar.get("_rsi2"), 0)
+        if split and not half_closed and rsi > half_exit:
+            realized += 0.5 * _r(entry, close, atr, "做多")
+            half_closed = True
+        hit_trail = close < trail
+        hit_rsi = not split and rsi > _num(p.get("rsi2_exit"), 80.0)
+        if hit_trail or hit_rsi:
+            realized += (0.5 if half_closed else 1.0) * _r(entry, close, atr, "做多")
+            return {"outcome": "ATR追踪出场" if hit_trail else "RSI出场", "r_mult": round(realized, 3), "bars": n, "exit_model": "close"}
+    realized += (0.5 if half_closed else 1.0) * _r(entry, float(future["Close"].iloc[-1]), atr, "做多")
+    return {"outcome": "时间止损", "r_mult": round(realized, 3), "bars": len(future), "exit_model": "close"}
+
+
+def evaluate(row: pd.Series | dict, price: pd.DataFrame | None, max_bars: int) -> dict:
+    if price is None or price.empty:
+        return {"outcome": "数据失败", "r_mult": None, "bars": 0}
+    strategy = str(row.get("strategy", "")).lower()
+    if "rsi2" in strategy:
+        return eval_rsi2(row, price, max_bars)
+    return eval_confluence(row, price, max_bars)

@@ -2,6 +2,8 @@
 
 > **语言规则**：只用中文或英文回复，绝对不能出现韩语或其他语言。
 
+> **DO NOT send optional commentary.**
+
 > 本项目仅发 Telegram 信号告警，**不下单**。
 
 ## 环境

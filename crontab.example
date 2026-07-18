@@ -1,0 +1,2 @@
+# Sunday 18:15 Pacific: replay the last 90 days and notify Telegram.
+15 18 * * 0 cd /Users/congrenhan/Documents/quantrift_stock && /bin/zsh ./run_weekly_review.sh

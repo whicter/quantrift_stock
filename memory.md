@@ -8,6 +8,23 @@
 - **干跑（--dry-run）绝对不能用 clientId 20**（主bot用20，会踢掉主bot）。
 - **Bash 直接跑，不问确认**：本项目所有 Bash 命令直接执行，不要问"要不要执行"。
 - **参数改动必须先问用户确认**，不能自己决定（如冷却时间、阈值等）。
+- **DO NOT send optional commentary.**
+
+## Codex 仓库工作规则
+
+- **分阶段工作**：仓库工作必须明确拆分为 Review / Design / Implementation / Verification / Deployment readiness。用户只要求 review 时，不改文件、不提交、不格式化、不更新文档、不顺手重构、不直接进入实现。用户只要求 design 时，只说明行为、影响文件、状态变化、失败处理、测试计划和回滚计划，不实现。用户要求 implement 时，只改已批准范围。
+- **不能声称全仓库覆盖，除非有证据**：不要说"我看完了所有代码"或"整个仓库都检查了"。需要给可验证覆盖报告：已读文件、部分读取文件、未读文件、入口文件、引擎文件、共享库、配置、状态管理、运维脚本、测试、作为事实来源的文档；每个相关文件标记 fully reviewed / partially reviewed / located but not reviewed / not found / excluded with reason。
+- **每个发现必须有证据**：代码审查发现需包含 Severity(P0-P3)、Confidence、文件、函数/类、代码路径、触发条件、当前行为、期望行为、最坏后果、代码证据、建议修复、是否改变交易/业务行为、必需测试。发现要分为 confirmed bugs / likely bugs / design risks / operational risks / documentation inconsistencies。架构偏好不能写成确认 bug。
+- **事实和假设必须分开**：明确标注 confirmed from code / confirmed from tests / confirmed from runtime output / inferred from surrounding logic / assumed because evidence is unavailable。代码、文档、配置冲突时，报告冲突并说明当前哪个来源实际生效。
+- **最小改动范围**：优先最小正确改动。不要重构无关代码、改无关命名、整文件格式化、升级依赖、改公共接口。任何 instrument、position size、entry/exit、SL/TP、交易时间、bar 构造、策略参数、reconciliation 行为变化，都必须明确标为 strategy behavior change，并先获批准。
+- **实现前先说明范围**：实现前列出要改文件、要改函数、预计行数范围、新状态字段、接口变化、运行时行为变化、测试覆盖、回滚方法。小修如果变成大 diff，必须停下说明原因。
+- **提交粒度**：一个 commit 只包含一个可独立测试和回滚的风险/修复。不要把无关改动混在一起。不要提交运行状态文件、秘密、生成文件、备份、本地环境文件或无关既有改动。
+- **验证不能只靠编译**：`py_compile` 只代表语法通过，不代表运行正确。根据改动选择 unit test、regression test、deterministic replay、backtest comparison、dry-run、paper test、断连/重启/缺 bar/重复回调/陈旧数据等模拟。必须区分 syntax verified / unit tested / integration tested / dry-run tested / paper-account tested / production tested。
+- **测试/回测证据必须可复现**：报告 exact command、git commit、配置、数据源、数据日期范围、相关环境变量、初始资金、佣金/滑点、仓位大小、交易笔数、PnL、Sharpe、MaxDD、测试结果、前后对比。不可复现结果只能标为 preliminary。
+- **生产系统 fail closed**：无法确认数据新鲜度、bar 完整性、合约身份、持仓归属、open-order 归属、状态一致性、保护单存在、市场 session 有效性时，不开新风险。默认动作：暂停新入场、保留现有保护、告警、记录具体不一致、要求确定性恢复。
+- **完成标准必须明确**：任务完成只在 requested scope 已实现、无关文件未改、必需测试通过、失败/跳过测试已披露、运行时行为变化已总结、剩余风险已列出、回滚方式已提供后成立。达到完成标准后停止，不继续优化。
+- **生产相关改动要可追踪**：提供 finding ID、commit ID、改动文件、执行测试、测试输出、已知限制、部署前提、回滚 commit/命令。审查者要能追踪 finding → design → implementation → verification → deployment decision。
+- **交易系统专项检查**：自动交易代码必须关注数据新鲜度/完整性、时区和 session、完成 bar vs 未完成 bar、历史/实时连续性、contract month/localSymbol/conId/clientId/orderRef/orderId/permId、parent-child、OCA、partial fills、重复回调、断连重连、Gateway/bot 重启、持仓归属、shared-contract 冲突、状态对账、孤儿订单、无保护持仓、残余 spread legs、重复入场、陈旧信号、fail-safe alerts。
 
 ## SSH / 同步规则
 

@@ -18,6 +18,7 @@ signal_review.py — 信号复盘脚本
 
 import argparse
 import csv
+import json
 import math
 import time
 from datetime import datetime, timedelta
@@ -26,11 +27,15 @@ from pathlib import Path
 import pandas as pd
 import yfinance as yf
 
+from meta_label import train as train_meta_model
+from review_core import evaluate
+
 SIGNAL_LOG = Path("logs/signal_log.csv")
 LOG_FIELDS = [
     "timestamp", "bar_date", "symbol", "tf", "strategy", "direction",
     "entry_price", "atr", "tp1", "tp2", "sl",
-    "market_score", "vix", "quality",
+    "market_score", "vix", "quality", "signal_id", "is_shadow", "source_strategy",
+    "params_json", "sector_aligned", "screener_rank", "market_regime",
 ]
 
 
@@ -99,42 +104,7 @@ def _eval_confluence(row: pd.Series, price: pd.DataFrame, tf: str) -> dict:
     逐 bar 检查：同一根 bar 内 SL 优先（保守假设）。
     超过 MAX_BARS 未触及 SL/TP 则按收盘价时间止损。
     """
-    entry     = float(row["entry_price"])
-    tp1       = float(row["tp1"])
-    tp2       = float(row["tp2"])
-    sl        = float(row["sl"])
-    atr       = float(row["atr"])
-    direction = str(row["direction"])
-    sig_dt    = pd.to_datetime(row["timestamp"])
-    max_bars  = MAX_BARS.get(tf, 10)
-
-    future = price[price.index > sig_dt].head(max_bars)
-    if future.empty:
-        return {"outcome": "未决", "r_mult": _current_r(price, entry, atr, direction), "bars": 0}
-
-    for i, (_, bar) in enumerate(future.iterrows()):
-        hi = float(bar["High"])
-        lo = float(bar["Low"])
-
-        if direction == "做多":
-            if lo <= sl:
-                return {"outcome": "止损",   "r_mult": round((sl - entry) / atr, 2), "bars": i + 1}
-            if hi >= tp2:
-                return {"outcome": "TP2命中", "r_mult": round((tp2 - entry) / atr, 2), "bars": i + 1}
-            if hi >= tp1:
-                return {"outcome": "TP1命中", "r_mult": round((tp1 - entry) / atr, 2), "bars": i + 1}
-        else:  # 做空
-            if hi >= sl:
-                return {"outcome": "止损",   "r_mult": round((entry - sl) / atr, 2), "bars": i + 1}
-            if lo <= tp2:
-                return {"outcome": "TP2命中", "r_mult": round((entry - tp2) / atr, 2), "bars": i + 1}
-            if lo <= tp1:
-                return {"outcome": "TP1命中", "r_mult": round((entry - tp1) / atr, 2), "bars": i + 1}
-
-    # 时间止损：按最后一根 bar 收盘价平仓
-    last_close = float(future["Close"].iloc[-1])
-    r = _current_r(future, entry, atr, direction)
-    return {"outcome": "时间止损", "r_mult": r, "bars": len(future)}
+    return evaluate(row, price, MAX_BARS.get(tf, 10))
 
 
 def _eval_rsi2(row: pd.Series, price: pd.DataFrame, tf: str) -> dict:
@@ -142,23 +112,7 @@ def _eval_rsi2(row: pd.Series, price: pd.DataFrame, tf: str) -> dict:
     RSI2 信号评估（只有 SL，无固定 TP）。
     超过 MAX_BARS 未触及 SL 则按收盘价时间止损。
     """
-    entry    = float(row["entry_price"])
-    sl       = float(row["sl"])
-    atr      = float(row["atr"])
-    sig_dt   = pd.to_datetime(row["timestamp"])
-    max_bars = MAX_BARS.get(tf, 15)
-
-    future = price[price.index > sig_dt].head(max_bars)
-    if future.empty:
-        return {"outcome": "未决", "r_mult": _current_r(price, entry, atr, "做多"), "bars": 0}
-
-    for i, (_, bar) in enumerate(future.iterrows()):
-        if float(bar["Low"]) <= sl:
-            return {"outcome": "止损", "r_mult": round((sl - entry) / atr, 2), "bars": i + 1}
-
-    # 时间止损：按最后一根 bar 收盘价平仓
-    r = _current_r(future, entry, atr, "做多")
-    return {"outcome": "时间止损", "r_mult": r, "bars": len(future)}
+    return evaluate(row, price, MAX_BARS.get(tf, 15))
 
 
 def _current_r(price: pd.DataFrame, entry: float, atr: float, direction: str) -> float | None:
@@ -206,6 +160,61 @@ def add_signal_manually():
     print(f"\n✅ 已追加到 {SIGNAL_LOG}")
 
 
+def _quality_report(rdf: pd.DataFrame) -> None:
+    """Show whether the published quality score predicts realized R."""
+    decided = rdf[pd.to_numeric(rdf["r_mult"], errors="coerce").notna()].copy()
+    if decided.empty:
+        return
+    decided["quality"] = pd.to_numeric(decided["quality"], errors="coerce").fillna(0)
+    print("\n📏 Quality 校准")
+    for label, low, high in (("0-4", 0, 4), ("5-7", 5, 7), ("8-10", 8, 10)):
+        group = decided[decided["quality"].between(low, high)]
+        if not group.empty:
+            print(f"  {label}: N={len(group)} 胜率={(group['r_mult'] > 0).mean() * 100:.1f}% 平均R={group['r_mult'].mean():+.2f}")
+
+
+def _monitor(rdf: pd.DataFrame) -> None:
+    """Write rolling live performance history and flag statistical degradation."""
+    decided = rdf[pd.to_numeric(rdf["r_mult"], errors="coerce").notna()].copy()
+    if decided.empty:
+        print("\n🚦 衰减监控：暂无已决信号")
+        return
+    path = Path("logs/review_history.csv")
+    rows = []
+    for (strategy, symbol), group in decided.groupby(["strategy", "symbol"]):
+        recent = group.sort_values("timestamp").tail(20)
+        mean = float(recent["r_mult"].mean())
+        sigma = float(recent["r_mult"].std(ddof=0) / max(len(recent) ** 0.5, 1))
+        # Before an expectation table has enough validated rows, use zero-R neutral baseline.
+        z = mean / sigma if sigma > 0 else 0.0
+        level = "红" if z < -2 else "黄" if z < -1 else "绿"
+        rows.append({"timestamp": datetime.now().isoformat(timespec="seconds"), "strategy": strategy,
+                     "symbol": symbol, "n": len(recent), "mean_r": round(mean, 4), "se": round(sigma, 4),
+                     "z_vs_baseline": round(z, 3), "status": level})
+    hist = pd.DataFrame(rows)
+    path.parent.mkdir(exist_ok=True)
+    hist.to_csv(path, mode="a", index=False, header=not path.exists())
+    print("\n🚦 衰减监控（最近20笔，基准暂为 0R；期望表可在样本稳定后固化）")
+    for row in rows:
+        print(f"  {row['status']} {row['strategy']} {row['symbol']}: N={row['n']} 均R={row['mean_r']:+.2f} z={row['z_vs_baseline']:+.2f}")
+
+
+def _telegram_summary(rdf: pd.DataFrame) -> None:
+    """A weekly status notification; failures must never affect the ledger."""
+    import os
+    import requests
+    token, chat_id = os.environ.get("TG_TOKEN"), os.environ.get("TG_CHAT_ID")
+    if not token or not chat_id:
+        return
+    decided = rdf[pd.to_numeric(rdf["r_mult"], errors="coerce").notna()]
+    avg_r = decided["r_mult"].mean() if not decided.empty else 0
+    text = f"📋 周度信号复盘\n信号 {len(rdf)} 条，已决 {len(decided)} 条，均R {avg_r:+.2f}\n详情：logs/review_history.csv"
+    try:
+        requests.post(f"https://api.telegram.org/bot{token}/sendMessage", data={"chat_id": chat_id, "text": text}, timeout=10)
+    except requests.RequestException:
+        pass
+
+
 # ── 主逻辑 ──────────────────────────────────────────────────────────────────
 
 def main():
@@ -214,6 +223,9 @@ def main():
     parser.add_argument("--symbol", type=str, default="", help="只看某标的")
     parser.add_argument("--tf",     type=str, default="", help="只看某周期 1h/4h/1d")
     parser.add_argument("--add",    action="store_true",  help="手动补录一条历史信号")
+    parser.add_argument("--monitor", action="store_true", help="写入最近20笔策略衰减监控")
+    parser.add_argument("--train-meta", action="store_true", help="样本>=150时训练逻辑回归元标签模型")
+    parser.add_argument("--telegram", action="store_true", help="发送复盘摘要到 Telegram")
     args = parser.parse_args()
 
     if args.add:
@@ -403,6 +415,14 @@ def main():
             if len(pr) > 0:
                 line += f"  未决{len(pen)}条(浮盈{pr.mean():+.2f}R)"
         print(line)
+
+    _quality_report(rdf)
+    if args.monitor:
+        _monitor(rdf)
+    if args.train_meta:
+        print(f"\n🤖 Meta-label: {train_meta_model(rdf).get('reason') or '模型已训练'}")
+    if args.telegram:
+        _telegram_summary(rdf)
 
     print()
 

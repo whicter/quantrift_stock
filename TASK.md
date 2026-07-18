@@ -286,3 +286,49 @@ ssh mac-studio "cd /Users/congrenhan/Documents/quantrift_stock && /opt/homebrew/
 - [ ] **参考资源**：
   - [WorldQuant 101 Formulaic Alphas](https://github.com/yli188/WorldQuant_alpha101_code)：因子公式参考
   - [alphalens-reloaded](https://github.com/stefan-jansen/alphalens-reloaded)：因子 IC / 衰减分析工具
+
+### K — 复盘闭环与策略进化机制（2026-07-18 制定）
+
+**背景**：本项目无实盘下单，`logs/signal_log.csv` + `signal_review.py` 是唯一的真实账本，是复盘和进化的核心资产。当前复盘口径与实盘出场逻辑不一致，导致统计结果失真，无法可靠驱动策略升降级决策。以下按 Phase 1→5 顺序实施，前一阶段是后一阶段的地基。
+
+#### Phase 1（优先级最高，零风险，只改 signal_review.py）— 复盘保真度（已完成）
+
+- [x] **复盘状态机对齐实盘出场逻辑**：新增 `review_core.py`，按 close-driven 实盘规则回放 Confluence 34%/33%/33% staged TP、utTS/sslExit，以及 RSI2 ATR trail/RSI 半仓/时间止损，输出加权 R。
+- [x] **同 bar 内 SL/TP 判定精细化**：记录 Open 跳空的确定顺序；OHLC 双触达时明确写入不可判序标记，而非伪装成 SL 优先的确定结果。
+- [x] **Quality 分数校准**：`signal_review.py` 输出 0-4/5-7/8-10 三桶的已决胜率和均 R。
+- [x] **复盘自动化**：新增 `run_weekly_review.sh` 和 `crontab.example`，周日复盘 90 天、更新监控并推送 Telegram 摘要。
+
+#### Phase 2 — 影子信号流（Shadow Signals，已完成）
+
+- [x] **框架**：影子记录统一以 `_shadow` 后缀写入同一账本，不发送 Telegram，保留 source strategy 和参数快照。
+- [x] **候选1：TSLA 4h 纯 sslExit 追踪出场**：`TSLA_SSLTrail_shadow`。
+- [x] **候选2：MRVL 1h 出场放宽**：`MRVL_WideExit_shadow`（TP2 再放宽 1 ATR）。
+- [x] **候选3：RKLB 突破策略转正观察**：`RKLB_Breakout_shadow`。
+- [x] **候选4：RSI2 加 IBS 过滤**：`RSI2_IBS_shadow`，仅 IBS < 0.2 记录。
+
+#### Phase 3 — Paper Portfolio 虚拟持仓状态机（已完成）
+
+- [x] **虚拟持仓账本**：`paper_portfolio.py` 维护 `data/.paper_positions.json`，全程无下单接口。
+- [x] **板块暴露警示**：半导体新增 10% 权重后超过 45% 时在消息中提示。
+- [x] **单标的风险敞口提示**：同标的虚拟仓位存在时提示新增风险超过 0.75% equity。
+- [x] **TP1 后 Pyramiding 加仓提示**：TP1 虚拟触达后，后续 bar 继续创新高时发送纸面补仓提示，并明确保护止损上移至 TP1；不执行任何下单。
+- [x] **虚拟净值曲线**：平仓后按每笔 0.75% 风险更新 `logs/paper_equity.csv`。
+
+#### Phase 4 — 衰减监控与市场状态路由（已完成）
+
+- [x] **策略衰减红黄灯**：`--monitor` 维护 `logs/review_history.csv`，最近 20 笔以 0R 中性基线计算 z 分数，样本稳定后可用回测期望表替换基线。
+- [x] **多周期共振加分**：同一轮扫描已触发的同标的信号 quality +1 并追加共振标记。
+- [x] **市场状态 × 策略路由**：主扫描按 ETF 扫描器同定义计算 Risk-On/Neutral/Risk-Off；Risk-On chop 降趋势类质量，Risk-Off 仅保留 ETF 信号。
+- [x] **VIX 分级仓位建议推广**：已加入 Confluence/RSI2/breakout 消息。
+
+#### Phase 5（样本 ≥150-200 条已决信号后，避免过拟合）— Meta-labeling（框架完成，严格等待门槛）
+
+- [x] **信号质量二级过滤**：新增依赖最小的逻辑回归训练器与 `--train-meta`。少于 150 条已决信号时拒绝训练；达到门槛后保存模型并仅输出仓位建议，不自动过滤信号。
+
+#### 明确不做（已有结论，不重复投入）
+
+- PEAD / AMZN 专项策略 / EMA Pullback：已证伪，见 LEARNING.md
+- 图形形态识别提前介入：高实现成本 + lookahead bias 风险，维持 TASK.md 原有低优先级
+- MR 策略重启：全周期 N<50，等结构性改善再议
+
+**落地顺序**：Phase 1 → Phase 2 → Phase 3 → Phase 4 → Phase 5（样本积累后）。Phase 1-2 是地基（可信复盘数据 + 零成本实验通道），之后任何新策略想法走"影子流 → 复盘对比 → 转正"标准路径。
