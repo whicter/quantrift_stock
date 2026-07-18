@@ -341,7 +341,7 @@ ssh mac-studio "cd /Users/congrenhan/Documents/quantrift_stock && /opt/homebrew/
 
 - [x] **文档状态修正**：I 节 Pyramiding 保持未完成；K / Phase 3 仅标注“纸面 Pyramiding 提示已实现”，不得等同于完整 Pyramiding。
 - [x] **历史数据覆盖审计**：`data_audit.py --write` 输出全部主策略及影子候选的 `symbol × tf` CSV 起止时间、缺口与数据来源报告。2026-07-18 审计：主池多数文件覆盖约两年/十年，但最新 bar 普遍停在 2026-06-18；生成 48 个 IB 原始周期补拉计划（4h 由 1h 重采样）。
-- [ ] **IB 历史数据补拉**：现有 CSV 不足时由 IB 补拉；1h 约两年、4h 由 1h 重采样、1d 更长历史。保留拉取时间、来源与合并记录；IB 无法覆盖的缺口才使用 yfinance，并标记来源。
+- [ ] **IB 历史数据补拉**：现有 CSV 不足时由 IB 补拉；1h 约两年、4h 由 1h 重采样、1d 更长历史。保留拉取时间、来源与合并记录；IB 无法覆盖的缺口才使用 yfinance，并标记来源。2026-07-18 已实际尝试：Gateway 可连通，但 NVDA 首个合约/历史请求 45 秒内未返回，未写入新 bar；`fetch_ib_data.py` 已加入合约与历史请求超时，待 Gateway 历史数据服务恢复后重跑 `--merge`。
 
 #### 历史回放
 
