@@ -68,6 +68,7 @@ stage 3（持33%）→ sslExit 跟踪止盈（吃大趋势）
 - **4h**：由 1h 重采样（OHLCV 聚合规则：O=first, H=max, L=min, C=last, V=sum）
 - **数据存储**：`data/{SYMBOL}_{TF}.csv`；用 `data_audit.py --write` 查看覆盖、陈旧度和补拉计划
 - **2026-07-18 运行状态**：IB Gateway 的 US 历史数据 farm `ushmds` 断开，IB 补拉仍不可用；已改用 yfinance 合并更新全部配置数据，72 个 `symbol × tf` 文件均覆盖至 2026-07-17 并标记来源
+- **ETF 扫描器数据独立**：47 个 ETF/基准日线不包含在上述 72 文件中；截至 2026-07-18，43 个 ETF 仍需更新，运行 ETF 轮动扫描前必须先完成独立回补
 - **SNDK**：2025-02-20 重新上市，历史数据有限（约1年）
 
 ## 告警格式

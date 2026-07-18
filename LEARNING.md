@@ -7,6 +7,7 @@
 ## 数据运行事实（2026-07-18）
 
 - `data_audit.py --write` 初审发现主池本地 CSV 多数最新 bar 停在 2026-06-18，生成 48 个 IB 原始周期补拉请求；4h 应由 1h 重采样。IB 不可用后通过 `fetch_data.py --merge` 用 yfinance 更新全部 72 个 `symbol × tf` 文件，复审全部为 `fresh`，最新为 2026-07-17。
+- ETF 轮动扫描器的 47 个 ETF/基准日线是独立数据集，未被上述 72 文件覆盖。2026-07-18 检查发现 43 个 ETF 文件陈旧，不能在未回补前据此更新板块轮动结论。
 - IB Gateway API 会话本身正常：`reqCurrentTime()` 成功，NVDA 合约解析成功。
 - Gateway 明确返回 `2105: HMDS data farm connection is broken: ushmds`；随后 NVDA 5 日历史请求超时且无 bar。因此当前无法把陈旧数据归因于脚本、合约或 clientId。
 - `fetch_ib_data.py` 对合约解析和历史请求都使用 45 秒超时，失败只跳过该请求，不应再无限阻塞整批。下一项待验证的恢复动作是 Gateway 重启；它会影响同机期货 bot，必须在维护窗口执行。若恢复，再依次执行 IB 单标的验证、`--merge`、数据审计和历史回填。

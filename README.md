@@ -130,6 +130,11 @@ offline; `fetch_data.py --merge` refreshed all 72 configured `symbol × tf`
 files through yfinance instead. The audit now reports all 72 files as fresh
 through 2026-07-17 and records `source=yfinance` in `data/.data_sources.json`.
 
+This audit covers the alert/backfill symbol pool only. The ETF rotation scanner
+maintains a separate 47-symbol daily dataset: 43 ETF files remain stale as of
+2026-07-18 and require their own yfinance fallback before the next rotation
+scan. `SMH`, `SOXX`, `SPY`, and `QQQ` are already current.
+
 ### Current IB Status (2026-07-18)
 
 The Gateway socket and API session are healthy, but the US historical-data farm

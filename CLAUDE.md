@@ -133,6 +133,7 @@ ssh -A mac-studio "cd /Users/congrenhan/Documents/quantrift_stock && git push"
 - 已证实：Gateway 返回 `2105: HMDS data farm connection is broken: ushmds`，NVDA 5 日历史请求超时无 bar。不要将此诊断改写为 pacing、clientId 或合约问题。
 - `fetch_ib_data.py` 对合约解析和历史请求均设 45 秒上限。下一项待验证恢复动作是：在维护窗口重启 Gateway（会影响同机期货 bot）→ 单标的验证 → `--merge` → `data_audit.py --write` → `historical_backfill.py --write`。未经用户明确批准，不得重启 Gateway。
 - 2026-07-18 已完成 yfinance 备用回补：`fetch_data.py --merge` 更新 24 个配置标的的 72 个文件，审计全部为 fresh、末端 2026-07-17；数据来源已写入 `data/.data_sources.json`。该路径用于研究/回填，实时告警仍独立使用 yfinance 拉取。
+- ETF 扫描器使用独立的 47 个 ETF/基准日线数据集，不包含在上述 72 文件中。2026-07-18 仍有 43 个 ETF 文件陈旧；在实现并运行独立 yfinance 回补前，不得将 ETF 扫描结果视为最新。
 
 ## 告警格式
 
