@@ -108,6 +108,15 @@ IB Gateway :4001 (real) / :4002 (paper)
 `run_weekly_review.sh` is the scheduled entry point; install the line in
 `crontab.example` on Mac Studio. Meta-label training is intentionally blocked
 until at least 150 resolved signals exist.
+
+## Historical Data Audit
+
+```bash
+.venv/bin/python data_audit.py --write
+```
+
+This is read-only. It writes a coverage report and an IB refresh plan under
+`logs/`; use `fetch_ib_data.py --merge` only after reviewing that plan.
 📊 NVDA 1h 做多信号
   价格: $887.5  ATR: $18.2
   Bull得分: 5/6  ADX: 32.4

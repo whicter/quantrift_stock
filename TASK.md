@@ -138,7 +138,7 @@ rsync -av mac-studio:/Users/congrenhan/Documents/quantrift_stock/data/ data/
 
 - [x] **选股排名联动标注**（2026-07-02）：`_load_screener_ranks()` 每次扫描读 `data/screener_results.csv` 最新 Top10，触发信号时追加 `📊 本周因子选股 #N`。文件不存在时静默跳过。screener_results.csv 需定期同步至 Mac Studio。
 
-- [ ] **TP1 后追加（Pyramiding）**（优先级 4）：TP1 触达后下一根 bar 若继续创新高，允许在 TP1 价位补回减掉的半仓，止损上移至 TP1。强趋势行情（如 MU 大涨段）直接提升盈亏比。难点：需要在 `alert_engine.py` 记录持仓状态（目前无持仓跟踪），实现成本较高，需设计持仓状态机。
+- [ ] **TP1 后追加（Pyramiding）**（优先级 4）：完整纸面状态机尚未完成。目标：TP1 触达后下一根 bar 若继续创新高，在 TP1 价位补回减掉的半仓，止损上移至 TP1。当前仅有 Telegram 人工提示，不改变任何真实仓位。
 
 - [x] **52周高点突破**（2026-07-08完成）：`breakout_backtest.py` 新建，网格优化 36 组合。接入 `alert_engine.py`（`check_breakout_signal` + `build_breakout_alert`），`BREAKOUT_PARAMS` 含 NVDA/MU/MSFT/PLTR/TSLA/AAPL（2026-07-09 加入）。数据源从 IB 切换至 yfinance（解决 IB pacing 限制）。
   - NVDA 0.761 / MU 0.843 / PLTR 0.825 / TSLA 0.935 / MSFT 0.628 / AAPL 1.161（9笔样本少）
@@ -311,7 +311,7 @@ ssh mac-studio "cd /Users/congrenhan/Documents/quantrift_stock && /opt/homebrew/
 - [x] **虚拟持仓账本**：`paper_portfolio.py` 维护 `data/.paper_positions.json`，全程无下单接口。
 - [x] **板块暴露警示**：半导体新增 10% 权重后超过 45% 时在消息中提示。
 - [x] **单标的风险敞口提示**：同标的虚拟仓位存在时提示新增风险超过 0.75% equity。
-- [x] **TP1 后 Pyramiding 加仓提示**：TP1 虚拟触达后，后续 bar 继续创新高时发送纸面补仓提示，并明确保护止损上移至 TP1；不执行任何下单。
+- [x] **TP1 后 Pyramiding 提示**：TP1 虚拟触达后，后续 bar 继续创新高时发送人工补仓提示，并明确保护止损上移至 TP1；不执行任何下单，且不修改虚拟仓位数量。
 - [x] **虚拟净值曲线**：平仓后按每笔 0.75% 风险更新 `logs/paper_equity.csv`。
 
 #### Phase 4 — 衰减监控与市场状态路由（已完成）
@@ -332,3 +332,25 @@ ssh mac-studio "cd /Users/congrenhan/Documents/quantrift_stock && /opt/homebrew/
 - MR 策略重启：全周期 N<50，等结构性改善再议
 
 **落地顺序**：Phase 1 → Phase 2 → Phase 3 → Phase 4 → Phase 5（样本积累后）。Phase 1-2 是地基（可信复盘数据 + 零成本实验通道），之后任何新策略想法走"影子流 → 复盘对比 → 转正"标准路径。
+
+### L — 历史回填与样本积累（2026-07-18 制定）
+
+**目标**：不等待未来实时信号，使用可追溯的历史 OHLCV 回放来验证状态机、积累影子策略样本和运行纸面组合。实时账本与历史模拟账本必须严格隔离。
+
+#### 数据与账本边界
+
+- [x] **文档状态修正**：I 节 Pyramiding 保持未完成；K / Phase 3 仅标注“纸面 Pyramiding 提示已实现”，不得等同于完整 Pyramiding。
+- [x] **历史数据覆盖审计**：`data_audit.py --write` 输出全部主策略及影子候选的 `symbol × tf` CSV 起止时间、缺口与数据来源报告。2026-07-18 审计：主池多数文件覆盖约两年/十年，但最新 bar 普遍停在 2026-06-18；生成 48 个 IB 原始周期补拉计划（4h 由 1h 重采样）。
+- [ ] **IB 历史数据补拉**：现有 CSV 不足时由 IB 补拉；1h 约两年、4h 由 1h 重采样、1d 更长历史。保留拉取时间、来源与合并记录；IB 无法覆盖的缺口才使用 yfinance，并标记来源。
+
+#### 历史回放
+
+- [ ] **独立历史信号账本**：新建 `logs/backfill_signal_log.csv`，逐 bar 回放 Confluence、RSI2 与 Breakout。不得写入实时 `logs/signal_log.csv`。
+- [ ] **影子策略历史回填**：TSLA 4h sslExit、MRVL 1h 宽出场、RKLB Breakout、RSI2 + IBS 分别写入独立影子回填记录。
+- [ ] **历史虚拟组合回填**：按回填信号时间顺序模拟开仓、TP1、止损、追踪出场、纸面 Pyramiding，输出 `logs/backfill_paper_equity.csv`，统计半导体暴露、单标的风险、净值与回撤。
+
+#### 复盘与转正门槛
+
+- [ ] **复盘来源分层**：所有报告明确区分 `live` / `historical_backfill` / `shadow`；Meta-label 默认仅用 live 已决样本。
+- [ ] **Pyramiding 完整验证**：明确仅 Telegram 人工提示或完整纸面加仓状态；若后者，TP1 后创新高时补回半仓、保护止损移至 TP1，并由历史回放验证。
+- [ ] **持续收集复核**：确认新实时信号可创建 `data/.paper_positions.json` 与 `logs/paper_equity.csv`；定期审查影子样本数量，达到统计门槛后才转正。

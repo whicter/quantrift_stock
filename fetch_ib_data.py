@@ -16,6 +16,8 @@ IB pacing 限制：
 """
 
 import argparse
+import json
+import os
 import sys
 import time
 from pathlib import Path
@@ -26,13 +28,14 @@ import yaml
 try:
     from ib_insync import IB, Stock, util
 except ImportError:
-    sys.exit("请安装 ib_insync：pip install ib_insync")
+    IB = Stock = util = None
 
 with open("config.yaml") as f:
     cfg = yaml.safe_load(f)
 
 DATA_DIR = Path(cfg["data"]["dir"])
 DATA_DIR.mkdir(exist_ok=True)
+SOURCE_MANIFEST = DATA_DIR / ".data_sources.json"
 
 ALL_SYMBOLS = (
     cfg["symbols"].get("momentum",         [])
@@ -61,6 +64,51 @@ def resample_4h(df_1h: pd.DataFrame) -> pd.DataFrame:
     agg = {"Open": "first", "High": "max", "Low": "min",
            "Close": "last", "Volume": "sum"}
     return df.resample("4h", closed="left", label="left").agg(agg).dropna()
+
+
+def merge_bars(existing: pd.DataFrame | None, incoming: pd.DataFrame) -> pd.DataFrame:
+    """Keep prior history and prefer newly fetched bars at duplicate timestamps."""
+    if existing is None or existing.empty:
+        return incoming.sort_index()
+    merged = pd.concat([existing, incoming])
+    merged.index = pd.to_datetime(merged.index)
+    return merged[~merged.index.duplicated(keep="last")].sort_index()
+
+
+def _load_existing(path: Path) -> pd.DataFrame | None:
+    if not path.exists():
+        return None
+    try:
+        frame = pd.read_csv(path, index_col=0, parse_dates=True)
+        frame.columns = [column.capitalize() for column in frame.columns]
+        return frame
+    except Exception:
+        return None
+
+
+def _record_source(path: Path, symbol: str, tf: str, bars: int):
+    try:
+        manifest = json.loads(SOURCE_MANIFEST.read_text()) if SOURCE_MANIFEST.exists() else {}
+    except (OSError, json.JSONDecodeError):
+        manifest = {}
+    manifest[f"{symbol}|{tf}"] = {
+        "source": "ib",
+        "fetched_at": pd.Timestamp.now(tz="America/Los_Angeles").isoformat(),
+        "bars": bars,
+        "path": str(path),
+    }
+    temp = SOURCE_MANIFEST.with_suffix(".tmp")
+    temp.write_text(json.dumps(manifest, indent=2, sort_keys=True))
+    os.replace(temp, SOURCE_MANIFEST)
+
+
+def save_bars(path: Path, df: pd.DataFrame, symbol: str, tf: str, merge: bool):
+    output = merge_bars(_load_existing(path), df) if merge else df
+    temp = path.with_suffix(".tmp")
+    output.to_csv(temp)
+    os.replace(temp, path)
+    _record_source(path, symbol, tf, len(output))
+    return output
 
 
 def fetch_bars(ib: IB, symbol: str, tf: str) -> pd.DataFrame | None:
@@ -93,7 +141,7 @@ def fetch_bars(ib: IB, symbol: str, tf: str) -> pd.DataFrame | None:
     return df
 
 
-def fetch_symbol(ib: IB, symbol: str, tfs: list[str]):
+def fetch_symbol(ib: IB, symbol: str, tfs: list[str], merge: bool = False):
     print(f"\n{'─'*40}")
     print(f"  {symbol}")
     print(f"{'─'*40}")
@@ -111,8 +159,8 @@ def fetch_symbol(ib: IB, symbol: str, tfs: list[str]):
                 print(f"  [4h] ❌ 无 1h 数据，跳过")
                 continue
             df = resample_4h(df_1h)
-            print(f"  [4h] ✅ {len(df)} 行（由 1h 重采样）→ {out_path}")
-            df.to_csv(out_path)
+            saved = save_bars(out_path, df, symbol, tf, merge)
+            print(f"  [4h] ✅ {len(saved)} 行（由 1h 重采样）→ {out_path}")
             continue
 
         df = fetch_bars(ib, symbol, tf)
@@ -122,8 +170,8 @@ def fetch_symbol(ib: IB, symbol: str, tfs: list[str]):
         if tf == "1h":
             df_1h = df  # 保留供 4h 重采样用
 
-        df.to_csv(out_path)
-        print(f" ✅ {len(df)} 行  →  {out_path}")
+        saved = save_bars(out_path, df, symbol, tf, merge)
+        print(f" ✅ {len(saved)} 行  →  {out_path}")
 
 
 def main():
@@ -134,7 +182,12 @@ def main():
     parser.add_argument("--tf",       help="单周期：1h / 4h / 1d")
     parser.add_argument("--universe", choices=["dow30", "ndx100", "sp500", "russell2000", "all"],
                         help="指数成分股批量下载（仅 1d，用于 screener）")
+    parser.add_argument("--merge", action="store_true",
+                        help="与已有 CSV 合并，保留旧历史且以新 IB bar 覆盖重复时间戳")
     args = parser.parse_args()
+
+    if IB is None:
+        raise SystemExit("请安装 ib_insync：pip install ib_insync")
 
     if args.universe:
         # screener 用途：仅下载日线，不需要 1h/4h
@@ -159,7 +212,7 @@ def main():
 
     try:
         for sym in symbols:
-            fetch_symbol(ib, sym, tfs)
+            fetch_symbol(ib, sym, tfs, merge=args.merge)
     except KeyboardInterrupt:
         print("\n⛔ 用户中断")
     finally:
