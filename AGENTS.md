@@ -43,6 +43,12 @@ ssh mac-studio "cd /Users/congrenhan/Documents/quantrift_stock && /opt/homebrew/
 # 单标的单周期
 ssh mac-studio "cd /Users/congrenhan/Documents/quantrift_stock && /opt/homebrew/bin/python3.11 fetch_ib_data.py --symbol NVDA --tf 1h"
 
+# 补拉前审计、Gateway 恢复后的单标的验证、再合并全量历史
+/opt/homebrew/bin/python3.11 data_audit.py --write
+/opt/homebrew/bin/python3.11 fetch_ib_data.py --symbol NVDA --tf 1d --merge
+/opt/homebrew/bin/python3.11 fetch_ib_data.py --merge
+/opt/homebrew/bin/python3.11 historical_backfill.py --write
+
 # IB 不可用时用 yfinance 拉新标的数据（直接在 Mac Studio 跑）
 ssh mac-studio "cd /Users/congrenhan/Documents/quantrift_stock && /opt/homebrew/bin/python3.11 -c \"
 import yfinance as yf, pandas as pd
@@ -94,6 +100,12 @@ ssh -A mac-studio "cd /Users/congrenhan/Documents/quantrift_stock && git push"
 - **出场模式**：`use_staged_tp=True`，止损用 utTS，TP1/TP2 固定 ATR 倍数
 - **数据源**：`fetch_bars()` 使用 **yfinance**（无 IB pacing 限制，15 分钟延时，够用）
 - **clientId**：IB 连接已从 alert_engine 移除，clientId=2 仅 fetch_ib_data.py 使用
+
+### IB 历史数据运行状态（2026-07-18）
+
+- 已证实：Gateway API 可连接、`reqCurrentTime()` 成功、NVDA 合约可解析。
+- 已证实：Gateway 返回 `2105: HMDS data farm connection is broken: ushmds`，NVDA 5 日历史请求超时无 bar。不要将此诊断改写为 pacing、clientId 或合约问题。
+- `fetch_ib_data.py` 对合约解析和历史请求均设 45 秒上限。下一项待验证恢复动作是：在维护窗口重启 Gateway（会影响同机期货 bot）→ 单标的验证 → `--merge` → `data_audit.py --write` → `historical_backfill.py --write`。未经用户明确批准，不得重启 Gateway。
 
 ## 告警格式
 

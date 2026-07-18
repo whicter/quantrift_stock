@@ -42,6 +42,7 @@
   - `ib` 参数保留签名兼容性，实际传 `None`。
 - **IB pacing 风险**：Error 162 → crash-restart 无限循环教训。`alert_engine.py` 已彻底不连 IB。
   - `clientId=2` 仅 `fetch_ib_data.py` 使用。
+- **IB 历史数据健康状态（2026-07-18）**：API 会话、`reqCurrentTime()` 和 NVDA 合约解析成功；Gateway 返回 `2105: HMDS data farm connection is broken: ushmds`，NVDA 5 日历史请求在 15 秒诊断超时。已证实为 US HMDS 断连，不能猜测为 pacing、clientId 或合约问题。`fetch_ib_data.py` 使用 45 秒请求上限；下一项待验证恢复动作是重启 Gateway，再用单标的历史请求验证。Gateway 同时服务期货 bot，重启属于运维操作，不能擅自执行。
 - **df_1d_cache**：主循环中按 `(symbol, "1d")` 缓存 DataFrame，breakout 扫描复用，避免重复 fetch。
   - DataFrame bool 判断要用 `_cached if _cached is not None else fetch_bars(...)`，不能用 `or`（ValueError）。
 

@@ -306,13 +306,13 @@ ssh mac-studio "cd /Users/congrenhan/Documents/quantrift_stock && /opt/homebrew/
 - [x] **候选3：RKLB 突破策略转正观察**：`RKLB_Breakout_shadow`。
 - [x] **候选4：RSI2 加 IBS 过滤**：`RSI2_IBS_shadow`，仅 IBS < 0.2 记录。
 
-#### Phase 3 — Paper Portfolio 虚拟持仓状态机（已完成）
+#### Phase 3 — Paper Portfolio 虚拟持仓状态机（代码存在，未完成运行验证）
 
-- [x] **虚拟持仓账本**：`paper_portfolio.py` 维护 `data/.paper_positions.json`，全程无下单接口。
-- [x] **板块暴露警示**：半导体新增 10% 权重后超过 45% 时在消息中提示。
-- [x] **单标的风险敞口提示**：同标的虚拟仓位存在时提示新增风险超过 0.75% equity。
-- [x] **TP1 后 Pyramiding 提示**：TP1 虚拟触达后，后续 bar 继续创新高时发送人工补仓提示，并明确保护止损上移至 TP1；不执行任何下单，且不修改虚拟仓位数量。
-- [x] **虚拟净值曲线**：平仓后按每笔 0.75% 风险更新 `logs/paper_equity.csv`。
+- [ ] **虚拟持仓账本**：`paper_portfolio.py` 已有实现，但 `data/.paper_positions.json` 尚不存在，未有运行证据；全程无下单接口。
+- [ ] **板块暴露警示**：代码已实现，尚未由实际纸面仓位触发验证。
+- [ ] **单标的风险敞口提示**：代码已实现，尚未由实际纸面仓位触发验证。
+- [ ] **TP1 后 Pyramiding 提示**：仅有 Telegram 人工提示代码，未改变虚拟仓位数量；完整 Pyramiding 状态机仍未完成。
+- [ ] **虚拟净值曲线**：代码已实现，但 `logs/paper_equity.csv` 尚不存在，未有实际平仓写入验证。
 
 #### Phase 4 — 衰减监控与市场状态路由（已完成）
 
@@ -339,9 +339,9 @@ ssh mac-studio "cd /Users/congrenhan/Documents/quantrift_stock && /opt/homebrew/
 
 #### 数据与账本边界
 
-- [x] **文档状态修正**：I 节 Pyramiding 保持未完成；K / Phase 3 仅标注“纸面 Pyramiding 提示已实现”，不得等同于完整 Pyramiding。
+- [x] **文档状态修正**：I 节 Pyramiding 保持未完成；K / Phase 3 改为“代码存在，未完成运行验证”，不得将人工提示或未触发的实现等同于完成。
 - [x] **历史数据覆盖审计**：`data_audit.py --write` 输出全部主策略及影子候选的 `symbol × tf` CSV 起止时间、缺口与数据来源报告。2026-07-18 审计：主池多数文件覆盖约两年/十年，但最新 bar 普遍停在 2026-06-18；生成 48 个 IB 原始周期补拉计划（4h 由 1h 重采样）。
-- [ ] **IB 历史数据补拉**：现有 CSV 不足时由 IB 补拉；1h 约两年、4h 由 1h 重采样、1d 更长历史。保留拉取时间、来源与合并记录；IB 无法覆盖的缺口才使用 yfinance，并标记来源。2026-07-18 已实际尝试：Gateway 可连通，但 NVDA 首个合约/历史请求 45 秒内未返回，未写入新 bar；`fetch_ib_data.py` 已加入合约与历史请求超时，待 Gateway 历史数据服务恢复后重跑 `--merge`。
+- [ ] **IB 历史数据补拉**：现有 CSV 不足时由 IB 补拉；1h 约两年、4h 由 1h 重采样、1d 更长历史。保留拉取时间、来源与合并记录；IB 无法覆盖的缺口才使用 yfinance，并标记来源。已确认阻塞：Gateway API 连接、服务器时间和 NVDA 合约解析都成功；Gateway 返回 `2105: HMDS data farm connection is broken: ushmds`，NVDA 5 日历史请求超时无 bar。此为 US 历史数据 farm 断连；下一项待验证的恢复动作是在不影响期货 bot 的维护窗口重启 Gateway，单标的验证成功后再执行 `fetch_ib_data.py --merge`。
 
 #### 历史回放
 

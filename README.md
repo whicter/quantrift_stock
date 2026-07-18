@@ -38,8 +38,9 @@ Stock signal monitor with multi-strategy architecture.
 ```bash
 pip install backtesting pandas yfinance pyyaml requests
 
-# Download historical data (run on Mac Studio with IB Gateway)
-ssh mac-studio "cd /Users/congrenhan/Documents/quantrift_stock && /opt/homebrew/bin/python3.11 fetch_ib_data.py"
+# Audit local coverage, then merge an IB refresh (Mac Studio only)
+/opt/homebrew/bin/python3.11 data_audit.py --write
+/opt/homebrew/bin/python3.11 fetch_ib_data.py --merge
 
 # Sync data to local
 rsync -av mac-studio:/Users/congrenhan/Documents/quantrift_stock/data/ /Users/cohan/Documents/quantrift_stock/data/
@@ -54,18 +55,21 @@ rsync -av mac-studio:/Users/congrenhan/Documents/quantrift_stock/data/ /Users/co
 .venv/bin/python mr_backtest.py --optimize
 
 # Start alert engine (Mac Studio only)
-ssh mac-studio "cd /Users/congrenhan/Documents/quantrift_stock && /opt/homebrew/bin/python3.11 alert_engine.py --port 4002"
+/opt/homebrew/bin/python3.11 alert_engine.py
 ```
 
 ## Architecture
 
 ```
-IB Gateway :4001 (real) / :4002 (paper)
-  └── alert_engine.py  clientId=2
+yfinance (15-minute delayed OHLCV)
+  └── alert_engine.py
         ├── fetch bars for each symbol × timeframe
         ├── compute_signals() / RSI2 signals
         ├── check entry conditions (per strategy)
         └── send Telegram alert (NO orders placed)
+
+IB Gateway :4001
+  └── fetch_ib_data.py (clientId=2, offline history refresh only)
 ```
 
 ## Files
@@ -97,6 +101,11 @@ IB Gateway :4001 (real) / :4002 (paper)
 ## Alert Format
 
 ```
+📊 NVDA 1h 做多信号
+  价格: $887.5  ATR: $18.2
+  Bull得分: 5/6  ADX: 32.4
+  TP1: $905.7  TP2: $923.9  SL(utTS): $851.2
+```
 
 ## Review Loop
 
@@ -118,6 +127,22 @@ until at least 150 resolved signals exist.
 This is read-only. It writes a coverage report and an IB refresh plan under
 `logs/`; use `fetch_ib_data.py --merge` only after reviewing that plan.
 
+### Current IB Status (2026-07-18)
+
+The Gateway socket and API session are healthy, but the US historical-data farm
+reported `2105: HMDS data farm connection is broken: ushmds`. Contract lookup
+for NVDA succeeds; a 5-day historical request times out without returning bars.
+This is a Gateway/IB historical-data service condition, not a symbol, clientId,
+or CSV merge failure. `fetch_ib_data.py` bounds contract and historical requests
+to 45 seconds so a batch cannot hang indefinitely.
+
+Do not run a bulk refresh until `ushmds` reconnects. The next recovery action
+to test is an IB Gateway restart, but it can disconnect the separate futures
+bots using the same Gateway, so it requires an explicit operational window.
+Its effectiveness has not yet been verified. After restart, verify the farm
+status with a single NVDA request, then run `--merge`, rerun
+`data_audit.py --write`, and finally rerun `historical_backfill.py --write`.
+
 ## Historical Backfill
 
 ```bash
@@ -131,8 +156,3 @@ to IB. The paper ledger fixes 0.75% dollar risk when each position opens,
 allows at most 10 simultaneous positions, and records semiconductor-exposure
 warnings. It intentionally does not simulate Pyramiding until that state
 machine is implemented and verified.
-📊 NVDA 1h 做多信号
-  价格: $887.5  ATR: $18.2
-  Bull得分: 5/6  ADX: 32.4
-  TP1: $905.7  TP2: $923.9  SL(utTS): $851.2
-```
