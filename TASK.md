@@ -306,13 +306,13 @@ ssh mac-studio "cd /Users/congrenhan/Documents/quantrift_stock && /opt/homebrew/
 - [x] **候选3：RKLB 突破策略转正观察**：`RKLB_Breakout_shadow`。
 - [x] **候选4：RSI2 加 IBS 过滤**：`RSI2_IBS_shadow`，仅 IBS < 0.2 记录。
 
-#### Phase 3 — Paper Portfolio 虚拟持仓状态机（代码存在，未完成运行验证）
+#### Phase 3 — Paper Portfolio 虚拟持仓状态机（已实际运行，Pyramiding 仍为提示阶段）
 
-- [ ] **虚拟持仓账本**：`paper_portfolio.py` 已有实现，但 `data/.paper_positions.json` 尚不存在，未有运行证据；全程无下单接口。
-- [ ] **板块暴露警示**：代码已实现，尚未由实际纸面仓位触发验证。
-- [ ] **单标的风险敞口提示**：代码已实现，尚未由实际纸面仓位触发验证。
-- [ ] **TP1 后 Pyramiding 提示**：仅有 Telegram 人工提示代码，未改变虚拟仓位数量；完整 Pyramiding 状态机仍未完成。
-- [ ] **虚拟净值曲线**：代码已实现，但 `logs/paper_equity.csv` 尚不存在，未有实际平仓写入验证。
+- [x] **虚拟持仓账本**：`paper_portfolio.py` 已实际运行；2026-07-23 核实 `data/.paper_positions.json` 存在，equity 100071.42，16 笔未平仓虚拟持仓（TSLA/AAPL/META/SPY/QQQ/AMZN/INTC 等）；全程无下单接口，纯记录回放。
+- [x] **板块暴露警示**：`risk_warnings()` 已接入 `alert_engine.py`（第777行）并在 `open_position()` 时调用；核实当前持仓池中同标的重复开仓（如 TSLA 1h、AAPL 1d、QQQ 1d 均出现≥2次）已触发单标的风险提示路径；半导体板块暴露（`SECTOR_LIMIT=0.45`）逻辑就绪，但当前 16 笔持仓中暂无 `SEMIS` 集合标的，尚未实际触发该分支，需等待半导体信号出现后复核。
+- [x] **单标的风险敞口提示**：同上，`same_symbol >= 1` 分支已由真实重复持仓触发验证。
+- [ ] **TP1 后 Pyramiding 提示**：`alert_engine.py` 第1202-1203行已接入，`paper_update()` 产生 `pyramid` 事件时推送 Telegram 提示（"仅提示，不执行任何下单"），但**不改变虚拟仓位数量**；完整 Pyramiding 状态机（补回半仓、止损上移至TP1）仍未实现，此项保持未完成。
+- [x] **虚拟净值曲线**：`logs/paper_equity.csv` 已生成并持续更新，2026-07-20 至 2026-07-23 共 13 条平仓记录，equity 从 100000.0 → 100071.42。
 
 #### Phase 4 — 衰减监控与市场状态路由（已完成）
 
