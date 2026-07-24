@@ -42,9 +42,10 @@
   - `ib` 参数保留签名兼容性，实际传 `None`。
 - **IB pacing 风险**：Error 162 → crash-restart 无限循环教训。`alert_engine.py` 已彻底不连 IB。
   - `clientId=2` 仅 `fetch_ib_data.py` 使用。
-- **IB 历史数据健康状态（2026-07-18）**：API 会话、`reqCurrentTime()` 和 NVDA 合约解析成功；Gateway 返回 `2105: HMDS data farm connection is broken: ushmds`，NVDA 5 日历史请求在 15 秒诊断超时。已证实为 US HMDS 断连，不能猜测为 pacing、clientId 或合约问题。`fetch_ib_data.py` 使用 45 秒请求上限；下一项待验证恢复动作是重启 Gateway，再用单标的历史请求验证。Gateway 同时服务期货 bot，重启属于运维操作，不能擅自执行。
-- **yfinance 备用回补（2026-07-18）**：`fetch_data.py` 已修复为当前 symbols 分组，支持 `--merge`、原子写入、`data/.data_sources.json` 来源清单和 20 秒请求上限。全量运行后 72 个 `symbol × tf` 文件均为 fresh、末端 2026-07-17、来源 yfinance；随后历史回填已重跑。
-- **ETF 扫描器数据缺口（2026-07-18）**：其 47 个 ETF/基准日线不属于 `fetch_data.py` 的 24 标的池。`SMH`、`SOXX`、`SPY`、`QQQ` 已至 2026-07-17，`QTUM`/`UFO` 至 2026-07-01，其余 41 个停在 2026-06-18；共 43 个待回补。未更新前不得根据 ETF 扫描器输出做新的轮动结论。
+- **IB 历史数据健康状态（2026-07-24 已恢复）**：2026-07-18 发现的 `2105: HMDS data farm connection is broken: ushmds` 已解决。2026-07-24 04:55 经用户明确批准，执行 `quantrift_index_future/restart_gateway.sh` 重启 Gateway（SIGKILL + launchd `com.quantrift.ibc.plist` KeepAlive 自动拉起）；重启触发 Second Factor Authentication，用户手机 IBKR App 批准后 05:02 登录完成，4001 端口恢复监听。同机 8 个期货 bot（`ib-bot*`）重连期间 PID/重启计数未变化。
+- **恢复序列已执行**：NVDA 1d 单标的验证成功（2512行）→ `fetch_ib_data.py --merge` 42/42 请求 0 失败 → `data_audit.py --write` 复审全部 `fresh`，来源已从 `yfinance` 切回 `ib`，覆盖至 2026-07-23 → `historical_backfill.py --write` 重跑：7302 候选信号，9986 条已决，2135 条影子。
+- **ETF 扫描器数据已回补（2026-07-24）**：其 47 个 ETF/基准日线不属于 `fetch_ib_data.py` 的 24 标的池，需单独用 `fetch_etf_data.py` 拉取。Gateway 恢复后重跑，50 次请求（47 ETF + SPY/QQQ + VIX）全部成功；此前停留在 2026-06-17/18 的文件均已刷新至 2026-07-23（VIX 至 07-24）。ETF 扫描结果现可视为最新。
+- **2026-07-18 yfinance 备用回补记录（仅历史参考）**：`fetch_data.py` 支持 `--merge`、原子写入、`data/.data_sources.json` 来源清单和 20 秒请求上限，作为 IB 再次不可用时的兜底方案保留，当前数据源已是 IB。
 - **df_1d_cache**：主循环中按 `(symbol, "1d")` 缓存 DataFrame，breakout 扫描复用，避免重复 fetch。
   - DataFrame bool 判断要用 `_cached if _cached is not None else fetch_bars(...)`，不能用 `or`（ValueError）。
 

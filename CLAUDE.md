@@ -127,13 +127,13 @@ ssh -A mac-studio "cd /Users/congrenhan/Documents/quantrift_stock && git push"
 - **数据源**：`fetch_bars()` 使用 **yfinance**（无 IB pacing 限制，15 分钟延时，够用）
 - **clientId**：IB 连接已从 alert_engine 移除，clientId=2 仅 fetch_ib_data.py 使用
 
-### IB 历史数据运行状态（2026-07-18）
+### IB 历史数据运行状态（2026-07-24 已恢复）
 
-- 已证实：Gateway API 可连接、`reqCurrentTime()` 成功、NVDA 合约可解析。
-- 已证实：Gateway 返回 `2105: HMDS data farm connection is broken: ushmds`，NVDA 5 日历史请求超时无 bar。不要将此诊断改写为 pacing、clientId 或合约问题。
-- `fetch_ib_data.py` 对合约解析和历史请求均设 45 秒上限。下一项待验证恢复动作是：在维护窗口重启 Gateway（会影响同机期货 bot）→ 单标的验证 → `--merge` → `data_audit.py --write` → `historical_backfill.py --write`。未经用户明确批准，不得重启 Gateway。
-- 2026-07-18 已完成 yfinance 备用回补：`fetch_data.py --merge` 更新 24 个配置标的的 72 个文件，审计全部为 fresh、末端 2026-07-17；数据来源已写入 `data/.data_sources.json`。该路径用于研究/回填，实时告警仍独立使用 yfinance 拉取。
-- ETF 扫描器使用独立的 47 个 ETF/基准日线数据集，不包含在上述 72 文件中。2026-07-18 仍有 43 个 ETF 文件陈旧；在实现并运行独立 yfinance 回补前，不得将 ETF 扫描结果视为最新。
+- **HMDS 断连已解决**：2026-07-18 发现的 `2105: HMDS data farm connection is broken: ushmds` 于 2026-07-24 04:55 通过重启 Gateway 解决。经用户明确批准后执行 `quantrift_index_future/restart_gateway.sh`（SIGKILL + launchd `com.quantrift.ibc.plist` KeepAlive 自动拉起）；重启触发 Second Factor Authentication，用户在手机 IBKR App 批准后 05:02 登录完成，4001 端口恢复监听。
+- **恢复序列已跑完**：① NVDA 1d 单标的验证成功（2512行）② `fetch_ib_data.py --merge` 全量补拉 42 次请求 0 失败 ③ `data_audit.py --write` 复审：全部 `fresh`，数据来源已从 `yfinance` 切回 `ib`，覆盖至 2026-07-23 ④ `historical_backfill.py --write` 重跑：7302 候选信号，9986 条已决，2135 条影子。
+- **期货 bot 未受影响**：同机 8 个 `ib-bot*` pm2 进程重连期间 PID 和重启计数均未变化，未触发 crash-restart。
+- **ETF 扫描器数据已回补**：`fetch_etf_data.py` 在 Gateway 恢复后重跑，47 个 ETF + SPY/QQQ + VIX 共 50 次请求全部成功；此前停留在 2026-06-17/18 的文件均已刷新至 2026-07-23（VIX 至 07-24）。ETF 扫描结果现可视为最新。
+- **历史事实保留**：`fetch_ib_data.py` 对合约解析和历史请求仍保留 45 秒超时（当时用于诊断 HMDS 断连，现继续作为常规保护）；2026-07-18 曾用 `fetch_data.py --merge` 做 yfinance 备用回补覆盖 72 个文件，该记录仅作历史参考，当前数据源已是 IB。
 
 ## 告警格式
 

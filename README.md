@@ -127,31 +127,40 @@ until at least 150 resolved signals exist.
 This is read-only. It writes a coverage report and an IB refresh plan under
 `logs/`. On 2026-07-18, the IB plan could not run because `ushmds` was
 offline; `fetch_data.py --merge` refreshed all 72 configured `symbol × tf`
-files through yfinance instead. The audit now reports all 72 files as fresh
-through 2026-07-17 and records `source=yfinance` in `data/.data_sources.json`.
+files through yfinance as a stopgap. As of 2026-07-24 the audit runs against
+live IB data again: all 72 files report fresh with `source=ib`, coverage
+through 2026-07-23. The 2026-07-18 yfinance pass is kept only as a historical
+record in `data/.data_sources.json`.
 
 This audit covers the alert/backfill symbol pool only. The ETF rotation scanner
-maintains a separate 47-symbol daily dataset: 43 ETF files remain stale as of
-2026-07-18 and require their own yfinance fallback before the next rotation
-scan. `SMH`, `SOXX`, `SPY`, and `QQQ` are already current.
+maintains a separate 47-symbol daily dataset. It was stale as of 2026-07-18
+(43 files behind); after the IB Gateway recovery on 2026-07-24, `fetch_etf_data.py`
+was rerun and all 50 requests (47 ETFs + SPY/QQQ + VIX) succeeded — every file
+is now current through 2026-07-23 (VIX through 07-24).
 
-### Current IB Status (2026-07-18)
+### IB Status (resolved 2026-07-24)
 
-The Gateway socket and API session are healthy, but the US historical-data farm
-reported `2105: HMDS data farm connection is broken: ushmds`. Contract lookup
-for NVDA succeeds; a 5-day historical request times out without returning bars.
-This is a Gateway/IB historical-data service condition, not a symbol, clientId,
-or CSV merge failure. `fetch_ib_data.py` bounds contract and historical requests
-to 45 seconds so a batch cannot hang indefinitely.
+The `2105: HMDS data farm connection is broken: ushmds` condition reported on
+2026-07-18 was resolved on 2026-07-24 04:55 by restarting IB Gateway, with
+explicit user approval, via `quantrift_index_future/restart_gateway.sh`
+(SIGKILL + launchd `com.quantrift.ibc.plist` KeepAlive auto-restart). The
+restart triggered a Second Factor Authentication prompt that blocked
+automatic login; the user approved it on the IBKR mobile app, and login
+completed at 05:02 with port 4001 listening again.
 
-Do not run a bulk refresh until `ushmds` reconnects. The next recovery action
-to test is an IB Gateway restart, but it can disconnect the separate futures
-bots using the same Gateway, so it requires an explicit operational window.
-Its effectiveness has not yet been verified. After restart, verify the farm
-status with a single NVDA request, then run `--merge`, rerun
-`data_audit.py --write`, and finally rerun `historical_backfill.py --write`.
+Recovery sequence executed in full: a single-symbol NVDA 1d request succeeded
+(2512 rows), `fetch_ib_data.py --merge` completed 42/42 requests with zero
+failures, `data_audit.py --write` reported all files fresh with `source=ib`
+through 2026-07-23, and `historical_backfill.py --write` re-ran producing
+7,302 candidate signals (9,986 decided, 2,135 shadow). The 8 co-located
+futures bots (`ib-bot*` under pm2) kept the same PID and restart count
+throughout — no crash-restart was triggered.
 
-While the farm remains offline, refresh the local research dataset safely with:
+`fetch_ib_data.py` still bounds contract and historical requests to 45
+seconds as a standing safeguard, independent of this incident.
+
+If the IB historical-data farm goes offline again before this is fixed
+upstream, the same yfinance fallback used on 2026-07-18 remains available:
 
 ```bash
 /opt/homebrew/bin/python3.11 fetch_data.py --merge

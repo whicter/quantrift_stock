@@ -4,14 +4,14 @@
 
 ---
 
-## 数据运行事实（2026-07-18）
+## 数据运行事实（2026-07-24 更新：HMDS 已恢复）
 
-- `data_audit.py --write` 初审发现主池本地 CSV 多数最新 bar 停在 2026-06-18，生成 48 个 IB 原始周期补拉请求；4h 应由 1h 重采样。IB 不可用后通过 `fetch_data.py --merge` 用 yfinance 更新全部 72 个 `symbol × tf` 文件，复审全部为 `fresh`，最新为 2026-07-17。
-- ETF 轮动扫描器的 47 个 ETF/基准日线是独立数据集，未被上述 72 文件覆盖。2026-07-18 检查发现 43 个 ETF 文件陈旧，不能在未回补前据此更新板块轮动结论。
-- IB Gateway API 会话本身正常：`reqCurrentTime()` 成功，NVDA 合约解析成功。
-- Gateway 明确返回 `2105: HMDS data farm connection is broken: ushmds`；随后 NVDA 5 日历史请求超时且无 bar。因此当前无法把陈旧数据归因于脚本、合约或 clientId。
-- `fetch_ib_data.py` 对合约解析和历史请求都使用 45 秒超时，失败只跳过该请求，不应再无限阻塞整批。下一项待验证的恢复动作是 Gateway 重启；它会影响同机期货 bot，必须在维护窗口执行。若恢复，再依次执行 IB 单标的验证、`--merge`、数据审计和历史回填。
-- `historical_backfill.py --write` 已用刷新后的 yfinance CSV 重跑，生成 6,285 条候选信号（其中 1,813 条影子）。这是历史模拟，不是实时样本；不得据此训练 live Meta-label 或直接转正策略。
+- `data_audit.py --write` 初审发现主池本地 CSV 多数最新 bar 停在 2026-06-18，生成 48 个 IB 原始周期补拉请求；4h 应由 1h 重采样。IB 不可用后通过 `fetch_data.py --merge` 用 yfinance 更新全部 72 个 `symbol × tf` 文件，复审全部为 `fresh`，最新为 2026-07-17（该记录现仅作历史参考）。
+- IB Gateway API 会话本身正常：`reqCurrentTime()` 成功，NVDA 合约解析成功。Gateway 曾明确返回 `2105: HMDS data farm connection is broken: ushmds`，导致 NVDA 5 日历史请求超时无 bar。
+- **2026-07-24 04:55 已解决**：经用户明确批准，执行 `quantrift_index_future/restart_gateway.sh` 重启 Gateway（SIGKILL + launchd KeepAlive 自动拉起）；重启触发 Second Factor Authentication，用户手机批准后 05:02 登录完成。恢复序列全部跑完：NVDA 1d 单标的验证成功 → `fetch_ib_data.py --merge` 42/42 请求 0 失败 → `data_audit.py --write` 复审全部 `fresh`，来源 `ib`，覆盖至 2026-07-23 → `historical_backfill.py --write` 重跑生成 7,302 条候选信号（9,986 条已决，2,135 条影子）。同机 8 个期货 bot 重连期间 PID/重启计数未变化。
+- ETF 轮动扫描器的 47 个 ETF/基准日线是独立数据集，未被上述 72 文件覆盖。2026-07-18 检查发现 43 个 ETF 文件陈旧；2026-07-24 Gateway 恢复后已用 `fetch_etf_data.py` 重新拉取，50 次请求全部成功，全部文件覆盖至 2026-07-23（VIX 至 07-24），板块轮动结论现可基于最新数据。
+- `fetch_ib_data.py` 对合约解析和历史请求仍保留 45 秒超时，作为常规保护，不再是诊断专用措施。
+- 2026-07-18 用 yfinance CSV 生成的 6,285 条候选信号（1,813 条影子）已被 2026-07-24 用 IB 数据重跑的结果取代（见上）。历史回填样本仍是历史模拟，不是实时样本；不得据此训练 live Meta-label 或直接转正策略。
 
 ---
 
