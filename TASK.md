@@ -343,7 +343,7 @@ ssh mac-studio "cd /Users/congrenhan/Documents/quantrift_stock && /opt/homebrew/
 - [x] **历史数据覆盖审计**：`data_audit.py --write` 输出全部主策略及影子候选的 `symbol × tf` CSV 起止时间、缺口与数据来源报告。2026-07-18 初审生成 48 个 IB 原始周期补拉计划；IB 的 US HMDS 断连后，已通过 yfinance 合并补拉全部 72 个 `symbol × tf` 文件。复审：全部 `fresh`，覆盖至 2026-07-17，来源 `yfinance`。
 - [x] **IB 历史数据补拉**：2026-07-24 04:55 用户明确批准后，通过 `quantrift_index_future/restart_gateway.sh`（SIGKILL + launchd `com.quantrift.ibc.plist` KeepAlive 自动拉起）重启 Gateway；重启触发了 Second Factor Authentication，由用户在手机 IBKR App 上批准后 05:02 登录完成，4001 端口恢复监听。恢复序列：① NVDA 1d 单标的验证成功（2512行）② `fetch_ib_data.py --merge` 全量补拉 42 次请求 0 失败 ③ `data_audit.py --write` 复审：全部 `fresh`，来源已从 `yfinance` 切回 `ib`，覆盖至 2026-07-23，需 IB 补拉 0 项 ④ `historical_backfill.py --write` 重跑：7302 候选信号，9986 条已决，2135 条影子。同机 8 个期货 bot（`ib-bot*`）重连期间 PID/重启计数未变化，未触发 crash-restart。
 - [x] **yfinance 历史回补**：IB HMDS 断连期间，`fetch_data.py --merge` 已为全部 24 个配置标的刷新 1d、1h 与 4h（由 1h 重采样），共 72 个文件；保留旧历史、覆盖重复 bar、写入 `data/.data_sources.json`，并为每次请求设置 20 秒上限。
-- [ ] **ETF 扫描器日线回补**：该扫描器的 47 个 ETF/基准不属于 `fetch_ib_data.py` 的 24 标的池，未被本次 `--merge` 覆盖。2026-07-24 复查：`SMH`/`SOXX`/`SPY`/`QQQ` 已随主池更新至 2026-07-23；`XLK`/`XBI` 等其余 ETF 仍停在 2026-06-17/18，尚未回补。IB HMDS 已恢复，可直接用 `fetch_etf_data.py` 重新拉取，无需 yfinance 兜底；仍待执行。
+- [x] **ETF 扫描器日线回补**：该扫描器的 47 个 ETF/基准不属于 `fetch_ib_data.py` 的 24 标的池，需单独用 `fetch_etf_data.py` 拉取。2026-07-24 IB 恢复后执行：50 次请求（47 ETF + SPY/QQQ + VIX）全部成功、0 失败；`XLK`/`XBI` 等此前停留在 2026-06-17/18 的文件均已刷新至 2026-07-23（VIX 至 07-24）。
 
 #### 历史回放
 
