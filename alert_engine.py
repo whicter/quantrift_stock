@@ -69,6 +69,7 @@ ALL_SYMBOLS = (
     + cfg["symbols"].get("pending",  [])
     + cfg["symbols"].get("sector_etf", [])
     + cfg["symbols"].get("broad_etf",  [])
+    + cfg["symbols"].get("watchlist_2026_07", [])
 )
 TIMEFRAMES = ["1h", "4h", "1d"]
 
@@ -118,6 +119,39 @@ STRATEGY_MAP: dict[tuple[str, str], str] = {
     ("MSFT", "1d:bo"): "breakout",
     ("PLTR", "1d:bo"): "breakout",
     ("TSLA", "1d:bo"): "breakout",
+
+    # ── 2026-07-25 watchlist 批量回测新增（见 config.yaml watchlist_2026_07 注释）──
+    ("AIS", "1d"): "confluence",  # Sharpe 0.64 N=30 WR=70.0%
+    ("BB", "4h"): "confluence",  # Sharpe 1.36 N=44 WR=61.4%
+    ("DJT", "1h"): "confluence",  # Sharpe 1.31 N=125 WR=66.4%
+    ("GME", "1h"): "confluence",  # Sharpe 0.69 N=129 WR=56.6%
+    ("IBM", "4h"): "confluence",  # Sharpe 0.76 N=53 WR=67.9%
+    ("INTU", "4h"): "confluence",  # Sharpe 0.60 N=34 WR=64.7%
+    ("LUNR", "4h"): "confluence",  # Sharpe 1.08 N=50 WR=68.0%
+    ("LWLG", "1h"): "confluence",  # Sharpe 0.70 N=133 WR=58.6%
+    ("MORN", "4h"): "confluence",  # Sharpe 0.71 N=37 WR=67.6%
+    ("MSOS", "1d"): "confluence",  # Sharpe 0.87 N=50 WR=76.0%
+    ("PYPL", "1d"): "confluence",  # Sharpe 0.65 N=53 WR=66.0%
+    ("RBLX", "1d"): "confluence",  # Sharpe 1.06 N=38 WR=78.9%
+    ("SOFI", "1d"): "confluence",  # Sharpe 0.71 N=42 WR=73.8%
+    ("USAR", "1h"): "confluence",  # Sharpe 0.75 N=74 WR=59.5%
+    ("AIS", "1h"): "rsi2",  # Sharpe 0.784 N=77 WR=57.1%
+    ("BABA", "4h"): "rsi2",  # Sharpe 0.621 N=30 WR=53.3%
+    ("BB", "1h"): "rsi2",  # Sharpe 0.727 N=93 WR=55.9%
+    ("CEG", "1h"): "rsi2",  # Sharpe 0.603 N=109 WR=51.4%
+    ("CRWD", "1h"): "rsi2",  # Sharpe 0.765 N=124 WR=58.9%
+    ("CRWD", "4h"): "rsi2",  # Sharpe 0.69 N=42 WR=64.3%
+    ("JPM", "1h"): "rsi2",  # Sharpe 0.622 N=107 WR=55.1%
+    ("JPM", "4h"): "rsi2",  # Sharpe 0.604 N=47 WR=70.2%
+    ("LVHI", "4h"): "rsi2",  # Sharpe 1.195 N=30 WR=63.3%
+    ("NTRS", "1h"): "rsi2",  # Sharpe 1.017 N=107 WR=59.8%
+    ("OKLO", "4h"): "rsi2",  # Sharpe 0.766 N=33 WR=72.7%
+    ("ORCL", "1h"): "rsi2",  # Sharpe 0.842 N=113 WR=54.9%
+    ("PKW", "4h"): "rsi2",  # Sharpe 0.614 N=40 WR=57.5%
+    ("RBLX", "4h"): "rsi2",  # Sharpe 0.91 N=38 WR=57.9%
+    ("REMX", "4h"): "rsi2",  # Sharpe 0.845 N=32 WR=71.9%
+    ("SLV", "4h"): "rsi2",  # Sharpe 0.744 N=40 WR=65.0%
+    ("SPMO", "1h"): "rsi2",  # Sharpe 1.074 N=134 WR=56.7%
 }
 
 # 52周突破最优参数（来自 breakout_backtest.py --optimize）
@@ -129,6 +163,12 @@ BREAKOUT_PARAMS: dict[str, dict] = {
     "TSLA": {"confirm_days": 1, "atr_trail_mult": 2.5, "atr_sl_mult": 1.5, "max_hold_bars": 10, "use_vol_filter": False},
     # AAPL: Sharpe 1.161（9笔，样本偏少），confirm=2 过滤假突破，vol 放量确认
     "AAPL": {"confirm_days": 2, "atr_trail_mult": 2.0, "atr_sl_mult": 1.5, "max_hold_bars": 20, "use_vol_filter": True},
+
+    # 2026-07-25 watchlist 批量回测新增（默认参数，未逐个网格优化）
+    "DGRO": {"confirm_days": 1, "atr_trail_mult": 2.5, "atr_sl_mult": 1.5, "max_hold_bars": 20, "use_vol_filter": False},  # Sharpe 0.662 N=50
+    "SPYM": {"confirm_days": 1, "atr_trail_mult": 2.5, "atr_sl_mult": 1.5, "max_hold_bars": 20, "use_vol_filter": False},  # Sharpe 0.635 N=51
+    "VOO":  {"confirm_days": 1, "atr_trail_mult": 2.5, "atr_sl_mult": 1.5, "max_hold_bars": 20, "use_vol_filter": False},  # Sharpe 0.611 N=52
+    "VTI":  {"confirm_days": 1, "atr_trail_mult": 2.5, "atr_sl_mult": 1.5, "max_hold_bars": 20, "use_vol_filter": False},  # Sharpe 0.627 N=54
 }
 
 # RSI2 最优参数（来自 LEARNING.md 网格优化结果）
@@ -157,6 +197,25 @@ RSI2_PARAMS: dict[tuple[str, str], dict] = {
     ("PLTR", "1d"): {"rsi2_entry": 10, "atr_trail_mult": 2.0, "min_market_score": 1, "use_vol_score": True},
     ("PLTR", "1h"): {"rsi2_entry": 5,  "atr_trail_mult": 3.0, "min_market_score": 3},
     ("PLTR", "4h"): {"rsi2_entry": 10, "atr_trail_mult": 3.0, "min_market_score": 1},
+
+    # 2026-07-25 watchlist 批量回测新增（rsi2_backtest.py DEFAULT_PARAMS，未逐个网格优化）
+    ("AIS",  "1h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.0, "min_market_score": 2},
+    ("BABA", "4h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.5, "min_market_score": 2},
+    ("BB",   "1h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.0, "min_market_score": 2},
+    ("CEG",  "1h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.0, "min_market_score": 2},
+    ("CRWD", "1h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.0, "min_market_score": 2},
+    ("CRWD", "4h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.5, "min_market_score": 2},
+    ("JPM",  "1h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.0, "min_market_score": 2},
+    ("JPM",  "4h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.5, "min_market_score": 2},
+    ("LVHI", "4h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.5, "min_market_score": 2},
+    ("NTRS", "1h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.0, "min_market_score": 2},
+    ("OKLO", "4h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.5, "min_market_score": 2},
+    ("ORCL", "1h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.0, "min_market_score": 2},
+    ("PKW",  "4h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.5, "min_market_score": 2},
+    ("RBLX", "4h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.5, "min_market_score": 2},
+    ("REMX", "4h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.5, "min_market_score": 2},
+    ("SLV",  "4h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.5, "min_market_score": 2},
+    ("SPMO", "1h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.0, "min_market_score": 2},
 }
 
 BENCHMARK_SYMBOLS  = {"QQQ", "SPY"}

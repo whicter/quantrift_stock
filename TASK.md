@@ -4,6 +4,21 @@
 
 无
 
+## 已完成（最近）
+
+### M — 用户 watchlist 批量接入（2026-07-25）
+
+**背景**：用户提供两版 watchlist.txt（205 -> 175(清洗后) 个代码），要求判断有效性并接入 alert_engine。
+
+- [x] **第一版 watchlist（205个代码）根源排查**：核实其中大量无法识别代码（ACAC/AIRJ/BATL等）来自用户提供的 `adanos.org` Reddit热度榜单页面——该页面每个 ticker 前有取代码前1-2位字母的徽标图标，抓取时徽标与完整代码断开会残留半截代码（如 `FX FXAIX` 只剩 `FX`，`MQ MQG` 只剩 `MQ`）。该榜单每小时刷新，无法逐个精确复原，改用真实数据拉取结果做最终判断。
+- [x] **第二版 watchlist（195个代码）美股交易所核实**：`yfinance fast_info` 查交易所/币种，对无法直接解析的代码额外用常见外国后缀（.SW/.AX/.TO/.L/.DE等）反查真实上市地。确认 21 个非美股代码并从 `watchlist.txt` 移除：`ABBN`(瑞士ABBN.SW) `AVG`(澳洲) `CBE`(澳洲) `CESG`(伦敦) `CVD`(加拿大) `DHHF`(澳洲) `HHIS`(加拿大) `HULC`(加拿大) `MSTE`(加拿大) `MQG`(澳洲，麦格理) `PRL`(加拿大) `TTM`(澳洲) `VDHG`(澳洲) `VEQT`(加拿大) `VOW`(德国，大众) `VWRA`(瑞士) `XEQT`(加拿大) `DLA HFC INVEST KPL`(任何后缀均无法解析)。`BRK` 修正为 `BRK-B`（纽交所真实代码）。
+- [x] **数据拉取 + 三策略批量回测**：清洗后 175 个代码中 156 个是系统外的全新标的（另加用户指定的 RBLX，共157个）。yfinance 批量拉取 1d/1h/4h（153/144 成功，少数因近期上市/退市数据不足），对每个 `(symbol,tf)` 跑 Confluence + RSI2（默认参数）+ Breakout（仅1d，默认参数）三套回测，取每组合最优 Sharpe。
+- [x] **结果过滤与晋升门槛**：Sharpe≥0.6 且 N≥30 共 54 条 `(symbol,tf)` 组合，剔除退化结果（`XHLF` breakout Sharpe 2.4 但 WR=100%/RR=0，货币基金近零波动率导致 ATR 止盈止损逻辑失效的伪信号）、货币基金/短债ETF（`SGOV`）、杠杆反向ETF（`SOXS`/`SPXU` 达标但不自动接入，风险特征未验证）。最终 **30 个标的、35 个 (symbol,tf) 组合**通过筛选。
+- [x] **接入 alert_engine.py**：`config.yaml` 新增 `watchlist_2026_07` 标的组（30个），`alert_engine.py` 的 `ALL_SYMBOLS`、`STRATEGY_MAP`（+31条）、`RSI2_PARAMS`（+17条）、`BREAKOUT_PARAMS`（+4条：DGRO/SPYM/VOO/VTI）全部更新。完整 import 验证：`ALL_SYMBOLS` 17→47，`STRATEGY_MAP` 37→68，`RSI2_PARAMS` 22→39，`BREAKOUT_PARAMS` 6→10，数量吻合，无 key 覆盖问题。
+- [ ] **参数尚未逐个网格优化**：本批全部使用默认参数（RSI2: entry=10/atr_trail=2.0(1h)or2.5(4h,1d)/score=2；Breakout: confirm=1/trail=2.5/sl=1.5/hold=20），后续可用 `rsi2_backtest.py --symbol X --optimize` / `breakout_backtest.py --optimize` 逐个精调。
+- [ ] **成本压力测试/Walk-Forward 验证未做**：这批标的直接用单一样本回测 Sharpe 门槛接入，未经过现有主池标的都做过的 0-30bps 成本压力测试和训练/测试分段验证（见 LEARNING.md「上线验证结论」），建议观察 1-2 个月实盘信号质量后再补做。
+- [ ] **杠杆/反向ETF专项评估**：`SOXS`(1h Confluence Sharpe 1.19) `SPXU`(1h/1d Confluence Sharpe 1.22/0.60) 达标但因杠杆衰减特性从未验证，暂不接入，留待专项研究决定是否需要独立参数体系。
+
 ## 待完成（优先级顺序）
 
 ### A — alert_engine 剩余功能

@@ -50,6 +50,15 @@ symbols:
   # 宽基 ETF：RSI2 benchmark 模式（不参与 RS 过滤）
   broad_etf:   [QQQ, SPY]
 
+  # 2026-07-25 用户提供 watchlist 批量回测新增（157个候选 -> 30个通过 Sharpe>=0.6 且 N>=30）
+  # 方法：yfinance 拉取 1h/4h/1d -> Confluence/RSI2(默认参数)/Breakout(默认参数) 三策略回测
+  #      -> 取每个 (symbol,tf) 最优 Sharpe -> 剔除退化结果(WR=100%或RR=0，多为货币基金/近零波动品种伪信号)
+  #      -> 剔除货币基金/短债ETF(SGOV/BND等) -> 剩余即本组
+  # 杠杆/反向ETF(SOXS/SPXU等)即使达标也不自动列入，见 LEARNING.md 说明
+  watchlist_2026_07: [AIS, BABA, BB, CEG, CRWD, DGRO, DJT, GME, IBM, INTU, JPM,
+                       LUNR, LVHI, LWLG, MORN, MSOS, NTRS, OKLO, ORCL, PKW,
+                       PYPL, RBLX, REMX, SLV, SOFI, SPMO, SPYM, USAR, VOO, VTI]
+
 # ── 数据设置 ────────────────────────────────────────────────────────────
 data:
   dir: "data"
