@@ -63,6 +63,7 @@
 | `screener.py` | 多指数周频因子选股（NDX100/SP500等） |
 | `mag7_rotation.py` | MAG7 周频相对强弱轮动 |
 | `signal_review.py` | 信号复盘（读 logs/signal_log.csv） |
+| `mr_backtest.py`/`mr_signals.py`/`mr_strategy.py` | MR均值回归回测；2026-07-25 起 `alert_engine.py` 的 `check_mr_signal()` 也直接实现同一入场规则用于实时扫描 |
 
 ## BREAKOUT_PARAMS（当前接入实盘的标的）
 
@@ -74,6 +75,14 @@
 | PLTR | 1 | 2.5 | 1.5 | 20 | 否 | 0.825 |
 | TSLA | 1 | 2.5 | 1.5 | 10 | 否 | 0.935 |
 | AAPL | 2 | 2.0 | 1.5 | 20 | 是 | 1.161（9笔，样本少） |
+| DGRO/SPYM/VOO/VTI | 1 | 2.5 | 1.5 | 20 | 否 | 0.66/0.64/0.61/0.63（2026-07-25 watchlist批量新增，默认参数未调优） |
+
+## MR_PARAMS（2026-07-25 首次接入实时扫描）
+
+| 标的 | bb_mult | rsi_os | adx_max | atr_sl× | atr_trail× | hold | Sharpe |
+|------|---------|--------|---------|---------|-----------|------|--------|
+| TSM  | 2.0 | 40 | 25 | 2.0 | 2.5 | 48 | 1.281（N=31，勉强过30笔门槛） |
+| FDVV | 2.0 | 40 | 25 | 2.0 | 2.5 | 48 | 0.619（N=38） |
 
 ## pending_high_vol 观察标的
 

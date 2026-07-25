@@ -10,7 +10,8 @@ Stock signal monitor with multi-strategy architecture.
 |---|---|---|
 | High-beta momentum | NVDA, TSLA, SNDK, MU, STX, MRVL | ConfluenceStrategy |
 | Large-cap slow-trend | MSFT, GOOGL, META, AAPL, AMZN | RSI2 + QQQ filter + RS filter |
-| Broad ETFs | SOXX, SMH, QQQ, SPY | RSI2 or MR + ATR Trail |
+| Broad ETFs | SOXX, SMH, QQQ, SPY | RSI2 (self-trend, no QQQ RS filter for SOXX/SMH) |
+| Watchlist batch (2026-07-25) | 34 symbols in `config.yaml` `watchlist_2026_07` | Confluence/RSI2/Breakout/MR — whichever cleared Sharpe≥0.6, N≥30 on default params; see TASK.md section M |
 
 ## Strategies
 
@@ -24,10 +25,11 @@ Stock signal monitor with multi-strategy architecture.
 - Exit: RSI2 > 80 OR ATR trailing stop OR time stop
 - Best results: MSFT 4h (Sharpe 1.13), SOXX 1h (Sharpe 1.14)
 
-### 3. MR + ATR Trail（宽基 ETF 高胜率方案）
+### 3. MR + ATR Trail（均值回归）
 - Entry: z-score ≤ −0.9 (near BB lower band) AND RSI < 40 AND ADX < 25 AND close > 200 SMA
 - Exit: ATR trailing stop（不在中轨止盈，让趋势跑起来）
-- Best results: SOXX 1d (Sharpe 0.71, WR 61.9%, RR 3.41)
+- Originally researched for broad ETFs (SOXX/SMH/QQQ/SPY) but paused for insufficient sample size across the board (see LEARNING.md); those four still run on RSI2 in production
+- **2026-07-25**: first live deployment via `check_mr_signal()`, discovered through the watchlist batch probe rather than the original broad-ETF research — currently `TSM` (1h) and `FDVV` (1h) only, on unoptimized default params
 
 ## Timeframes
 
@@ -83,6 +85,7 @@ IB Gateway :4001
 | `mr_signals.py` | Signal computation for MR strategy |
 | `mr_strategy.py` | MeanReversionStrategy (backtesting.py) |
 | `mr_backtest.py` | MR + ATR Trail backtest runner & optimizer |
+| `check_mr_signal()` (in `alert_engine.py`) | Live MR entry check (2026-07-25), mirrors `mr_strategy.py`'s rule directly rather than importing it |
 | `ema_signals.py` | Signal computation for EMA Pullback (archived) |
 | `ema_strategy.py` | EMABounceStrategy (archived, WR too low) |
 | `ema_backtest.py` | EMA Pullback backtest runner (archived) |

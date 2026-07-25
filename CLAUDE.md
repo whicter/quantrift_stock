@@ -121,8 +121,9 @@ ssh -A mac-studio "cd /Users/congrenhan/Documents/quantrift_stock && git push"
 - **核心文件**：`alert_engine.py`（信号监控）、`strategy.py`（ConfluenceStrategy）、`indicators.py`（compute_signals）、`config.yaml`（参数）
 - **品种**：见 `config.yaml` symbols 列表
 - **周期**：1h / 4h / 1d，三周期独立信号
-- **策略路由**：`STRATEGY_MAP` 按 `(symbol, tf)` 路由到 confluence / rsi2 / breakout
-- **52周突破**：`BREAKOUT_PARAMS` 独立配置（NVDA/MU/MSFT/PLTR/TSLA/AAPL），仅日线
+- **策略路由**：`STRATEGY_MAP` 按 `(symbol, tf)` 路由到 confluence / rsi2 / breakout / mr（2026-07-25 新增 MR 均值回归实时分支，见下方 MR 策略说明）
+- **52周突破**：`BREAKOUT_PARAMS` 独立配置（NVDA/MU/MSFT/PLTR/TSLA/AAPL + 2026-07-25 新增 DGRO/SPYM/VOO/VTI），仅日线
+- **MR 均值回归**（2026-07-25 首次接入实时扫描）：`check_mr_signal()` + `MR_PARAMS`，只做多，入场 z-score≤-0.9 + RSI<40 + ADX<25 + close>200SMA，出场纯 ATR 追踪+时间止损（无固定TP）。目前仅 `TSM`(1h)/`FDVV`(1h) 接入；`mr_backtest.py` 存在多年但此前从未接入实时告警，是这次才补的缺口
 - **出场模式**：`use_staged_tp=True`，止损用 utTS，TP1/TP2 固定 ATR 倍数
 - **数据源**：`fetch_bars()` 使用 **yfinance**（无 IB pacing 限制，15 分钟延时，够用）
 - **clientId**：IB 连接已从 alert_engine 移除，clientId=2 仅 fetch_ib_data.py 使用
