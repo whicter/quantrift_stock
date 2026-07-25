@@ -33,8 +33,9 @@ symbols:
   watch:       [AAPL, INTC]
 
   # 选股初筛发现的候选（连续 Top5 SP500/NDX），待 backtest_runner 验证参数后升级
-  # AMD/AMAT/KLAC/DELL：回测最优 Sharpe 0.52/0.36/0.05/0.26，未达 0.6 门槛（2026-07-02）
-  watch_candidates: [AMD, AMAT, KLAC, DELL]
+  # AMD/AMAT/KLAC：回测最优 Sharpe 0.52/0.36/0.05，未达 0.6 门槛（2026-07-02）
+  # DELL 已于 2026-07-25 用新参数重跑达标（1h Confluence 0.83 / 4h RSI2 0.85），升级至 watchlist_2026_07
+  watch_candidates: [AMD, AMAT, KLAC]
 
   # 待专项研究：RSI2 失效（Sharpe 0.27），ConfluenceStrategy 待验证
   # 备选方案："距 20 日高点回撤 5-10% + RSI 40-55"
@@ -55,9 +56,10 @@ symbols:
   #      -> 取每个 (symbol,tf) 最优 Sharpe -> 剔除退化结果(WR=100%或RR=0，多为货币基金/近零波动品种伪信号)
   #      -> 剔除货币基金/短债ETF(SGOV/BND等) -> 剩余即本组
   # 杠杆/反向ETF(SOXS/SPXU等)即使达标也不自动列入，见 LEARNING.md 说明
-  watchlist_2026_07: [AIS, BABA, BB, CEG, CRWD, DGRO, DJT, GME, IBM, INTU, JPM,
-                       LUNR, LVHI, LWLG, MORN, MSOS, NTRS, OKLO, ORCL, PKW,
-                       PYPL, RBLX, REMX, SLV, SOFI, SPMO, SPYM, USAR, VOO, VTI]
+  # 2026-07-25 补跑：用户追问的 HOOD/EU/XYZ/COIN/DELL 中仅 HOOD/DELL 达标（COIN/EU/XYZ 三策略全周期均未达标，未列入）
+  watchlist_2026_07: [AIS, BABA, BB, CEG, CRWD, DELL, DGRO, DJT, GME, HOOD, IBM,
+                       INTU, JPM, LUNR, LVHI, LWLG, MORN, MSOS, NTRS, OKLO, ORCL,
+                       PKW, PYPL, RBLX, REMX, SLV, SOFI, SPMO, SPYM, USAR, VOO, VTI]
 
 # ── 数据设置 ────────────────────────────────────────────────────────────
 data:

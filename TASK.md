@@ -18,6 +18,7 @@
 - [ ] **参数尚未逐个网格优化**：本批全部使用默认参数（RSI2: entry=10/atr_trail=2.0(1h)or2.5(4h,1d)/score=2；Breakout: confirm=1/trail=2.5/sl=1.5/hold=20），后续可用 `rsi2_backtest.py --symbol X --optimize` / `breakout_backtest.py --optimize` 逐个精调。
 - [ ] **成本压力测试/Walk-Forward 验证未做**：这批标的直接用单一样本回测 Sharpe 门槛接入，未经过现有主池标的都做过的 0-30bps 成本压力测试和训练/测试分段验证（见 LEARNING.md「上线验证结论」），建议观察 1-2 个月实盘信号质量后再补做。
 - [ ] **杠杆/反向ETF专项评估**：`SOXS`(1h Confluence Sharpe 1.19) `SPXU`(1h/1d Confluence Sharpe 1.22/0.60) 达标但因杠杆衰减特性从未验证，暂不接入，留待专项研究决定是否需要独立参数体系。
+- [x] **补跑用户追问标的（2026-07-25）**：用户核对系统是否包含 `INTC/META/HOOD/EU/XYZ/COIN/IBM/DELL` 八个代码。核实结果：`INTC`(watch组已在跑)/`META`(mega_cap已在跑)/`IBM`(本轮已接入)三个已在系统；`DELL` 在 `watch_candidates`（未接入ALL_SYMBOLS，未实际扫描）；`HOOD/EU/XYZ/COIN` 完全不在系统。对 `HOOD/EU/XYZ/COIN/DELL` 五个补跑三策略回测：**`DELL`(1h Confluence Sharpe 0.83 N=70；4h RSI2 Sharpe 0.853 N=38) 和 `HOOD`(1h RSI2 Sharpe 1.108 N=142；4h RSI2 Sharpe 0.644 N=51) 达标接入** `watchlist_2026_07`（DELL 同时从 `watch_candidates` 移除，避免重复归属）；`COIN`(三周期 Sharpe 0.03~0.28，全部不达标)、`EU`(即 enCore Energy，NASDAQ小盘铀矿股，三周期 Sharpe -0.55~0.13，不达标)、`XYZ`(Block Inc，三周期 Sharpe -1.02~0.56，不达标) 均未接入。`import` 验证：`ALL_SYMBOLS` 47→49，`STRATEGY_MAP` 68→72，`RSI2_PARAMS` 39→42，数量吻合。
 
 ## 待完成（优先级顺序）
 

@@ -152,6 +152,12 @@ STRATEGY_MAP: dict[tuple[str, str], str] = {
     ("REMX", "4h"): "rsi2",  # Sharpe 0.845 N=32 WR=71.9%
     ("SLV", "4h"): "rsi2",  # Sharpe 0.744 N=40 WR=65.0%
     ("SPMO", "1h"): "rsi2",  # Sharpe 1.074 N=134 WR=56.7%
+
+    # 2026-07-25 补跑（用户追问 HOOD/EU/XYZ/COIN/DELL，仅 HOOD/DELL 达标）
+    ("DELL", "1h"): "confluence",  # Sharpe 0.83 N=70 WR=61.4%
+    ("DELL", "4h"): "rsi2",  # Sharpe 0.853 N=38 WR=68.4%
+    ("HOOD", "1h"): "rsi2",  # Sharpe 1.108 N=142 WR=62.7%
+    ("HOOD", "4h"): "rsi2",  # Sharpe 0.644 N=51 WR=54.9%
 }
 
 # 52周突破最优参数（来自 breakout_backtest.py --optimize）
@@ -216,6 +222,11 @@ RSI2_PARAMS: dict[tuple[str, str], dict] = {
     ("REMX", "4h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.5, "min_market_score": 2},
     ("SLV",  "4h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.5, "min_market_score": 2},
     ("SPMO", "1h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.0, "min_market_score": 2},
+
+    # 2026-07-25 补跑
+    ("DELL", "4h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.5, "min_market_score": 2},
+    ("HOOD", "1h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.0, "min_market_score": 2},
+    ("HOOD", "4h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.5, "min_market_score": 2},
 }
 
 BENCHMARK_SYMBOLS  = {"QQQ", "SPY"}
