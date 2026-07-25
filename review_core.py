@@ -199,10 +199,42 @@ def eval_rsi2(row: pd.Series | dict, price: pd.DataFrame, max_bars: int) -> dict
     return {"outcome": "时间止损", "r_mult": round(realized, 3), "bars": len(future), "exit_model": "close"}
 
 
+def eval_mr(row: pd.Series | dict, price: pd.DataFrame, max_bars: int) -> dict:
+    """Replay MR model: pure ATR trailing stop (ratchets favorably only) + time exit.
+
+    No partial exits and no RSI-based trigger -- unlike RSI2, MR never takes profit
+    on an oscillator crossing a level; mr_strategy.py only exits via the trailing
+    stop or the hold-bar limit.
+    """
+    entry, atr = _num(row.get("entry_price")), _num(row.get("atr"))
+    if entry <= 0 or atr <= 0:
+        return {"outcome": "数据失败", "r_mult": None, "bars": 0}
+    p = signal_params(row)
+    trail_mult = _num(p.get("atr_trail_mult"), 2.5)
+    sl_mult = _num(p.get("atr_sl_mult"), 2.0)
+    data = price.copy()
+    data["_atr"] = _atr(data)
+    future = _future_bars(row, data, max_bars)
+    if future.empty:
+        return {"outcome": "未决", "r_mult": None, "bars": 0, "exit_model": "close"}
+    trail = entry - sl_mult * atr
+    for n, (_, bar) in enumerate(future.iterrows(), 1):
+        close, current_atr = float(bar["Close"]), _num(bar.get("_atr"), atr)
+        trail = max(trail, close - trail_mult * current_atr)
+        if close < trail:
+            return {"outcome": "ATR追踪出场", "r_mult": round(_r(entry, close, atr, "做多"), 3), "bars": n, "exit_model": "close"}
+    return {"outcome": "时间止损", "r_mult": round(_r(entry, float(future["Close"].iloc[-1]), atr, "做多"), 3),
+            "bars": len(future), "exit_model": "close"}
+
+
 def evaluate(row: pd.Series | dict, price: pd.DataFrame | None, max_bars: int) -> dict:
     if price is None or price.empty:
         return {"outcome": "数据失败", "r_mult": None, "bars": 0}
     strategy = str(row.get("strategy", "")).lower()
     if "rsi2" in strategy:
         return eval_rsi2(row, price, max_bars)
+    # Exact/prefix match only -- "mr" as a plain substring also matches names like
+    # "MRVL_WideExit" (a Confluence-based shadow variant), which must NOT be routed here.
+    if strategy == "mr" or strategy.startswith("mr_"):
+        return eval_mr(row, price, max_bars)
     return eval_confluence(row, price, max_bars)

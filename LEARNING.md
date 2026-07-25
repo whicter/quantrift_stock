@@ -17,6 +17,8 @@
 - **"没数据"不等于"无效标的"，但也不等于"值得强行回测"**：`watchlist.txt` 中 `BSP`/`RAM`/`SPCX` 最初批量拉取失败，核实后确认是真实美股代码，只是近1个月内新上市（1d 仅16-28行）。真实但数据不足时不应强行跑批量回测凑出统计上不可信的 Sharpe 数字（参考本文件其他章节 REXC N=3 Sharpe 3.78 的反面案例），应比照 `pending_high_vol` 先例列为"数据不足暂缓"，等待更多历史积累。
 - **换一套策略框架不是万能解法**：对 107 个 Confluence/RSI2/Breakout 均未达标的标的补跑 MR（均值回归）策略，命中率极低——仅 `TSM`(1h Sharpe 1.281 N=31) 和 `FDVV`(1h Sharpe 0.619 N=38) 达标，105 个依然不达标，其中包括用户重点关注的 `COIN`/`EU`（MR 下反而比 Confluence/RSI2 更差）。说明多数未达标标的是结构性不适配当前四套策略框架（近零波动、无明确趋势也无明确均值回归特征、样本噪声过大等），不是简单换个策略视角就能捞回来的问题。
 - **回测覆盖不等于实盘覆盖**：`mr_backtest.py` 存在多年但从未接入 `alert_engine.py` 的实时信号分发（`STRATEGY_MAP` 只识别 `confluence`/`rsi2`/`breakout`，无 `check_mr_signal()`），此次尝试才发现这个缺口。回测框架的存在不代表已经形成完整的"回测→实盘"闭环，接入前需要显式检查目标策略是否真的在 `alert_engine.py` 里有对应的实时检测函数。
+- **新增策略接入实盘要连带检查复盘/纸面组合逻辑**：接入 MR 实时扫描时发现 `review_core.py` 的 `evaluate()` 分发只区分"含 rsi2"和"其余都当 Confluence 处理"，而 Confluence 复盘要求 `tp1`/`tp2` 字段，MR 只有 SL——如果不补 `eval_mr()`，MR 的纸面持仓会被用错误的出场规则复盘，产生虚假的 R 值统计。任何新策略接入 `alert_engine.py` 后，都要检查 `review_core.py`/`paper_portfolio.py` 是否也需要对应更新，不能只看 `STRATEGY_MAP` 一处。
+- **策略名子串匹配容易误伤**：`review_core.py` 原计划用 `"mr" in strategy.lower()` 判断是否为 MR 策略，但 `MRVL_WideExit`（已有的 Confluence 影子变体）小写后恰好包含"mr"子串，会被误路由到错误的复盘逻辑。策略名匹配必须用精确匹配或前缀/后缀匹配（`== "mr"` 或 `.startswith("mr_")`），不能用宽松的子串包含判断，尤其当策略池里标的代码本身可能包含目标子串时（MRVL 就是个现成的反例）。
 
 ---
 

@@ -47,7 +47,7 @@ try:
 except ImportError:
     sys.exit("请安装 yfinance：pip install yfinance")
 
-from indicators import compute_signals, _sma, _atr
+from indicators import compute_signals, _sma, _atr, _rsi, _adx
 from param_loader import get_params
 from data_providers import get_provider
 from mag7_rotation import run_rotation
@@ -158,6 +158,10 @@ STRATEGY_MAP: dict[tuple[str, str], str] = {
     ("DELL", "4h"): "rsi2",  # Sharpe 0.853 N=38 WR=68.4%
     ("HOOD", "1h"): "rsi2",  # Sharpe 1.108 N=142 WR=62.7%
     ("HOOD", "4h"): "rsi2",  # Sharpe 0.644 N=51 WR=54.9%
+
+    # 2026-07-25 MR（均值回归）首次接入实时扫描，见 MR_PARAMS 注释
+    ("TSM",  "1h"): "mr",  # Sharpe 1.281 N=31 WR=61.3%
+    ("FDVV", "1h"): "mr",  # Sharpe 0.619 N=38 WR=42.1%
 }
 
 # 52周突破最优参数（来自 breakout_backtest.py --optimize）
@@ -229,10 +233,23 @@ RSI2_PARAMS: dict[tuple[str, str], dict] = {
     ("HOOD", "4h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.5, "min_market_score": 2},
 }
 
+# MR（均值回归）参数：来自 mr_backtest.py DEFAULT_PARAMS，2026-07-25 首次接入实时扫描
+# 只做多，z-score<=-0.9 + RSI超卖 + ADX<上限 + close>trendSMA；ATR追踪出场+时间止损
+MR_PARAMS: dict[tuple[str, str], dict] = {
+    ("TSM",  "1h"): {"bb_len": 20, "bb_mult": 2.0, "rsi_len": 14, "rsi_os": 40.0,
+                      "adx_len": 14, "adx_max": 25.0, "trend_filter_len": 200,
+                      "use_trend_filter": True, "atr_sl_mult": 2.0, "atr_trail_mult": 2.5,
+                      "max_hold_bars": 48},  # Sharpe 1.281 N=31
+    ("FDVV", "1h"): {"bb_len": 20, "bb_mult": 2.0, "rsi_len": 14, "rsi_os": 40.0,
+                      "adx_len": 14, "adx_max": 25.0, "trend_filter_len": 200,
+                      "use_trend_filter": True, "atr_sl_mult": 2.0, "atr_trail_mult": 2.5,
+                      "max_hold_bars": 48},  # Sharpe 0.619 N=38
+}
+
 BENCHMARK_SYMBOLS  = {"QQQ", "SPY"}
 SECTOR_ETF_SYMBOLS = {"SOXX", "SMH"}
 # 半导体个股：SOXX 弱势时追加板块逆风警告
-SEMI_SYMBOLS = {"MU", "MRVL", "STX", "SNDK", "NVDA", "INTC", "AMD", "AMAT", "KLAC"}
+SEMI_SYMBOLS = {"MU", "MRVL", "STX", "SNDK", "NVDA", "INTC", "AMD", "AMAT", "KLAC", "TSM"}
 
 # ── 信号去重：同一根 bar 的信号只发一次（持久化到磁盘，重启不丢失）────────────
 # key: "symbol|tf|strategy|direction"  value: bar 日期字符串 (YYYY-MM-DD)
@@ -632,6 +649,84 @@ def check_rsi2_signal(df_raw: pd.DataFrame, symbol: str, tf: str,
     }
 
 
+# ── MR（均值回归）信号检查 ─────────────────────────────────────────────────
+# 2026-07-25 首次接入实时扫描，逻辑对齐 mr_strategy.py 回测（只做多）：
+#   入场：z-score <= -0.9（布林下轨附近）+ RSI < rsi_os + ADX < adx_max + close > trendSMA
+#   出场（仅供告警展示，不做状态跟踪）：初始 SL = entry - atr_sl_mult × ATR，
+#   之后转为 ATR 追踪止损（只升不降）+ 超过 max_hold_bars 时间止损
+
+def check_mr_signal(df_raw: pd.DataFrame, symbol: str, tf: str,
+                     vix_value: float | None = None) -> dict | None:
+    if len(df_raw) < 210:
+        return None
+
+    p = MR_PARAMS.get((symbol, tf))
+    if p is None:
+        return None
+
+    bb_len      = int(p.get("bb_len", 20))
+    bb_mult     = float(p.get("bb_mult", 2.0))
+    rsi_len     = int(p.get("rsi_len", 14))
+    rsi_os      = float(p.get("rsi_os", 40.0))
+    adx_len     = int(p.get("adx_len", 14))
+    adx_max     = float(p.get("adx_max", 25.0))
+    trend_len   = int(p.get("trend_filter_len", 200))
+    use_trend   = bool(p.get("use_trend_filter", True))
+    atr_sl_mult = float(p.get("atr_sl_mult", 2.0))
+
+    close = df_raw["Close"]
+    high  = df_raw["High"]
+    low   = df_raw["Low"]
+
+    bb_mid     = _sma(close, bb_len)
+    bb_std     = close.rolling(bb_len, min_periods=bb_len).std(ddof=1)
+    bb_upper   = bb_mid + bb_mult * bb_std
+    bb_lower   = bb_mid - bb_mult * bb_std
+    band_width = bb_upper - bb_lower
+    z_score    = (2 * (close - bb_mid) / band_width.replace(0, np.nan)).clip(-2, 2)
+
+    rsi_val   = _rsi(close, rsi_len)
+    adx_val   = _adx(high, low, close, adx_len)
+    atr_val   = _atr(high, low, close, 14)
+    trend_sma = _sma(close, trend_len)
+
+    last_close = float(close.iloc[-1])
+    last_z     = float(z_score.iloc[-1])
+    last_rsi   = float(rsi_val.iloc[-1])
+    last_adx   = float(adx_val.iloc[-1])
+    last_atr   = float(atr_val.iloc[-1])
+    last_trend = float(trend_sma.iloc[-1])
+
+    if any(math.isnan(v) for v in [last_z, last_rsi, last_adx, last_atr, last_trend]):
+        return None
+
+    ok_trend = (not use_trend) or (last_close > last_trend)
+    ok_adx   = last_adx < adx_max
+    touch_lower = last_z <= -0.9
+
+    if not (touch_lower and last_rsi < rsi_os and ok_adx and ok_trend):
+        return None
+
+    sl = last_close - atr_sl_mult * last_atr
+
+    z_pts   = min(5.0, max(0.0, (-0.9 - last_z) * 5.0))
+    rsi_pts = min(5.0, max(0.0, (rsi_os - last_rsi) / rsi_os * 5.0)) if rsi_os > 0 else 0.0
+    quality = round(min(10, max(0, z_pts + rsi_pts)))
+
+    return {
+        "strategy":  "MR",
+        "direction": "做多",
+        "close":     last_close,
+        "atr":       last_atr,
+        "z_score":   last_z,
+        "rsi":       last_rsi,
+        "adx":       last_adx,
+        "sl":        sl,
+        "vix":       vix_value,
+        "quality":   quality,
+    }
+
+
 # ── 告警消息格式 ──────────────────────────────────────────────────────────
 
 def _regime_line(market_score: float, vix: float | None) -> str:
@@ -674,6 +769,21 @@ def build_rsi2_alert(symbol: str, tf: str, sig: dict) -> str:
         f"  RSI2: {sig['rsi2']:.1f}  SMA200: ${sig['sma200']:.2f}\n"
         f"  SL(ATR trail ×{p.get('atr_trail_mult', 2.5)}): ${sig['sl']:.2f}  持仓: {hold}\n"
         + _regime_line(sig["market_score"], sig.get("vix")) + "\n"
+        + _vix_position_hint(sig.get("vix")) + "\n"
+        + f"  时间: {ts} ET"
+    )
+
+
+def build_mr_alert(symbol: str, tf: str, sig: dict) -> str:
+    ts = datetime.now().strftime("%Y-%m-%d %H:%M")
+    p = MR_PARAMS.get((symbol, tf), {})
+    quality = sig.get("quality", 0)
+    hold = _HOLD_DESC.get(tf, "—")
+    return (
+        f"🔄 {symbol} {tf} 做多信号 [MR 均值回归]  ⭐ {quality}/10\n"
+        f"  价格: ${sig['close']:.2f}  ATR: ${sig['atr']:.2f}\n"
+        f"  z-score: {sig['z_score']:.2f}  RSI: {sig['rsi']:.1f}  ADX: {sig['adx']:.1f}\n"
+        f"  SL(初始 ATR×{p.get('atr_sl_mult', 2.0)}，之后转追踪): ${sig['sl']:.2f}  持仓: {hold}\n"
         + _vix_position_hint(sig.get("vix")) + "\n"
         + f"  时间: {ts} ET"
     )
@@ -1211,6 +1321,39 @@ def run_scan(ib=None):
                 else:
                     p = RSI2_PARAMS.get((symbol, tf), {})
                     print(f"  {symbol} {tf}: 无信号 [RSI2 v2 entry<{p.get('rsi2_entry', 10)}]")
+
+            elif strategy == "mr":
+                p = MR_PARAMS.get((symbol, tf), {})
+                sig = check_mr_signal(df_raw, symbol, tf, vix_value)
+                if sig:
+                    dedup_key = f"{symbol}|{tf}|mr|做多"
+                    if _sent_signals.get(dedup_key) == bar_date:
+                        print(f"  {symbol} {tf}: 已发送（同 bar），跳过 [MR]")
+                    else:
+                        extra = _extra_warnings(symbol, earnings_days, soxx_below_ma50, screener_ranks)
+                        resonance = scan_signals.setdefault(symbol, [])
+                        if resonance:
+                            sig["quality"] = min(10, int(sig.get("quality", 0)) + 1)
+                            extra = "\n".join(filter(None, [extra, "  📈 多周期/多策略共振"] ))
+                        resonance.append(f"{tf}:mr")
+                        portfolio = _portfolio_context(sig, symbol)
+                        msg = build_mr_alert(symbol, tf, sig)
+                        if extra:
+                            msg += "\n" + extra
+                        if portfolio:
+                            msg += "\n" + portfolio
+                        print(f"\n  ⚡ 信号：{symbol} {tf} 做多 [MR]")
+                        print(msg)
+                        tg_alert(msg)
+                        row = _log_signal(symbol, tf, bar_date, sig, params=p,
+                                          sector_aligned=not soxx_below_ma50 if symbol in SEMI_SYMBOLS else None,
+                                          screener_rank=screener_ranks.get(symbol), market_regime=market_regime)
+                        paper_open_position(row)
+                        _sent_signals[dedup_key] = bar_date
+                        _save_sent_signals(_sent_signals)
+                        found += 1
+                else:
+                    print(f"  {symbol} {tf}: 无信号 [MR]")
 
             else:
                 print(f"  {symbol} {tf}: 未知策略路由 '{strategy}'")

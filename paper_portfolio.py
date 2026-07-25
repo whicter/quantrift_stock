@@ -14,7 +14,7 @@ from review_core import evaluate
 
 POSITIONS_PATH = Path("data/.paper_positions.json")
 EQUITY_PATH = Path("logs/paper_equity.csv")
-SEMIS = {"MU", "MRVL", "STX", "SNDK", "NVDA", "INTC", "AMD", "AMAT", "KLAC", "SOXX", "SMH"}
+SEMIS = {"MU", "MRVL", "STX", "SNDK", "NVDA", "INTC", "AMD", "AMAT", "KLAC", "SOXX", "SMH", "TSM"}
 RISK_PCT = 0.0075
 POSITION_WEIGHT = 0.10
 SECTOR_LIMIT = 0.45
