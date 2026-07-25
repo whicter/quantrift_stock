@@ -46,14 +46,16 @@ def load_daily(symbol: str) -> pd.DataFrame | None:
 
 def run_rotation(top_n: int = 2, rs_period: int = 60,
                  use_risk_off: bool = False,
-                 qqq_sma: int = 200) -> pd.DataFrame:
+                 qqq_sma: int = 200,
+                 symbols: list[str] | None = None) -> pd.DataFrame:
     """
-    运行 MAG7 周频轮动回测。
+    运行周频相对强弱轮动回测（默认 MAG7 标的池，传 symbols 可复用于任意标的组）。
     返回每周调仓记录 DataFrame。
     """
+    universe = symbols if symbols is not None else MAG7
     # 加载所有数据
     prices = {}
-    for sym in MAG7:
+    for sym in universe:
         df = load_daily(sym)
         if df is not None:
             prices[sym] = df["Close"]

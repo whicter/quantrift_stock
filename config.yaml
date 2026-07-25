@@ -60,11 +60,18 @@ symbols:
   # 2026-07-25 MR策略补测：对107个未达标标的跑MR均值回归，仅 TSM/FDVV 达标（TSM/FDVV 首次由MR接入，非Confluence/RSI2/Breakout）
   # 2026-07-25 第四版watchlist（用户扩充到293个代码后）批量回测：89个新标的 -> 21个达标（含1个MR/8个Confluence/15个RSI2）
   # SMR 1h RSI2 Sharpe 0.686 但最大回撤-95.12%（小盘核能股暴涨暴跌），风险过高排除，不接入
-  watchlist_2026_07: [AGI, AIS, BABA, BAC, BB, BE, CBUS, CCB, CEG, CRCL, CRWD, CRWV,
-                       DELL, DGRO, DJT, FDVV, FOX, GE, GME, GOOG, HOOD, IBM,
-                       INTU, JPM, LMT, LTL, LUNR, LVHI, LWLG, MKSI, MORN, MS, MSOS,
-                       NTRS, OC, OKLO, ONDS, ORCL, OSCR, OUST, PKW, PYPL, RBLX,
-                       REMX, SLV, SOFI, SPMO, SPYM, TSM, USAR, VOO, VTI, WBD, WDC, WMT]
+  # 2026-07-25 网格优化：对60个"默认参数接近达标(Sharpe 0.35-0.6)"的标的跑RSI2_GRID×Confluence网格，
+  # 42个(symbol,tf)组合达标，SLS 1h RSI2最大回撤-56.9%风险过高排除，改用其Confluence 1h结果(0.76, -0%DD)
+  # 注：RGTI/AIRJ/CCJ/MSTR/UP/AAOI/HBM/DUOL/CRSP/APLD 等多个1h RSI2组合回撤在20-40%区间，
+  # 明显高于原主池标的，接入后需观察实盘信号质量，必要时收紧atr_sl_mult
+  watchlist_2026_07: [AAOI, AGI, AIRJ, AIS, ALL, AMC, APLD, APO, BA, BABA, BAC, BB, BBW,
+                       BE, CBUS, CCB, CCJ, CEG, CRCL, CRSP, CRWD, CRWV, DELL, DGRO, DJT,
+                       DUOL, FDVV, FOF, FOX, FWRG, GE, GFS, GL, GME, GOOG, HBM, HOOD,
+                       IBM, INTU, JPM, KO, LLY, LMT, LTL, LUNR, LVHI, LWLG, MKSI, MO,
+                       MORN, MS, MSOS, MSTR, NFLX, NTRS, OC, OKLO, ONDS, ORCL, OSCR,
+                       OUST, PB, PKW, PYPL, QCOM, RBC, RBLX, REMX, RGTI, SAP, SKM, SLS,
+                       SLV, SMCI, SNAP, SOFI, SPMO, SPXC, SPYM, STLA, TMC, TSM, UP,
+                       USAR, USO, VC, VOO, VTI, WBD, WDC, WMT]
 
 # ── 数据设置 ────────────────────────────────────────────────────────────
 data:
@@ -317,3 +324,37 @@ symbol_params:
     1h:  {adx_threshold: 25.0, ut_key: 1.5, min_score: 5}
     4h:  {adx_threshold: 25.0, ut_key: 2.0, min_score: 5}
     1d:  {adx_threshold: 20.0, ut_key: 3.0, min_score: 4}
+
+  # ── 2026-07-25 网格优化新增（对watchlist批量回测中"默认参数接近达标"的60个标的跑
+  #    RSI2_GRID×Confluence网格，42个组合达标；此处为Confluence部分的逐标的参数）──
+  AMC:
+    1h:  {adx_threshold: 30.0, ut_key: 1.5, min_score: 3}  # Sharpe 1.06 N=154 WR=63.6%
+  BA:
+    4h:  {adx_threshold: 20.0, ut_key: 1.0, min_score: 3}  # Sharpe 0.86 N=85 WR=68.2%
+  FWRG:
+    4h:  {adx_threshold: 15.0, ut_key: 1.0, min_score: 5}  # Sharpe 0.63 N=74 WR=60.8%
+  GFS:
+    1h:  {adx_threshold: 30.0, ut_key: 1.0, min_score: 5}  # Sharpe 0.69 N=82 WR=57.3%
+  KO:
+    4h:  {adx_threshold: 25.0, ut_key: 2.0, min_score: 3}  # Sharpe 0.78 N=41 WR=75.6%
+  LLY:
+    4h:  {adx_threshold: 20.0, ut_key: 2.0, min_score: 5}  # Sharpe 0.64 N=63 WR=61.9%
+  MO:
+    1h:  {adx_threshold: 25.0, ut_key: 3.0, min_score: 5}  # Sharpe 0.63 N=117 WR=68.4%
+  QCOM:
+    4h:  {adx_threshold: 25.0, ut_key: 2.0, min_score: 3}  # Sharpe 1.03 N=47 WR=72.3%
+  SLS:
+    1h:  {adx_threshold: 30.0, ut_key: 2.5, min_score: 4}  # Sharpe 0.76 N=105 WR=58.1%
+  SMCI:
+    1h:  {adx_threshold: 15.0, ut_key: 2.0, min_score: 3}  # Sharpe 0.60 N=294 WR=55.4%
+  SNAP:
+    1d:  {adx_threshold: 15.0, ut_key: 1.0, min_score: 5}  # Sharpe 0.62 N=59 WR=78.0%
+  STLA:
+    4h:  {adx_threshold: 15.0, ut_key: 3.0, min_score: 3}  # Sharpe 1.14 N=106 WR=64.2%
+  TMC:
+    1d:  {adx_threshold: 15.0, ut_key: 1.0, min_score: 5}  # Sharpe 0.62 N=31 WR=67.7%
+    1h:  {adx_threshold: 15.0, ut_key: 3.0, min_score: 3}  # Sharpe 1.18 N=302 WR=63.2%
+  UP:
+    1d:  {adx_threshold: 20.0, ut_key: 1.0, min_score: 5}  # Sharpe 0.84 N=37 WR=75.7%
+  USO:
+    1h:  {adx_threshold: 30.0, ut_key: 1.0, min_score: 5}  # Sharpe 0.63 N=80 WR=57.5%

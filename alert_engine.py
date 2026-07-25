@@ -189,6 +189,50 @@ STRATEGY_MAP: dict[tuple[str, str], str] = {
     ("WDC", "4h"): "rsi2",  # Sharpe 1.01 N=47 WR=70.2%
     ("WMT", "4h"): "rsi2",  # Sharpe 0.677 N=42 WR=61.9%
     ("MKSI", "1h"): "mr",  # Sharpe 0.623 N=31 WR=38.7%
+
+    # 2026-07-25 网格优化新增（60个"默认参数接近达标"标的跑RSI2_GRID×Confluence网格，42组合达标）
+    ("AMC", "1h"): "confluence",  # Sharpe 1.06 N=154 WR=63.6% [网格优化]
+    ("BA", "4h"): "confluence",  # Sharpe 0.86 N=85 WR=68.2% [网格优化]
+    ("FWRG", "4h"): "confluence",  # Sharpe 0.63 N=74 WR=60.8% [网格优化]
+    ("GFS", "1h"): "confluence",  # Sharpe 0.69 N=82 WR=57.3% [网格优化]
+    ("KO", "4h"): "confluence",  # Sharpe 0.78 N=41 WR=75.6% [网格优化]
+    ("LLY", "4h"): "confluence",  # Sharpe 0.64 N=63 WR=61.9% [网格优化]
+    ("MO", "1h"): "confluence",  # Sharpe 0.63 N=117 WR=68.4% [网格优化]
+    ("QCOM", "4h"): "confluence",  # Sharpe 1.03 N=47 WR=72.3% [网格优化]
+    ("SLS", "1h"): "confluence",  # Sharpe 0.76 N=105 WR=58.1% [网格优化]
+    ("SMCI", "1h"): "confluence",  # Sharpe 0.60 N=294 WR=55.4% [网格优化]
+    ("SNAP", "1d"): "confluence",  # Sharpe 0.62 N=59 WR=78.0% [网格优化]
+    ("STLA", "4h"): "confluence",  # Sharpe 1.14 N=106 WR=64.2% [网格优化]
+    ("TMC", "1d"): "confluence",  # Sharpe 0.62 N=31 WR=67.7% [网格优化]
+    ("TMC", "1h"): "confluence",  # Sharpe 1.18 N=302 WR=63.2% [网格优化]
+    ("UP", "1d"): "confluence",  # Sharpe 0.84 N=37 WR=75.7% [网格优化]
+    ("USO", "1h"): "confluence",  # Sharpe 0.63 N=80 WR=57.5% [网格优化]
+    ("AAOI", "4h"): "rsi2",  # Sharpe 0.672 N=70 WR=68.6% [网格优化]
+    ("AIRJ", "1h"): "rsi2",  # Sharpe 0.614 N=56 WR=57.1% [网格优化，DD-35.6%需关注]
+    ("ALL", "1h"): "rsi2",  # Sharpe 1.121 N=55 WR=69.1% [网格优化]
+    ("APLD", "1h"): "rsi2",  # Sharpe 1.029 N=91 WR=63.7% [网格优化]
+    ("APO", "1h"): "rsi2",  # Sharpe 0.659 N=72 WR=63.9% [网格优化]
+    ("BA", "1h"): "rsi2",  # Sharpe 0.98 N=74 WR=63.5% [网格优化]
+    ("BBW", "4h"): "rsi2",  # Sharpe 0.79 N=50 WR=62.0% [网格优化]
+    ("CCJ", "1h"): "rsi2",  # Sharpe 0.67 N=150 WR=62.0% [网格优化，DD-30.2%需关注]
+    ("CCJ", "4h"): "rsi2",  # Sharpe 0.75 N=50 WR=70.0% [网格优化]
+    ("CRSP", "1h"): "rsi2",  # Sharpe 1.048 N=74 WR=55.4% [网格优化]
+    ("DUOL", "1h"): "rsi2",  # Sharpe 1.234 N=156 WR=66.0% [网格优化]
+    ("FOF", "1h"): "rsi2",  # Sharpe 0.879 N=104 WR=51.0% [网格优化]
+    ("GL", "1h"): "rsi2",  # Sharpe 1.07 N=169 WR=60.9% [网格优化]
+    ("HBM", "4h"): "rsi2",  # Sharpe 1.053 N=63 WR=74.6% [网格优化]
+    ("LLY", "1h"): "rsi2",  # Sharpe 0.716 N=123 WR=57.7% [网格优化]
+    ("MSTR", "1h"): "rsi2",  # Sharpe 0.909 N=163 WR=61.3% [网格优化，DD-29.0%需关注]
+    ("NFLX", "1h"): "rsi2",  # Sharpe 0.821 N=77 WR=62.3% [网格优化]
+    ("PB", "4h"): "rsi2",  # Sharpe 0.689 N=33 WR=69.7% [网格优化]
+    ("RBC", "4h"): "rsi2",  # Sharpe 0.766 N=47 WR=63.8% [网格优化]
+    ("RGTI", "1h"): "rsi2",  # Sharpe 0.984 N=72 WR=63.9% [网格优化，DD-42.4%需关注]
+    ("RGTI", "4h"): "rsi2",  # Sharpe 0.908 N=52 WR=71.2% [网格优化，DD-30.8%需关注]
+    ("SAP", "4h"): "rsi2",  # Sharpe 1.161 N=52 WR=69.2% [网格优化]
+    ("SKM", "1h"): "rsi2",  # Sharpe 0.688 N=71 WR=60.6% [网格优化]
+    ("SPXC", "1h"): "rsi2",  # Sharpe 1.058 N=99 WR=59.6% [网格优化]
+    ("UP", "1h"): "rsi2",  # Sharpe 0.74 N=137 WR=57.7% [网格优化，DD-31.3%需关注]
+    ("VC", "1h"): "rsi2",  # Sharpe 0.972 N=68 WR=60.3% [网格优化]
 }
 
 # 52周突破最优参数（来自 breakout_backtest.py --optimize）
@@ -275,6 +319,35 @@ RSI2_PARAMS: dict[tuple[str, str], dict] = {
     ("WDC",  "1h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.0, "min_market_score": 2},
     ("WDC",  "4h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.5, "min_market_score": 2},
     ("WMT",  "4h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.5, "min_market_score": 2},
+
+    # 2026-07-25 网格优化新增（RSI2_GRID搜索：rsi2_entry×atr_trail_mult×max_hold_bars×
+    # min_market_score×use_pullback_filter×use_vol_score，324组合/标的/周期）
+    ("AAOI", "4h"): {"rsi2_entry": 5.0, "atr_trail_mult": 2.0, "max_hold_bars": 5, "min_market_score": 1, "use_pullback_filter": False, "use_vol_score": False},
+    ("AIRJ", "1h"): {"rsi2_entry": 15.0, "atr_trail_mult": 2.0, "max_hold_bars": 5, "min_market_score": 3, "use_pullback_filter": True, "use_vol_score": False},
+    ("ALL",  "1h"): {"rsi2_entry": 5.0, "atr_trail_mult": 2.5, "max_hold_bars": 15, "min_market_score": 2, "use_pullback_filter": True, "use_vol_score": False},
+    ("APLD", "1h"): {"rsi2_entry": 10.0, "atr_trail_mult": 3.0, "max_hold_bars": 15, "min_market_score": 2, "use_pullback_filter": True, "use_vol_score": True},
+    ("APO",  "1h"): {"rsi2_entry": 15.0, "atr_trail_mult": 2.0, "max_hold_bars": 10, "min_market_score": 2, "use_pullback_filter": True, "use_vol_score": False},
+    ("BA",   "1h"): {"rsi2_entry": 15.0, "atr_trail_mult": 2.5, "max_hold_bars": 10, "min_market_score": 3, "use_pullback_filter": True, "use_vol_score": True},
+    ("BBW",  "4h"): {"rsi2_entry": 15.0, "atr_trail_mult": 3.0, "max_hold_bars": 10, "min_market_score": 2, "use_pullback_filter": False, "use_vol_score": True},
+    ("CCJ",  "1h"): {"rsi2_entry": 5.0, "atr_trail_mult": 3.0, "max_hold_bars": 15, "min_market_score": 2, "use_pullback_filter": False, "use_vol_score": True},
+    ("CCJ",  "4h"): {"rsi2_entry": 5.0, "atr_trail_mult": 2.5, "max_hold_bars": 10, "min_market_score": 1, "use_pullback_filter": False, "use_vol_score": False},
+    ("CRSP", "1h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.5, "max_hold_bars": 15, "min_market_score": 2, "use_pullback_filter": True, "use_vol_score": True},
+    ("DUOL", "1h"): {"rsi2_entry": 15.0, "atr_trail_mult": 3.0, "max_hold_bars": 10, "min_market_score": 2, "use_pullback_filter": False, "use_vol_score": False},
+    ("FOF",  "1h"): {"rsi2_entry": 5.0, "atr_trail_mult": 3.0, "max_hold_bars": 10, "min_market_score": 3, "use_pullback_filter": False, "use_vol_score": True},
+    ("GL",   "1h"): {"rsi2_entry": 5.0, "atr_trail_mult": 2.0, "max_hold_bars": 15, "min_market_score": 1, "use_pullback_filter": False, "use_vol_score": False},
+    ("HBM",  "4h"): {"rsi2_entry": 10.0, "atr_trail_mult": 3.0, "max_hold_bars": 10, "min_market_score": 1, "use_pullback_filter": False, "use_vol_score": False},
+    ("LLY",  "1h"): {"rsi2_entry": 5.0, "atr_trail_mult": 2.0, "max_hold_bars": 15, "min_market_score": 3, "use_pullback_filter": False, "use_vol_score": False},
+    ("MSTR", "1h"): {"rsi2_entry": 15.0, "atr_trail_mult": 3.0, "max_hold_bars": 10, "min_market_score": 2, "use_pullback_filter": False, "use_vol_score": False},
+    ("NFLX", "1h"): {"rsi2_entry": 5.0, "atr_trail_mult": 2.5, "max_hold_bars": 15, "min_market_score": 1, "use_pullback_filter": True, "use_vol_score": True},
+    ("PB",   "4h"): {"rsi2_entry": 5.0, "atr_trail_mult": 2.5, "max_hold_bars": 15, "min_market_score": 1, "use_pullback_filter": False, "use_vol_score": False},
+    ("RBC",  "4h"): {"rsi2_entry": 5.0, "atr_trail_mult": 2.5, "max_hold_bars": 10, "min_market_score": 3, "use_pullback_filter": False, "use_vol_score": True},
+    ("RGTI", "1h"): {"rsi2_entry": 10.0, "atr_trail_mult": 3.0, "max_hold_bars": 15, "min_market_score": 2, "use_pullback_filter": True, "use_vol_score": False},
+    ("RGTI", "4h"): {"rsi2_entry": 5.0, "atr_trail_mult": 2.0, "max_hold_bars": 10, "min_market_score": 3, "use_pullback_filter": False, "use_vol_score": False},
+    ("SAP",  "4h"): {"rsi2_entry": 5.0, "atr_trail_mult": 2.0, "max_hold_bars": 5, "min_market_score": 1, "use_pullback_filter": False, "use_vol_score": False},
+    ("SKM",  "1h"): {"rsi2_entry": 5.0, "atr_trail_mult": 3.0, "max_hold_bars": 15, "min_market_score": 3, "use_pullback_filter": False, "use_vol_score": False},
+    ("SPXC", "1h"): {"rsi2_entry": 5.0, "atr_trail_mult": 3.0, "max_hold_bars": 15, "min_market_score": 2, "use_pullback_filter": True, "use_vol_score": False},
+    ("UP",   "1h"): {"rsi2_entry": 5.0, "atr_trail_mult": 2.5, "max_hold_bars": 5, "min_market_score": 1, "use_pullback_filter": False, "use_vol_score": True},
+    ("VC",   "1h"): {"rsi2_entry": 5.0, "atr_trail_mult": 2.5, "max_hold_bars": 5, "min_market_score": 1, "use_pullback_filter": True, "use_vol_score": True},
 }
 
 # MR（均值回归）参数：来自 mr_backtest.py DEFAULT_PARAMS，2026-07-25 首次接入实时扫描
