@@ -58,9 +58,13 @@ symbols:
   # 杠杆/反向ETF(SOXS/SPXU等)即使达标也不自动列入，见 LEARNING.md 说明
   # 2026-07-25 补跑：用户追问的 HOOD/EU/XYZ/COIN/DELL 中仅 HOOD/DELL 达标（COIN/EU/XYZ 三策略全周期均未达标，未列入）
   # 2026-07-25 MR策略补测：对107个未达标标的跑MR均值回归，仅 TSM/FDVV 达标（TSM/FDVV 首次由MR接入，非Confluence/RSI2/Breakout）
-  watchlist_2026_07: [AIS, BABA, BB, CEG, CRWD, DELL, DGRO, DJT, FDVV, GME, HOOD, IBM,
-                       INTU, JPM, LUNR, LVHI, LWLG, MORN, MSOS, NTRS, OKLO, ORCL,
-                       PKW, PYPL, RBLX, REMX, SLV, SOFI, SPMO, SPYM, TSM, USAR, VOO, VTI]
+  # 2026-07-25 第四版watchlist（用户扩充到293个代码后）批量回测：89个新标的 -> 21个达标（含1个MR/8个Confluence/15个RSI2）
+  # SMR 1h RSI2 Sharpe 0.686 但最大回撤-95.12%（小盘核能股暴涨暴跌），风险过高排除，不接入
+  watchlist_2026_07: [AGI, AIS, BABA, BAC, BB, BE, CBUS, CCB, CEG, CRCL, CRWD, CRWV,
+                       DELL, DGRO, DJT, FDVV, FOX, GE, GME, GOOG, HOOD, IBM,
+                       INTU, JPM, LMT, LTL, LUNR, LVHI, LWLG, MKSI, MORN, MS, MSOS,
+                       NTRS, OC, OKLO, ONDS, ORCL, OSCR, OUST, PKW, PYPL, RBLX,
+                       REMX, SLV, SOFI, SPMO, SPYM, TSM, USAR, VOO, VTI, WBD, WDC, WMT]
 
 # ── 数据设置 ────────────────────────────────────────────────────────────
 data:

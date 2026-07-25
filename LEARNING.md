@@ -19,6 +19,8 @@
 - **回测覆盖不等于实盘覆盖**：`mr_backtest.py` 存在多年但从未接入 `alert_engine.py` 的实时信号分发（`STRATEGY_MAP` 只识别 `confluence`/`rsi2`/`breakout`，无 `check_mr_signal()`），此次尝试才发现这个缺口。回测框架的存在不代表已经形成完整的"回测→实盘"闭环，接入前需要显式检查目标策略是否真的在 `alert_engine.py` 里有对应的实时检测函数。
 - **新增策略接入实盘要连带检查复盘/纸面组合逻辑**：接入 MR 实时扫描时发现 `review_core.py` 的 `evaluate()` 分发只区分"含 rsi2"和"其余都当 Confluence 处理"，而 Confluence 复盘要求 `tp1`/`tp2` 字段，MR 只有 SL——如果不补 `eval_mr()`，MR 的纸面持仓会被用错误的出场规则复盘，产生虚假的 R 值统计。任何新策略接入 `alert_engine.py` 后，都要检查 `review_core.py`/`paper_portfolio.py` 是否也需要对应更新，不能只看 `STRATEGY_MAP` 一处。
 - **策略名子串匹配容易误伤**：`review_core.py` 原计划用 `"mr" in strategy.lower()` 判断是否为 MR 策略，但 `MRVL_WideExit`（已有的 Confluence 影子变体）小写后恰好包含"mr"子串，会被误路由到错误的复盘逻辑。策略名匹配必须用精确匹配或前缀/后缀匹配（`== "mr"` 或 `.startswith("mr_")`），不能用宽松的子串包含判断，尤其当策略池里标的代码本身可能包含目标子串时（MRVL 就是个现成的反例）。
+- **不能只看 Sharpe 门槛，极端回撤本身就是拒绝理由**：第四版 watchlist 中 `SMR`（NuScale Power，小盘核能SMR股）1h RSI2 Sharpe 0.686 达标，但最大回撤 -95.12%——统计意义上"通过"但实际是几乎清零的尾部风险。批量筛选流程只设了 Sharpe/N 两个门槛，遇到结构性暴涨暴跌的标的会漏判，需要额外加最大回撤上限检查（比如 dd > -50% 才能进入候选池），不能假设 Sharpe 达标就等于风险可控。
+- **反复手动粘贴全量列表容易产生 drift，也浪费重复劳动**：用户的 watchlist 从 205 个代码增长到 293 个，前几轮每次都要求全量重新粘贴、我重新去重对比，一次导致了 `config.yaml`（已接入）与外部 `watchlist.txt`（用户实际清单）状态不一致（用户明确指出"我让你加入watchlist.txt，加了嘛"才发现遗漏）。解决方式：把 `watchlist.txt` 收进仓库版本控制，用户直接编辑该文件而非每次重新粘贴；同时建立持久化的 `watchlist_history.csv` 记录每个代码的处理状态，避免依赖 `/tmp` 临时文件（不跨会话）重建"已处理过什么"这个关键上下文。
 
 ---
 

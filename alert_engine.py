@@ -162,6 +162,33 @@ STRATEGY_MAP: dict[tuple[str, str], str] = {
     # 2026-07-25 MR（均值回归）首次接入实时扫描，见 MR_PARAMS 注释
     ("TSM",  "1h"): "mr",  # Sharpe 1.281 N=31 WR=61.3%
     ("FDVV", "1h"): "mr",  # Sharpe 0.619 N=38 WR=42.1%
+
+    # 2026-07-25 第四版watchlist批量回测新增（89个新标的 -> 21个通过筛选，含1个MR、8个Confluence、15个RSI2；
+    # SMR 1h RSI2 Sharpe 0.686 但最大回撤-95.12%，判定风险过高已排除，不接入）
+    ("CBUS", "1h"): "confluence",  # Sharpe 0.79 N=110 WR=59.1%
+    ("CRCL", "1h"): "confluence",  # Sharpe 0.92 N=40 WR=60.0%
+    ("CRWV", "1h"): "confluence",  # Sharpe 1.21 N=73 WR=64.4%
+    ("LMT", "1h"): "confluence",  # Sharpe 0.77 N=116 WR=65.5%
+    ("OC", "4h"): "confluence",  # Sharpe 0.83 N=40 WR=62.5%
+    ("ONDS", "1d"): "confluence",  # Sharpe 0.94 N=53 WR=79.2%
+    ("ONDS", "1h"): "confluence",  # Sharpe 0.88 N=131 WR=65.6%
+    ("OUST", "1d"): "confluence",  # Sharpe 0.62 N=46 WR=73.9%
+    ("AGI", "4h"): "rsi2",  # Sharpe 0.856 N=37 WR=70.3%
+    ("BAC", "1h"): "rsi2",  # Sharpe 0.782 N=116 WR=61.2%
+    ("BE", "4h"): "rsi2",  # Sharpe 0.698 N=41 WR=68.3%
+    ("CCB", "4h"): "rsi2",  # Sharpe 0.622 N=38 WR=71.1%
+    ("FOX", "4h"): "rsi2",  # Sharpe 0.91 N=40 WR=55.0%
+    ("GE", "4h"): "rsi2",  # Sharpe 0.837 N=45 WR=62.2%
+    ("GOOG", "4h"): "rsi2",  # Sharpe 0.875 N=46 WR=63.0% -- GOOGL已在mega_cap组，GOOG是无投票权股，走势高度相关，属重复板块敞口
+    ("LTL", "1h"): "rsi2",  # Sharpe 0.982 N=73 WR=56.2%
+    ("MS", "4h"): "rsi2",  # Sharpe 0.601 N=51 WR=62.7%
+    ("OSCR", "4h"): "rsi2",  # Sharpe 0.623 N=42 WR=61.9%
+    ("WBD", "1h"): "rsi2",  # Sharpe 0.969 N=81 WR=53.1%
+    ("WBD", "4h"): "rsi2",  # Sharpe 0.796 N=32 WR=62.5%
+    ("WDC", "1h"): "rsi2",  # Sharpe 1.276 N=141 WR=59.6%
+    ("WDC", "4h"): "rsi2",  # Sharpe 1.01 N=47 WR=70.2%
+    ("WMT", "4h"): "rsi2",  # Sharpe 0.677 N=42 WR=61.9%
+    ("MKSI", "1h"): "mr",  # Sharpe 0.623 N=31 WR=38.7%
 }
 
 # 52周突破最优参数（来自 breakout_backtest.py --optimize）
@@ -231,6 +258,23 @@ RSI2_PARAMS: dict[tuple[str, str], dict] = {
     ("DELL", "4h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.5, "min_market_score": 2},
     ("HOOD", "1h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.0, "min_market_score": 2},
     ("HOOD", "4h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.5, "min_market_score": 2},
+
+    # 2026-07-25 第四版watchlist批量回测新增
+    ("AGI",  "4h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.5, "min_market_score": 2},
+    ("BAC",  "1h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.0, "min_market_score": 2},
+    ("BE",   "4h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.5, "min_market_score": 2},
+    ("CCB",  "4h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.5, "min_market_score": 2},
+    ("FOX",  "4h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.5, "min_market_score": 2},
+    ("GE",   "4h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.5, "min_market_score": 2},
+    ("GOOG", "4h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.5, "min_market_score": 2},
+    ("LTL",  "1h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.0, "min_market_score": 2},
+    ("MS",   "4h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.5, "min_market_score": 2},
+    ("OSCR", "4h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.5, "min_market_score": 2},
+    ("WBD",  "1h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.0, "min_market_score": 2},
+    ("WBD",  "4h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.5, "min_market_score": 2},
+    ("WDC",  "1h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.0, "min_market_score": 2},
+    ("WDC",  "4h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.5, "min_market_score": 2},
+    ("WMT",  "4h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.5, "min_market_score": 2},
 }
 
 # MR（均值回归）参数：来自 mr_backtest.py DEFAULT_PARAMS，2026-07-25 首次接入实时扫描
@@ -244,6 +288,10 @@ MR_PARAMS: dict[tuple[str, str], dict] = {
                       "adx_len": 14, "adx_max": 25.0, "trend_filter_len": 200,
                       "use_trend_filter": True, "atr_sl_mult": 2.0, "atr_trail_mult": 2.5,
                       "max_hold_bars": 48},  # Sharpe 0.619 N=38
+    ("MKSI", "1h"): {"bb_len": 20, "bb_mult": 2.0, "rsi_len": 14, "rsi_os": 40.0,
+                      "adx_len": 14, "adx_max": 25.0, "trend_filter_len": 200,
+                      "use_trend_filter": True, "atr_sl_mult": 2.0, "atr_trail_mult": 2.5,
+                      "max_hold_bars": 48},  # Sharpe 0.623 N=31
 }
 
 BENCHMARK_SYMBOLS  = {"QQQ", "SPY"}
