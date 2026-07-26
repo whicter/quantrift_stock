@@ -115,7 +115,32 @@ _CONFIGS = {
         "tickers":   None,   # 运行时合并
         "benchmark": "SPY",
     },
+    # 用户 watchlist（watchlist.txt）：2026-07-26 加入。此前 watchlist 中 25 个个股
+    # 既无策略路由、也不在任何 screener 指数池内，完全无人看管（如 ASTS/RKLB/NBIS）。
+    # 该宇宙让周频因子选股覆盖用户关注的全部标的；无效代码在加载时按
+    # watchlist_history.csv 的 non_us_or_invalid / no_data_unverified 状态过滤。
+    "watchlist": {"label": "用户Watchlist", "tickers": None, "benchmark": "SPY"},  # 从文件加载
 }
+
+
+def _load_watchlist() -> list[str]:
+    """watchlist.txt 减去已确认无效的代码（非美股/拉不到数据）。"""
+    from pathlib import Path
+    path = Path(__file__).parent / "watchlist.txt"
+    if not path.exists():
+        raise FileNotFoundError("watchlist.txt 不存在")
+    tickers = {line.strip().upper() for line in path.read_text().splitlines() if line.strip()}
+
+    from pathlib import Path as _P
+    history = _P(__file__).parent / "watchlist_history.csv"
+    if history.exists():
+        import csv
+        with open(history, newline="") as fh:
+            for row in csv.DictReader(fh):
+                if row.get("status") in ("non_us_or_invalid", "no_data_unverified"):
+                    tickers.discard(row.get("symbol", "").upper())
+    # yfinance 用连字符表示股类（BRK.B -> BRK-B）
+    return sorted(t.replace(".", "-") for t in tickers)
 
 
 def get_universe(name: str) -> tuple[list[str], str, str]:
@@ -131,6 +156,8 @@ def get_universe(name: str) -> tuple[list[str], str, str]:
         tickers = sorted(set(DOW30 + NDX100 + SP500))
     elif name == "russell2000":
         tickers = _load_russell2000()
+    elif name == "watchlist":
+        tickers = _load_watchlist()
     else:
         tickers = sorted(set(cfg["tickers"]))
     return tickers, cfg["benchmark"], cfg["label"]

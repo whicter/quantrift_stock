@@ -155,6 +155,14 @@ Confluence 按周期：1h 做多 −0.74R / 做空 −0.75R；4h 做多 −1.64R
 - [ ] **方案C（补验证）**：对 183 个组合批量跑 Confluence 回测 + 上线验证，达标者转显式路由、不达标者关闭。成本最高但最彻底。
 - [ ] 无论选哪个方案，都需让 `historical_backfill.py` 覆盖默认路由，否则 ② 的期望表永远补不齐这 19/33 的缺口。
 
+#### ⑥ 无覆盖标的的处置：watchlist 选股宇宙 + 季度复检（2026-07-26 已完成）
+
+**触发**：用户追问"没有覆盖的 ticker（尤其个股）怎么办"。核查发现此前"screener 已覆盖它们"的说法**有漏洞**——screener 只扫指数成分池（NDX100/SP500/Dow30/R2000），watchlist 里 **25 个个股既无策略路由、也不在任何指数池内，完全无人看管**（含 ASTS/RKLB/NBIS/DUOL/GEV/LINK/ZION 等）。
+
+- [x] **`universes.py` 新增 `watchlist` 宇宙**：从 `watchlist.txt` 加载（285个，按 `watchlist_history.csv` 自动过滤 non_us_or_invalid / no_data_unverified，`BRK.B`→`BRK-B` 格式转换），基准 SPY；`screener.py --universe watchlist` 已接入并实测跑通（原孤儿 GEV 排第6、LINK 第11、WDC 第7）。**周频因子选股现在覆盖用户关注的全部标的**——个股不需要常驻策略，需要的是轮换发现机制：动量转强自然进 Top 榜。
+- [x] **季度复检机制（文档化流程，不新建常驻任务）**："rejected 不是永久判决"在本会话有三个实证：`DELL`(7/2拒0.26 → 7/25收0.83)、`IREN`(旧评估11笔不稳 → 刷新后230笔Sharpe1.15接入)、`HOOD`(第二版才达标)。每季度对 `watchlist_history.csv` 中 rejected 状态的标的重跑一遍四策略回测+验证（命令：批量回测脚本 + `validate_watchlist.py`），达标者按标准流程接入。下次复检：**2026-10 月末**。
+- [x] 处置总原则已记入 LEARNING.md：不是每个标的都需要一条策略，"无策略+周频发现机制+季度复检"就是无覆盖个股的完整答案。
+
 #### 已在流水线中、本节不重复动作
 
 - 4 个影子实验（TSLA 出场变体 / MRVL 宽出场 / RSI2+IBS / RKLB 突破）在等样本积累

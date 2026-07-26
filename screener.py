@@ -353,8 +353,8 @@ def save_csv(df: pd.DataFrame, top_n: int, universe: str, run_date: str) -> None
 def main():
     parser = argparse.ArgumentParser(description="多指数周频因子选股初筛")
     parser.add_argument("--universe", default="ndx100",
-                        choices=["ndx100", "sp500", "dow30", "russell2000", "all"],
-                        help="股票池：ndx100 / sp500 / dow30 / russell2000 / all（默认 ndx100）")
+                        choices=["ndx100", "sp500", "dow30", "russell2000", "all", "watchlist"],
+                        help="股票池：ndx100 / sp500 / dow30 / russell2000 / all / watchlist（默认 ndx100）")
     parser.add_argument("--top",      type=int, default=20, help="输出 Top N（默认 20）")
     parser.add_argument("--telegram", action="store_true",  help="推送 Telegram")
     parser.add_argument("--no-save",  action="store_true",  help="不写 CSV")
