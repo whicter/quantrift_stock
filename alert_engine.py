@@ -195,6 +195,7 @@ STRATEGY_MAP: dict[tuple[str, str], str] = {
     # 2026-07-26 默认路由清理：183 个原 fall-through 组合全部回测，仅此 2 个达标转为显式路由
     ("INTC", "1h"): "confluence",  # 10bps 0.86 N=240 训练-0.18→测试1.61
     ("HOOD", "1d"): "confluence",  # 10bps 0.71 N=38 训练0.36→测试0.68（分段样本偏少）
+    ("IREN", "1h"): "confluence",  # 10bps 1.15 N=230 训练0.73→测试1.76 [2026-07-26 从 pending_high_vol 升级]
 
     # 2026-07-25 网格优化新增（60个"默认参数接近达标"标的跑RSI2_GRID×Confluence网格，42组合达标）
     ("AMC", "1h"): "confluence",  # Sharpe 1.06 N=154 WR=63.6% [网格优化]

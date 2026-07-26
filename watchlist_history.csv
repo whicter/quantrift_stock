@@ -1000,3 +1000,31 @@ PANW,rejected,Confluence,1h,0.24,156.0,2026-07-26,用户要求加入，四策略
 PANW,rejected,RSI2,4h,0.111,42.0,2026-07-26,用户要求加入，四策略回测
 PANW,rejected,Confluence,4h,-0.08,44.0,2026-07-26,用户要求加入，四策略回测
 PANW,rejected,Confluence,1d,-0.21,62.0,2026-07-26,用户要求加入，四策略回测
+AMAT,rejected,MR,1h,1.196,21.0,2026-07-26,补跑从未回测标的（四策略）
+AMAT,rejected,RSI2,4h,0.439,48.0,2026-07-26,补跑从未回测标的（四策略）
+AMAT,rejected,RSI2,1d,0.383,15.0,2026-07-26,补跑从未回测标的（四策略）
+AMAT,rejected,Confluence,1d,0.25,47.0,2026-07-26,补跑从未回测标的（四策略）
+AMAT,rejected,Breakout,1d,0.237,36.0,2026-07-26,补跑从未回测标的（四策略）
+AMAT,rejected,Confluence,4h,-0.09,48.0,2026-07-26,补跑从未回测标的（四策略）
+AMAT,rejected,RSI2,1h,-0.274,110.0,2026-07-26,补跑从未回测标的（四策略）
+AMAT,rejected,Confluence,1h,-0.88,98.0,2026-07-26,补跑从未回测标的（四策略）
+EYES,insufficient_data,Confluence,1h,,0.0,2026-07-26,2026-05-05上市的新ETF(Corgi Data & Surveillance)，全部历史仅55个交易日，无法回测
+EYES,insufficient_data,Confluence,4h,,0.0,2026-07-26,2026-05-05上市的新ETF(Corgi Data & Surveillance)，全部历史仅55个交易日，无法回测
+EYES,insufficient_data,Confluence,1d,,0.0,2026-07-26,2026-05-05上市的新ETF(Corgi Data & Surveillance)，全部历史仅55个交易日，无法回测
+IREN,promoted,Confluence,1h,1.15,230.0,2026-07-26,补跑从未回测标的（四策略）；cost 30bps仍0.72、wf训练0.73→测试1.76，已从 pending_high_vol 升级接入
+IREN,promoted,RSI2,1h,0.783,172.0,2026-07-26,补跑从未回测标的（四策略）
+IREN,rejected,RSI2,1d,0.485,25.0,2026-07-26,补跑从未回测标的（四策略）
+IREN,rejected,RSI2,4h,0.314,42.0,2026-07-26,补跑从未回测标的（四策略）
+IREN,rejected,Breakout,1d,0.09,9.0,2026-07-26,补跑从未回测标的（四策略）
+IREN,rejected,Confluence,1d,-0.25,41.0,2026-07-26,补跑从未回测标的（四策略）
+IREN,rejected,Confluence,4h,-0.36,67.0,2026-07-26,补跑从未回测标的（四策略）
+IREN,rejected,MR,1h,-0.765,22.0,2026-07-26,补跑从未回测标的（四策略）
+KLAC,rejected,MR,1d,0.456,17.0,2026-07-26,补跑从未回测标的（四策略）
+KLAC,rejected,RSI2,4h,0.35,52.0,2026-07-26,补跑从未回测标的（四策略）
+KLAC,rejected,RSI2,1d,0.335,25.0,2026-07-26,补跑从未回测标的（四策略）
+KLAC,rejected,MR,1h,0.086,19.0,2026-07-26,补跑从未回测标的（四策略）
+KLAC,rejected,Confluence,1d,-0.04,45.0,2026-07-26,补跑从未回测标的（四策略）
+KLAC,rejected,RSI2,1h,-0.21,140.0,2026-07-26,补跑从未回测标的（四策略）
+KLAC,rejected,Breakout,1d,-0.407,44.0,2026-07-26,补跑从未回测标的（四策略）
+KLAC,rejected,Confluence,1h,-0.78,105.0,2026-07-26,补跑从未回测标的（四策略）
+KLAC,rejected,Confluence,4h,-0.9,45.0,2026-07-26,补跑从未回测标的（四策略）
