@@ -192,6 +192,10 @@ STRATEGY_MAP: dict[tuple[str, str], str] = {
     ("MKSI", "1h"): "mr",  # Sharpe 0.623 N=31 WR=38.7%
     ("PANW", "1h"): "rsi2",  # Sharpe 0.683 N=117 WR=59.0% [2026-07-26 接入，cost/wf 均通过]
 
+    # 2026-07-26 默认路由清理：183 个原 fall-through 组合全部回测，仅此 2 个达标转为显式路由
+    ("INTC", "1h"): "confluence",  # 10bps 0.86 N=240 训练-0.18→测试1.61
+    ("HOOD", "1d"): "confluence",  # 10bps 0.71 N=38 训练0.36→测试0.68（分段样本偏少）
+
     # 2026-07-25 网格优化新增（60个"默认参数接近达标"标的跑RSI2_GRID×Confluence网格，42组合达标）
     ("AMC", "1h"): "confluence",  # Sharpe 1.06 N=154 WR=63.6% [网格优化]
     ("BA", "4h"): "confluence",  # Sharpe 0.86 N=85 WR=68.2% [网格优化]
@@ -1352,6 +1356,22 @@ def run_scan(ib=None):
                 print(f"  [QQQ {tf}] ⚠ 无法获取 QQQ 数据，Market Regime 过滤将跳过")
 
         for symbol in ALL_SYMBOLS:
+            # No implicit fall-through to Confluence.  A 2026-07-26 sweep
+            # backtested all 183 previously-defaulted combinations: only 2
+            # cleared the bar, 167 failed cost pressure alone, and 113 had a
+            # negative Sharpe at 10bps -- i.e. half the live signal ledger came
+            # from routes we had already measured as unprofitable.  Combinations
+            # must now be listed in STRATEGY_MAP explicitly to alert.
+            strategy = STRATEGY_MAP.get((symbol, tf))
+            if strategy is None:
+                if tf == "1d":
+                    # Breakout scans daily bars separately, so keep fetching them.
+                    df_1d = fetch_bars(ib, symbol, tf)
+                    if df_1d is not None:
+                        price_cache[(symbol, tf)] = df_1d
+                        df_1d_cache[symbol] = df_1d
+                continue
+
             params  = get_params(symbol, tf)
             df_raw  = fetch_bars(ib, symbol, tf)
             if df_raw is None:
@@ -1362,7 +1382,6 @@ def run_scan(ib=None):
             if tf == "1d":
                 df_1d_cache[symbol] = df_raw  # 缓存日线数据供 breakout 扫描复用
 
-            strategy = STRATEGY_MAP.get((symbol, tf), "confluence")
             bar_date = str(df_raw.index[-1].date())
 
             # Risk-off keeps this alert-only system focused on ETF pullbacks.
