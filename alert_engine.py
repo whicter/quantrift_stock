@@ -125,21 +125,21 @@ STRATEGY_MAP: dict[tuple[str, str], str] = {
     ("AIS", "1d"): "confluence",  # Sharpe 0.64 N=30 WR=70.0%
     ("BB", "4h"): "confluence",  # Sharpe 1.36 N=44 WR=61.4%
     ("DJT", "1h"): "confluence",  # Sharpe 1.31 N=125 WR=66.4%
-    ("GME", "1h"): "confluence",  # Sharpe 0.69 N=129 WR=56.6%
+    # 降级(2026-07-26 walk-forward): ("GME", "1h"): "confluence",  # Sharpe 0.69 N=129 WR=56.6%
     ("IBM", "4h"): "confluence",  # Sharpe 0.76 N=53 WR=67.9%
     ("INTU", "4h"): "confluence",  # Sharpe 0.60 N=34 WR=64.7%
     ("LUNR", "4h"): "confluence",  # Sharpe 1.08 N=50 WR=68.0%
     ("LWLG", "1h"): "confluence",  # Sharpe 0.70 N=133 WR=58.6%
     ("MORN", "4h"): "confluence",  # Sharpe 0.71 N=37 WR=67.6%
     ("MSOS", "1d"): "confluence",  # Sharpe 0.87 N=50 WR=76.0%
-    ("PYPL", "1d"): "confluence",  # Sharpe 0.65 N=53 WR=66.0%
+    # 降级(2026-07-26 walk-forward): ("PYPL", "1d"): "confluence",  # Sharpe 0.65 N=53 WR=66.0%
     ("RBLX", "1d"): "confluence",  # Sharpe 1.06 N=38 WR=78.9%
     ("SOFI", "1d"): "confluence",  # Sharpe 0.71 N=42 WR=73.8%
     ("USAR", "1h"): "confluence",  # Sharpe 0.75 N=74 WR=59.5%
     ("AIS", "1h"): "rsi2",  # Sharpe 0.784 N=77 WR=57.1%
     ("BABA", "4h"): "rsi2",  # Sharpe 0.621 N=30 WR=53.3%
     ("BB", "1h"): "rsi2",  # Sharpe 0.727 N=93 WR=55.9%
-    ("CEG", "1h"): "rsi2",  # Sharpe 0.603 N=109 WR=51.4%
+    # 降级(2026-07-26 walk-forward): ("CEG", "1h"): "rsi2",  # Sharpe 0.603 N=109 WR=51.4%
     ("CRWD", "1h"): "rsi2",  # Sharpe 0.765 N=124 WR=58.9%
     ("CRWD", "4h"): "rsi2",  # Sharpe 0.69 N=42 WR=64.3%
     ("JPM", "1h"): "rsi2",  # Sharpe 0.622 N=107 WR=55.1%
@@ -194,7 +194,7 @@ STRATEGY_MAP: dict[tuple[str, str], str] = {
     # 2026-07-25 网格优化新增（60个"默认参数接近达标"标的跑RSI2_GRID×Confluence网格，42组合达标）
     ("AMC", "1h"): "confluence",  # Sharpe 1.06 N=154 WR=63.6% [网格优化]
     ("BA", "4h"): "confluence",  # Sharpe 0.86 N=85 WR=68.2% [网格优化]
-    ("FWRG", "4h"): "confluence",  # Sharpe 0.63 N=74 WR=60.8% [网格优化]
+    # 降级(2026-07-26 walk-forward): ("FWRG", "4h"): "confluence",  # Sharpe 0.63 N=74 WR=60.8% [网格优化]
     ("GFS", "1h"): "confluence",  # Sharpe 0.69 N=82 WR=57.3% [网格优化]
     ("KO", "4h"): "confluence",  # Sharpe 0.78 N=41 WR=75.6% [网格优化]
     ("LLY", "4h"): "confluence",  # Sharpe 0.64 N=63 WR=61.9% [网格优化]
@@ -203,10 +203,10 @@ STRATEGY_MAP: dict[tuple[str, str], str] = {
     ("SLS", "1h"): "confluence",  # Sharpe 0.76 N=105 WR=58.1% [网格优化]
     ("SMCI", "1h"): "confluence",  # Sharpe 0.60 N=294 WR=55.4% [网格优化]
     ("SNAP", "1d"): "confluence",  # Sharpe 0.62 N=59 WR=78.0% [网格优化]
-    ("STLA", "4h"): "confluence",  # Sharpe 1.14 N=106 WR=64.2% [网格优化]
+    # 降级(2026-07-26 walk-forward): ("STLA", "4h"): "confluence",  # Sharpe 1.14 N=106 WR=64.2% [网格优化]
     ("TMC", "1d"): "confluence",  # Sharpe 0.62 N=31 WR=67.7% [网格优化]
     ("TMC", "1h"): "confluence",  # Sharpe 1.18 N=302 WR=63.2% [网格优化]
-    ("UP", "1d"): "confluence",  # Sharpe 0.84 N=37 WR=75.7% [网格优化]
+    # 降级(2026-07-26 walk-forward): ("UP", "1d"): "confluence",  # Sharpe 0.84 N=37 WR=75.7% [网格优化]
     ("USO", "1h"): "confluence",  # Sharpe 0.63 N=80 WR=57.5% [网格优化]
     ("AAOI", "4h"): "rsi2",  # Sharpe 0.672 N=70 WR=68.6% [网格优化]
     ("AIRJ", "1h"): "rsi2",  # Sharpe 0.614 N=56 WR=57.1% [网格优化，DD-35.6%需关注]
@@ -215,14 +215,14 @@ STRATEGY_MAP: dict[tuple[str, str], str] = {
     ("APO", "1h"): "rsi2",  # Sharpe 0.659 N=72 WR=63.9% [网格优化]
     ("BA", "1h"): "rsi2",  # Sharpe 0.98 N=74 WR=63.5% [网格优化]
     ("BBW", "4h"): "rsi2",  # Sharpe 0.79 N=50 WR=62.0% [网格优化]
-    ("CCJ", "1h"): "rsi2",  # Sharpe 0.67 N=150 WR=62.0% [网格优化，DD-30.2%需关注]
+    # 降级(2026-07-26 walk-forward): ("CCJ", "1h"): "rsi2",  # Sharpe 0.67 N=150 WR=62.0% [网格优化，DD-30.2%需关注]
     ("CCJ", "4h"): "rsi2",  # Sharpe 0.75 N=50 WR=70.0% [网格优化]
     ("CRSP", "1h"): "rsi2",  # Sharpe 1.048 N=74 WR=55.4% [网格优化]
-    ("DUOL", "1h"): "rsi2",  # Sharpe 1.234 N=156 WR=66.0% [网格优化]
+    # 降级(2026-07-26 walk-forward): ("DUOL", "1h"): "rsi2",  # Sharpe 1.234 N=156 WR=66.0% [网格优化]
     ("FOF", "1h"): "rsi2",  # Sharpe 0.879 N=104 WR=51.0% [网格优化]
     ("GL", "1h"): "rsi2",  # Sharpe 1.07 N=169 WR=60.9% [网格优化]
     ("HBM", "4h"): "rsi2",  # Sharpe 1.053 N=63 WR=74.6% [网格优化]
-    ("LLY", "1h"): "rsi2",  # Sharpe 0.716 N=123 WR=57.7% [网格优化]
+    # 降级(2026-07-26 walk-forward): ("LLY", "1h"): "rsi2",  # Sharpe 0.716 N=123 WR=57.7% [网格优化]
     ("MSTR", "1h"): "rsi2",  # Sharpe 0.909 N=163 WR=61.3% [网格优化，DD-29.0%需关注]
     ("NFLX", "1h"): "rsi2",  # Sharpe 0.821 N=77 WR=62.3% [网格优化]
     ("PB", "4h"): "rsi2",  # Sharpe 0.689 N=33 WR=69.7% [网格优化]

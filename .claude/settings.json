@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ssh mac-studio*)",
+      "Bash(ssh -A mac-studio*)",
+      "Bash(rsync*)",
+      "Bash(.venv/bin/python*)",
+      "Bash(/opt/homebrew/bin/python3.11*)",
+      "Bash(python signal_review.py*)",
+      "Bash(python backtest_runner.py*)",
+      "Bash(python rsi2_backtest.py*)",
+      "Bash(python etf_scanner.py*)",
+      "Bash(python fetch_data.py*)",
+      "Bash(git status)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(cat logs/*)",
+      "Bash(ls*)",
+      "Bash(mkdir -p*)",
+      "Bash(sleep*)"
+    ]
+  }
+}

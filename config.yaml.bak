@@ -29,57 +29,17 @@ symbols:
   mega_cap:    [MSFT, GOOGL, META, PLTR]
 
   # 弱化/待观察：RSI2 Sharpe 低，暂不纳入主策略池
-  # INTC：1h Confluence Sharpe 0.67（95笔），2026-07-02 从 watch_candidates 升级
-  watch:       [AAPL, INTC]
-
-  # 选股初筛发现的候选（连续 Top5 SP500/NDX），待 backtest_runner 验证参数后升级
-  # AMD/AMAT/KLAC：回测最优 Sharpe 0.52/0.36/0.05，未达 0.6 门槛（2026-07-02）
-  # DELL 已于 2026-07-25 用新参数重跑达标（1h Confluence 0.83 / 4h RSI2 0.85），升级至 watchlist_2026_07
-  watch_candidates: [AMD, AMAT, KLAC]
+  watch:       [AAPL]
 
   # 待专项研究：RSI2 失效（Sharpe 0.27），ConfluenceStrategy 待验证
   # 备选方案："距 20 日高点回撤 5-10% + RSI 40-55"
   pending:     [AMZN]
-
-  # 高波动/新兴标的：波动大、上市时间短或流动性较低，需专项回测后决定策略
-  # RKLB：太空/火箭；NBIS：AI基础设施（前Yandex）；IREN：AI算力/比特币矿
-  pending_high_vol: [RKLB, NBIS, IREN]
 
   # 半导体 ETF：RSI2（不强制 RS vs QQQ）或 MR+ATR（待重新调参）
   sector_etf:  [SOXX, SMH]
 
   # 宽基 ETF：RSI2 benchmark 模式（不参与 RS 过滤）
   broad_etf:   [QQQ, SPY]
-
-  # 2026-07-25 用户提供 watchlist 批量回测新增（157个候选 -> 30个通过 Sharpe>=0.6 且 N>=30）
-  # 方法：yfinance 拉取 1h/4h/1d -> Confluence/RSI2(默认参数)/Breakout(默认参数) 三策略回测
-  #      -> 取每个 (symbol,tf) 最优 Sharpe -> 剔除退化结果(WR=100%或RR=0，多为货币基金/近零波动品种伪信号)
-  #      -> 剔除货币基金/短债ETF(SGOV/BND等) -> 剩余即本组
-  # 杠杆/反向ETF(SOXS/SPXU等)即使达标也不自动列入，见 LEARNING.md 说明
-  # 2026-07-25 补跑：用户追问的 HOOD/EU/XYZ/COIN/DELL 中仅 HOOD/DELL 达标（COIN/EU/XYZ 三策略全周期均未达标，未列入）
-  # 2026-07-25 MR策略补测：对107个未达标标的跑MR均值回归，仅 TSM/FDVV 达标（TSM/FDVV 首次由MR接入，非Confluence/RSI2/Breakout）
-  # 2026-07-25 第四版watchlist（用户扩充到293个代码后）批量回测：89个新标的 -> 21个达标（含1个MR/8个Confluence/15个RSI2）
-  # SMR 1h RSI2 Sharpe 0.686 但最大回撤-95.12%（小盘核能股暴涨暴跌），风险过高排除，不接入
-  # 2026-07-25 网格优化：对60个"默认参数接近达标(Sharpe 0.35-0.6)"的标的跑RSI2_GRID×Confluence网格，
-  # 42个(symbol,tf)组合达标，SLS 1h RSI2最大回撤-56.9%风险过高排除，改用其Confluence 1h结果(0.76, -0%DD)
-  # 注：RGTI/AIRJ/CCJ/MSTR/UP/AAOI/HBM/DUOL/CRSP/APLD 等多个1h RSI2组合回撤在20-40%区间，
-  # 明显高于原主池标的，接入后需观察实盘信号质量，必要时收紧atr_sl_mult
-  # 2026-07-26 walk-forward 验证降级：CEG/DUOL/FWRG/GME/PYPL/STLA 六个标的的唯一路由
-  # 在样本外测试期 Sharpe 转负（训练 0.83~1.89 → 测试 -0.29~-2.24），已整体移出扫描池；
-  # CCJ/LLY/UP 各降级一个周期但保留其他合格路由。详见 watchlist_validation.csv
-  watchlist_2026_07: [AAOI, AGI, AIRJ, AIS, ALL, AMC, APLD, APO, BA, BABA, BAC, BB,
-                       BBW, BE, CBUS, CCB, CCJ, CRCL, CRSP, CRWD, CRWV, DELL, DGRO, DJT,
-                       FDVV, FOF, FOX, GE, GFS, GL, GOOG, HBM, HOOD, IBM, INTU, JPM,
-                       KO, LLY, LMT, LTL, LUNR, LVHI, LWLG, MKSI, MO, MORN, MS, MSOS,
-                       MSTR, NFLX, NTRS, OC, OKLO, ONDS, ORCL, OSCR, OUST, PB, PKW, QCOM,
-                       RBC, RBLX, REMX, RGTI, SAP, SKM, SLS, SLV, SMCI, SNAP, SOFI, SPCX,
-                       SPMO, SPXC, SPYM, TMC, TSM, UP, USAR, USO, VC, VOO, VTI, WBD,
-                       WDC, WMT]
-  # SPCX（Space Exploration Technologies Corp，2026-06-12上市）：应用户明确要求接入实盘扫描，
-  # 但 1d 仅28行数据，任何策略都无法跑出有意义的回测（RSI2/MR需200+天，Breakout需252+天）。
-  # 未在 STRATEGY_MAP 显式指定策略 -> 默认走 confluence（1h有201根K线，够Confluence最低50根门槛）。
-  # ⚠️ 这是本系统里唯一一个未经任何回测验证就接入实盘的标的，需等1d数据积累到至少210天后补跑
-  # RSI2/MR回测、252天后补跑Breakout，重新评估是否要切换/调整策略。
 
 # ── 数据设置 ────────────────────────────────────────────────────────────
 data:
@@ -327,42 +287,3 @@ symbol_params:
     1h:  {adx_threshold: 20.0, ut_key: 2.0, min_score: 4}
     4h:  {adx_threshold: 20.0, ut_key: 2.5, min_score: 4}
     1d:  {adx_threshold: 20.0, ut_key: 2.5, min_score: 4}
-  INTC:
-    # Confluence 1h Sharpe 0.67（95笔），1d 0.56；4h 无效（0.11）
-    1h:  {adx_threshold: 25.0, ut_key: 1.5, min_score: 5}
-    4h:  {adx_threshold: 25.0, ut_key: 2.0, min_score: 5}
-    1d:  {adx_threshold: 20.0, ut_key: 3.0, min_score: 4}
-
-  # ── 2026-07-25 网格优化新增（对watchlist批量回测中"默认参数接近达标"的60个标的跑
-  #    RSI2_GRID×Confluence网格，42个组合达标；此处为Confluence部分的逐标的参数）──
-  AMC:
-    1h:  {adx_threshold: 30.0, ut_key: 1.5, min_score: 3}  # Sharpe 1.06 N=154 WR=63.6%
-  BA:
-    4h:  {adx_threshold: 20.0, ut_key: 1.0, min_score: 3}  # Sharpe 0.86 N=85 WR=68.2%
-  FWRG:
-    4h:  {adx_threshold: 15.0, ut_key: 1.0, min_score: 5}  # Sharpe 0.63 N=74 WR=60.8%
-  GFS:
-    1h:  {adx_threshold: 30.0, ut_key: 1.0, min_score: 5}  # Sharpe 0.69 N=82 WR=57.3%
-  KO:
-    4h:  {adx_threshold: 25.0, ut_key: 2.0, min_score: 3}  # Sharpe 0.78 N=41 WR=75.6%
-  LLY:
-    4h:  {adx_threshold: 20.0, ut_key: 2.0, min_score: 5}  # Sharpe 0.64 N=63 WR=61.9%
-  MO:
-    1h:  {adx_threshold: 25.0, ut_key: 3.0, min_score: 5}  # Sharpe 0.63 N=117 WR=68.4%
-  QCOM:
-    4h:  {adx_threshold: 25.0, ut_key: 2.0, min_score: 3}  # Sharpe 1.03 N=47 WR=72.3%
-  SLS:
-    1h:  {adx_threshold: 30.0, ut_key: 2.5, min_score: 4}  # Sharpe 0.76 N=105 WR=58.1%
-  SMCI:
-    1h:  {adx_threshold: 15.0, ut_key: 2.0, min_score: 3}  # Sharpe 0.60 N=294 WR=55.4%
-  SNAP:
-    1d:  {adx_threshold: 15.0, ut_key: 1.0, min_score: 5}  # Sharpe 0.62 N=59 WR=78.0%
-  STLA:
-    4h:  {adx_threshold: 15.0, ut_key: 3.0, min_score: 3}  # Sharpe 1.14 N=106 WR=64.2%
-  TMC:
-    1d:  {adx_threshold: 15.0, ut_key: 1.0, min_score: 5}  # Sharpe 0.62 N=31 WR=67.7%
-    1h:  {adx_threshold: 15.0, ut_key: 3.0, min_score: 3}  # Sharpe 1.18 N=302 WR=63.2%
-  UP:
-    1d:  {adx_threshold: 20.0, ut_key: 1.0, min_score: 5}  # Sharpe 0.84 N=37 WR=75.7%
-  USO:
-    1h:  {adx_threshold: 30.0, ut_key: 1.0, min_score: 5}  # Sharpe 0.63 N=80 WR=57.5%
