@@ -88,8 +88,11 @@ def load_data(symbol: str, tf: str) -> pd.DataFrame | None:
 
 
 def run_backtest(symbol: str, tf: str, params: dict,
-                 df_qqq: pd.DataFrame | None = None) -> dict | None:
-    df_raw = load_data(symbol, tf)
+                 df_qqq: pd.DataFrame | None = None,
+                 df_override: pd.DataFrame | None = None) -> dict | None:
+    """df_override lets callers backtest a slice (e.g. walk-forward segments)
+    instead of the full on-disk history."""
+    df_raw = df_override if df_override is not None else load_data(symbol, tf)
     if df_raw is None or len(df_raw) < 50:
         return None
 
