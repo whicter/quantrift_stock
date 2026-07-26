@@ -33,6 +33,27 @@
 - [x] **`SPCX`/`SPXC` 用户核实两者未混淆**：确认 `watchlist_history.csv` 中 `SPCX`（Space Exploration Technologies Corp，SpaceX关联，数据不足暂缓）与 `SPXC`（SPX Technologies，工业设备商，网格优化救回接入）是两条独立记录，代码里也只接入了 `SPXC`，未误接 `SPCX`。
 - [x] **`SPCX` 应用户明确要求接入实盘扫描（未经回测验证的特例）**：确认数据仍仅28行1d（6/12上市），任何策略都无法产生有意义回测。告知用户"若不指定策略，Confluence 默认门槛(50根1h K线)会被 SPCX 的201根1h数据满足，将立即产生未经验证的实盘信号"，用户明确选择现在接入。加入 `watchlist_2026_07`，未在 `STRATEGY_MAP` 显式指定策略（走默认confluence），代码注释标注"系统里唯一未经任何回测验证就接入实盘的标的"，需等1d数据积累到210天（RSI2/MR）、252天（Breakout）后补跑回测重新评估。`watchlist_history.csv` 状态改为 `promoted_unvalidated`（区别于其他经过验证的 `promoted`）。`import` 验证：`ALL_SYMBOLS` 108→109。已重启 `stock-alert` pm2 进程使其生效。
 
+### N — 复盘保真度修复（2026-07-25，进行中）
+
+**触发**：用户要求"先确认复盘逻辑有据可循、有意义，而不是一堆没用或缺失的信息"，随后追问三点：本地 CSV 价格是否正确、4h 做空信号的实际出场时刻与止损价是否有记录、持仓上限一刀切是否合理。代码级+数据级审计结论见 LEARNING.md「复盘保真度审计」。
+
+**审计已确认的事实**（不需再验证）：
+- 日线价格准确：IB `ADJUSTED_LAST` 与 yfinance `auto_adjust` 抽查 0.000% 差异
+- 1h/4h 存在采样锚点错位（IB 整点 vs yf 半点；离线 label=left vs 实时 label=right）——属回测/实盘结构性偏差，**本次不修**，改动会影响实时信号触发时点，需单独评估
+- 止损价有记录（`signal_log.csv` 的 `sl` 列 + Telegram 消息），但出场时刻无记录，且"持仓: 最长 2 交易日"文案错误
+- `params_json` 早已完整落盘每条信号的真实参数，但复盘链路从未读取
+
+**六项修复（全部只改复盘/账本/文案，不触碰任何策略参数与信号触发逻辑）**：
+
+- [ ] **修复1 — 4h 回放改用 4h CSV**：`signal_review._load_local_csv` 的 tf 映射表补 `4h`，让 4h 信号用 `{sym}_4h.csv` 回放而非落到 1h 分支；`_batch_download` 的 interval 分组同步区分 4h。
+- [ ] **修复2 — 持仓上限改为按信号自带参数**：新增解析优先级 `params_json.max_hold_bars` → (策略, 周期) 默认表（对齐 `rsi2_backtest`/`mr_backtest`/`breakout_backtest`/`config.yaml` 各自的真实默认值）→ 兜底常量，替换硬编码 `MAX_BARS = {1h:10, 4h:10, 1d:15}`。这是 RSI2 复盘胜率 7% vs 回测 60-70% 落差的直接原因。
+- [ ] **修复3 — `paper_portfolio.update` 同步**：虚拟持仓平仓判断改用修复2 的同一套解析逻辑，消除虚拟净值曲线的同源污染。
+- [ ] **修复4 — 衰减监控加最小样本量门槛**：N<5 的 (策略,标的) 组合标注"样本不足"，不参与红黄绿判定，避免 N=1/N=2 发出噪声警报。
+- [ ] **修复5 — 告警文案修正持仓时间**：`_HOLD_DESC` 按 RTH 每日 bar 数（1h=7根/日，4h=2根/日，1d=1根/日）正确换算，并显示具体 bar 数与对应交易日；文案取该信号真实的 `max_hold_bars` 而非全局常量。
+- [ ] **修复6 — Telegram 周报摘要增信息量**：现摘要仅"信号N条/已决N条/均R"，补充按策略拆分、红灯清单、以及"基线=0R（临时占位）"的显式标注，避免读者把 z 分数误读为对回测期望的偏离。
+
+**验证要求**：修复2 完成后需重跑 `signal_review.py --days 90` 对比修复前后的 RSI2 胜率/均R 变化，确认落差确实由口径造成；`test_review_core.py` 需新增覆盖"按 params_json 解析 hold"与"4h 用 4h CSV"的用例。
+
 ## 待完成（优先级顺序）
 
 ### A — alert_engine 剩余功能
