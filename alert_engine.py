@@ -190,6 +190,7 @@ STRATEGY_MAP: dict[tuple[str, str], str] = {
     ("WDC", "4h"): "rsi2",  # Sharpe 1.01 N=47 WR=70.2%
     ("WMT", "4h"): "rsi2",  # Sharpe 0.677 N=42 WR=61.9%
     ("MKSI", "1h"): "mr",  # Sharpe 0.623 N=31 WR=38.7%
+    ("PANW", "1h"): "rsi2",  # Sharpe 0.683 N=117 WR=59.0% [2026-07-26 接入，cost/wf 均通过]
 
     # 2026-07-25 网格优化新增（60个"默认参数接近达标"标的跑RSI2_GRID×Confluence网格，42组合达标）
     ("AMC", "1h"): "confluence",  # Sharpe 1.06 N=154 WR=63.6% [网格优化]
@@ -298,6 +299,7 @@ RSI2_PARAMS: dict[tuple[str, str], dict] = {
     ("REMX", "4h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.5, "min_market_score": 2},
     ("SLV",  "4h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.5, "min_market_score": 2},
     ("SPMO", "1h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.0, "min_market_score": 2},
+    ("PANW", "1h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.0, "min_market_score": 2},
 
     # 2026-07-25 补跑
     ("DELL", "4h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.5, "min_market_score": 2},

@@ -992,3 +992,11 @@ XYZ,rejected,RSI2,4h,0.798,17.0,2026-07-25,网格优化后仍不达标
 ZION,rejected,RSI2,1d,0.31,23.0,2026-07-25,网格优化后仍不达标
 ZION,rejected,RSI2,1h,0.569,62.0,2026-07-25,网格优化后仍不达标
 ZION,rejected,RSI2,4h,0.559,47.0,2026-07-25,网格优化后仍不达标
+PANW,promoted,RSI2,1h,0.683,117.0,2026-07-26,用户要求加入，四策略回测；cost 10bps通过、wf训练0.37→测试0.84 已接入
+PANW,rejected,MR,1d,0.444,15.0,2026-07-26,用户要求加入，四策略回测
+PANW,rejected,MR,1h,0.265,18.0,2026-07-26,用户要求加入，四策略回测
+PANW,rejected,Breakout,1d,0.244,28.0,2026-07-26,用户要求加入，四策略回测
+PANW,rejected,Confluence,1h,0.24,156.0,2026-07-26,用户要求加入，四策略回测
+PANW,rejected,RSI2,4h,0.111,42.0,2026-07-26,用户要求加入，四策略回测
+PANW,rejected,Confluence,4h,-0.08,44.0,2026-07-26,用户要求加入，四策略回测
+PANW,rejected,Confluence,1d,-0.21,62.0,2026-07-26,用户要求加入，四策略回测
