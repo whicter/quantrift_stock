@@ -53,6 +53,7 @@ from data_providers import get_provider
 from mag7_rotation import run_rotation
 from meta_label import suggest as meta_label_suggest
 from paper_portfolio import open_position as paper_open_position, risk_warnings as paper_risk_warnings, update as paper_update
+from review_core import hold_description
 
 with open("config.yaml") as f:
     cfg = yaml.safe_load(f)
@@ -858,7 +859,16 @@ def _regime_line(market_score: float, vix: float | None) -> str:
     return f"  Regime: {score_str}"
 
 
-_HOLD_DESC = {"1h": "最长 10 小时", "4h": "最长 2 交易日", "1d": "最长 3 周"}
+def _hold_text(strategy: str, tf: str, params: dict) -> str:
+    """Holding cap for this specific signal, in bars and trading days.
+
+    Derived from the signal's own parameters via review_core, so the alert, the
+    replay, and the paper ledger all quote the same number.  The previous fixed
+    table said "最长 2 交易日" for 4h by dividing 40 hours by a calendar day;
+    RTH only produces 2 4h bars per day, so that window is really 5 trading days.
+    """
+    return hold_description({"strategy": strategy, "tf": tf,
+                             "params_json": json.dumps(params or {})}, tf)
 
 
 def build_confluence_alert(symbol: str, tf: str, sig: dict) -> str:
@@ -866,7 +876,7 @@ def build_confluence_alert(symbol: str, tf: str, sig: dict) -> str:
     emoji = "📈" if d == "做多" else "📉"
     ts = datetime.now().strftime("%Y-%m-%d %H:%M")
     quality = sig.get("quality", 0)
-    hold = _HOLD_DESC.get(tf, "—")
+    hold = _hold_text("Confluence", tf, get_params(symbol, tf))
     return (
         f"{emoji} {symbol} {tf} {d}信号 [Confluence]  ⭐ {quality}/10\n"
         f"  价格: ${sig['close']:.2f}  ATR: ${sig['atr']:.2f}\n"
@@ -883,7 +893,7 @@ def build_rsi2_alert(symbol: str, tf: str, sig: dict) -> str:
     ts = datetime.now().strftime("%Y-%m-%d %H:%M")
     p = RSI2_PARAMS.get((symbol, tf), {})
     quality = sig.get("quality", 0)
-    hold = _HOLD_DESC.get(tf, "—")
+    hold = _hold_text("RSI2", tf, p)
     return (
         f"📊 {symbol} {tf} 做多信号 [RSI2 v2]  ⭐ {quality}/10\n"
         f"  价格: ${sig['close']:.2f}  ATR: ${sig['atr']:.2f}\n"
@@ -899,7 +909,7 @@ def build_mr_alert(symbol: str, tf: str, sig: dict) -> str:
     ts = datetime.now().strftime("%Y-%m-%d %H:%M")
     p = MR_PARAMS.get((symbol, tf), {})
     quality = sig.get("quality", 0)
-    hold = _HOLD_DESC.get(tf, "—")
+    hold = _hold_text("MR", tf, p)
     return (
         f"🔄 {symbol} {tf} 做多信号 [MR 均值回归]  ⭐ {quality}/10\n"
         f"  价格: ${sig['close']:.2f}  ATR: ${sig['atr']:.2f}\n"
@@ -996,7 +1006,7 @@ def build_breakout_alert(symbol: str, sig: dict) -> str:
         f"  价格: ${sig['close']:.2f}  52W高: ${sig['high_252']:.2f}  ATR: ${sig['atr']:.2f}\n"
         f"  TP1: ${sig['tp1']:.2f}  TP2: ${sig['tp2']:.2f}\n"
         f"  SL(初始 ×{p.get('atr_sl_mult',1.5)}): ${sig['sl']:.2f}"
-        f"  持仓: 最长 {p.get('max_hold_bars',20)} 交易日\n"
+        f"  持仓: {_hold_text('Breakout52W', '1d', p)}\n"
         + _regime_line(4.0, sig.get("vix")) + "\n"
         + _vix_position_hint(sig.get("vix")) + "\n"
         + f"  时间: {ts} ET"
@@ -1531,7 +1541,8 @@ def run_scan(ib=None):
                         "RKLB_Breakout", sector_aligned=None, screener_rank=screener_ranks.get("RKLB"),
                         market_regime=market_regime)
 
-    for event in paper_update(price_cache, {"1h": 10, "4h": 10, "1d": 15}):
+    # Holding caps now come from each position's own recorded parameters.
+    for event in paper_update(price_cache):
         print(f"  虚拟持仓平仓: {event['symbol']} {event['outcome']} {event['r_mult']:+.2f}R")
         if event["type"] == "pyramid":
             tg_alert(f"➕ {event['symbol']} 虚拟持仓 TP1 后继续创新高\n  纸面策略提示：可考虑补回已减半仓位，保护止损上移至 TP1。\n  仅提示，不执行任何下单。")

@@ -66,8 +66,14 @@ def open_position(row: dict, book: dict | None = None) -> list[str]:
     return warnings
 
 
-def update(price_by_key: dict[tuple[str, str], pd.DataFrame], max_bars: dict[str, int]) -> list[dict]:
-    """Close virtual positions using the shared replay; return new status events."""
+def update(price_by_key: dict[tuple[str, str], pd.DataFrame],
+           max_bars: dict[str, int] | None = None) -> list[dict]:
+    """Close virtual positions using the shared replay; return new status events.
+
+    max_bars is accepted for backward compatibility but ignored: each position
+    is replayed under its own recorded holding cap, so the virtual equity curve
+    matches what the issuing strategy would actually have done.
+    """
     book, events = load(), []
     for position in _open_positions(book):
         price = price_by_key.get((position["symbol"], position["tf"]))
@@ -85,7 +91,7 @@ def update(price_by_key: dict[tuple[str, str], pd.DataFrame], max_bars: dict[str
                 if continuing:
                     position["pyramiding_notified"] = True
                     events.append({"type": "pyramid", "symbol": position["symbol"], "outcome": "TP1后创新高", "r_mult": 0.0})
-        outcome = evaluate(position, price, max_bars.get(position["tf"], 10))
+        outcome = evaluate(position, price)
         if outcome["outcome"] == "未决":
             continue
         position.update(outcome)

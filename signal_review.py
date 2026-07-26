@@ -28,7 +28,7 @@ import pandas as pd
 import yfinance as yf
 
 from meta_label import train as train_meta_model
-from review_core import evaluate
+from review_core import evaluate, hold_bars
 
 SIGNAL_LOG = Path("logs/signal_log.csv")
 LOG_FIELDS = [
@@ -44,8 +44,13 @@ LOG_FIELDS = [
 DATA_DIR = Path("data")
 
 def _load_local_csv(symbol: str, interval: str) -> pd.DataFrame | None:
-    """尝试从本地 data/ 目录读取已有 CSV（IB 抓取的历史数据）。"""
-    tf_map = {"1h": "1h", "1d": "1d"}
+    """尝试从本地 data/ 目录读取已有 CSV（IB 抓取的历史数据）。
+
+    4h must map to the 4h file: replaying a 4h signal against 1h bars would
+    count each holding bar as one hour, cutting the effective holding window
+    to a quarter of what the strategy allows.
+    """
+    tf_map = {"1h": "1h", "4h": "4h", "1d": "1d"}
     tf = tf_map.get(interval)
     if tf is None:
         return None
@@ -83,42 +88,39 @@ def _fetch(symbol: str, start: str, interval: str = "1d") -> pd.DataFrame | None
             return filtered
 
     # 2. 回退 yfinance（限速：每次请求前等 2 秒）
+    # yfinance has no native 4h interval, so 4h is resampled from 1h the same
+    # way alert_engine builds its live 4h bars.
     time.sleep(2)
+    download_interval = "1h" if interval == "4h" else interval
     try:
-        df = yf.download(symbol, start=start, interval=interval,
+        df = yf.download(symbol, start=start, interval=download_interval,
                          progress=False, auto_adjust=True)
         if df.empty:
             return None
         if isinstance(df.columns, pd.MultiIndex):
             df.columns = df.columns.get_level_values(0)
         df.index = pd.to_datetime(df.index).tz_localize(None)
+        if interval == "4h":
+            df = _resample_4h(df)
         return df
     except Exception as e:
         print(f"  ⚠ 获取 {symbol} ({interval}) 数据失败: {e}")
         return None
 
 
+def _resample_4h(df_1h: pd.DataFrame) -> pd.DataFrame:
+    """Aggregate 1h bars into 4h using alert_engine's live convention."""
+    return (df_1h.resample("4h", label="right", closed="right")
+            .agg({"Open": "first", "High": "max", "Low": "min",
+                  "Close": "last", "Volume": "sum"})
+            .dropna(subset=["Close"]))
+
+
 # ── 信号评估 ────────────────────────────────────────────────────────────────
-
-# 各周期最大持仓 bar 数（与实际策略 hold 参数对齐）
-MAX_BARS = {"1h": 10, "4h": 10, "1d": 15}
-
-
-def _eval_confluence(row: pd.Series, price: pd.DataFrame, tf: str) -> dict:
-    """
-    Confluence 信号评估（有 TP1/TP2/SL）。
-    逐 bar 检查：同一根 bar 内 SL 优先（保守假设）。
-    超过 MAX_BARS 未触及 SL/TP 则按收盘价时间止损。
-    """
-    return evaluate(row, price, MAX_BARS.get(tf, 10))
-
-
-def _eval_rsi2(row: pd.Series, price: pd.DataFrame, tf: str) -> dict:
-    """
-    RSI2 信号评估（只有 SL，无固定 TP）。
-    超过 MAX_BARS 未触及 SL 则按收盘价时间止损。
-    """
-    return evaluate(row, price, MAX_BARS.get(tf, 15))
+# 持仓上限不再用统一常量：每条信号按自身 params_json 里的 max_hold_bars 回放，
+# 缺失时回退到该策略的回测默认值（见 review_core.hold_bars）。旧的
+# MAX_BARS = {1h:10, 4h:10, 1d:15} 会把 RSI2（默认 48 根）提前 5 倍平仓，
+# 是复盘胜率远低于回测胜率的直接原因。
 
 
 def _current_r(price: pd.DataFrame, entry: float, atr: float, direction: str) -> float | None:
@@ -180,6 +182,9 @@ def _quality_report(rdf: pd.DataFrame) -> None:
             print(f"  {label}: N={len(group)} 胜率={(group['r_mult'] > 0).mean() * 100:.1f}% 平均R={group['r_mult'].mean():+.2f}")
 
 
+MIN_MONITOR_SAMPLES = 5
+
+
 def _monitor(rdf: pd.DataFrame) -> None:
     """Write rolling live performance history and flag statistical degradation."""
     decided = rdf[pd.to_numeric(rdf["r_mult"], errors="coerce").notna()].copy()
@@ -194,16 +199,26 @@ def _monitor(rdf: pd.DataFrame) -> None:
         sigma = float(recent["r_mult"].std(ddof=0) / max(len(recent) ** 0.5, 1))
         # Before an expectation table has enough validated rows, use zero-R neutral baseline.
         z = mean / sigma if sigma > 0 else 0.0
-        level = "红" if z < -2 else "黄" if z < -1 else "绿"
+        # A handful of trades cannot support a degradation verdict; flagging
+        # N=1 as "red" is noise that invites acting on nothing.
+        if len(recent) < MIN_MONITOR_SAMPLES:
+            level = "样本不足"
+        else:
+            level = "红" if z < -2 else "黄" if z < -1 else "绿"
         rows.append({"timestamp": datetime.now().isoformat(timespec="seconds"), "strategy": strategy,
                      "symbol": symbol, "n": len(recent), "mean_r": round(mean, 4), "se": round(sigma, 4),
                      "z_vs_baseline": round(z, 3), "status": level})
     hist = pd.DataFrame(rows)
     path.parent.mkdir(exist_ok=True)
     hist.to_csv(path, mode="a", index=False, header=not path.exists())
-    print("\n🚦 衰减监控（最近20笔，基准暂为 0R；期望表可在样本稳定后固化）")
-    for row in rows:
+    graded = [r for r in rows if r["status"] != "样本不足"]
+    pending = [r for r in rows if r["status"] == "样本不足"]
+    print(f"\n🚦 衰减监控（最近20笔；基准=0R 临时占位，非回测期望值；N<{MIN_MONITOR_SAMPLES} 不判级）")
+    for row in sorted(graded, key=lambda r: r["z_vs_baseline"]):
         print(f"  {row['status']} {row['strategy']} {row['symbol']}: N={row['n']} 均R={row['mean_r']:+.2f} z={row['z_vs_baseline']:+.2f}")
+    if pending:
+        names = ", ".join(f"{r['strategy']}/{r['symbol']}(N={r['n']})" for r in pending)
+        print(f"  样本不足未判级：{names}")
 
 
 def _telegram_summary(rdf: pd.DataFrame) -> None:
@@ -213,11 +228,38 @@ def _telegram_summary(rdf: pd.DataFrame) -> None:
     token, chat_id = os.environ.get("TG_TOKEN"), os.environ.get("TG_CHAT_ID")
     if not token or not chat_id:
         return
-    decided = rdf[pd.to_numeric(rdf["r_mult"], errors="coerce").notna()]
+    decided = rdf[pd.to_numeric(rdf["r_mult"], errors="coerce").notna()].copy()
     avg_r = decided["r_mult"].mean() if not decided.empty else 0
-    text = f"📋 周度信号复盘\n信号 {len(rdf)} 条，已决 {len(decided)} 条，均R {avg_r:+.2f}\n详情：logs/review_history.csv"
+    lines = [f"📋 周度信号复盘",
+             f"信号 {len(rdf)} 条，已决 {len(decided)} 条，均R {avg_r:+.2f}"]
+
+    # Per-strategy breakdown: a single blended average hides which family is
+    # actually degrading.
+    if not decided.empty:
+        lines.append("")
+        for strategy, group in decided.groupby("strategy"):
+            wins = (group["r_mult"] > 0).mean() * 100
+            lines.append(f"· {strategy}: N={len(group)} 胜率{wins:.0f}% 均R{group['r_mult'].mean():+.2f}")
+
+        red = []
+        for (strategy, symbol), group in decided.groupby(["strategy", "symbol"]):
+            recent = group.sort_values("timestamp").tail(20)
+            if len(recent) < MIN_MONITOR_SAMPLES:
+                continue
+            mean = float(recent["r_mult"].mean())
+            sigma = float(recent["r_mult"].std(ddof=0) / max(len(recent) ** 0.5, 1))
+            if sigma > 0 and mean / sigma < -2:
+                red.append(f"{strategy}/{symbol}(均R{mean:+.2f}, N={len(recent)})")
+        if red:
+            lines.append("")
+            lines.append(f"🔴 红灯 {len(red)} 项：" + ", ".join(red))
+
+    lines.append("")
+    lines.append(f"基准=0R 临时占位（非回测期望值）；N<{MIN_MONITOR_SAMPLES} 不判级")
+    lines.append("详情：logs/review_history.csv")
     try:
-        requests.post(f"https://api.telegram.org/bot{token}/sendMessage", data={"chat_id": chat_id, "text": text}, timeout=10)
+        requests.post(f"https://api.telegram.org/bot{token}/sendMessage",
+                      data={"chat_id": chat_id, "text": "\n".join(lines)}, timeout=10)
     except requests.RequestException:
         pass
 
@@ -281,7 +323,8 @@ def main():
 
     # 批量下载：一次请求所有标的（避免逐个限速）
     all_symbols = df["symbol"].unique().tolist()
-    syms_1h = [s for s in all_symbols if df[df["symbol"] == s]["tf"].isin(["1h", "4h"]).any()]
+    syms_1h = [s for s in all_symbols if df[df["symbol"] == s]["tf"].eq("1h").any()]
+    syms_4h = [s for s in all_symbols if df[df["symbol"] == s]["tf"].eq("4h").any()]
     syms_1d = [s for s in all_symbols if df[df["symbol"] == s]["tf"].eq("1d").any()]
 
     price_cache: dict[tuple[str, str], pd.DataFrame | None] = {}
@@ -305,10 +348,11 @@ def main():
         if not missing:
             return
 
-        # 批量 yfinance（多 ticker 一次请求）
+        # 批量 yfinance（多 ticker 一次请求）；4h 无原生 interval，拉 1h 再聚合
         print(f"  yfinance 批量下载 {len(missing)} 个标的 [{interval}]...")
+        download_interval = "1h" if interval == "4h" else interval
         try:
-            raw = yf.download(missing, start=start, interval=interval,
+            raw = yf.download(missing, start=start, interval=download_interval,
                               progress=False, auto_adjust=True, group_by="ticker")
             if raw.empty:
                 return
@@ -322,6 +366,8 @@ def main():
                         sub.columns = sub.columns.get_level_values(0)
                     sub.index = pd.to_datetime(sub.index).tz_localize(None)
                     sub = sub.dropna(how="all")
+                    if interval == "4h" and not sub.empty:
+                        sub = _resample_4h(sub)
                     price_cache[(sym, interval)] = sub if not sub.empty else None
                 except Exception:
                     price_cache[(sym, interval)] = None
@@ -329,28 +375,30 @@ def main():
             print(f"  ⚠ 批量下载失败: {e}")
 
     _batch_download(syms_1h, "1h", global_start)
+    _batch_download(syms_4h, "4h", global_start)
     _batch_download(syms_1d, "1d", global_start)
 
     def get_price(symbol: str, tf: str, earliest_dt: datetime) -> pd.DataFrame | None:
-        interval = "1h" if tf in ("1h", "4h") else "1d"
+        # Each timeframe replays against its own bars; a 4h signal measured in
+        # 1h bars would be force-closed four times too early.
+        interval = tf if tf in ("1h", "4h", "1d") else "1d"
         return price_cache.get((symbol, interval))
 
     results = []
     for _, row in df.iterrows():
         sym   = row["symbol"]
         tf    = row["tf"]
-        strat = str(row.get("strategy", "")).lower()
 
         price = get_price(sym, tf, earliest_by_sym[sym])
 
         if price is None:
             ev = {"outcome": "数据失败", "r_mult": None, "bars": 0}
-        elif "confluence" in strat or float(row.get("tp1", 0) or 0) != 0:
-            ev = _eval_confluence(row, price, tf)
         else:
-            ev = _eval_rsi2(row, price, tf)
+            # Strategy routing and the holding cap both come from the signal
+            # itself (strategy name + params_json snapshot).
+            ev = evaluate(row, price)
 
-        results.append({**row.to_dict(), **ev})
+        results.append({**row.to_dict(), **ev, "hold_cap": hold_bars(row, tf)})
 
     rdf = pd.DataFrame(results)
 

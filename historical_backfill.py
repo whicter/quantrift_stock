@@ -29,7 +29,9 @@ DATA_DIR = Path("data")
 LOG_DIR = Path("logs")
 SIGNALS_PATH = LOG_DIR / "backfill_signal_log.csv"
 EQUITY_PATH = LOG_DIR / "backfill_paper_equity.csv"
-MAX_BARS = {"1h": 10, "4h": 10, "1d": 15}
+# Holding caps come from each event's own parameters (review_core.hold_bars);
+# CONTEXT_PAD only bounds how many bars of look-ahead the replay slice needs.
+CONTEXT_PAD = 96  # > any fallback cap (max 70) plus headroom for grid-tuned snapshots
 RISK_PCT = 0.0075
 POSITION_WEIGHT = 0.10
 SEMIS = {"MU", "MRVL", "STX", "SNDK", "NVDA", "INTC", "AMD", "AMAT", "KLAC", "SOXX", "SMH"}
@@ -178,7 +180,7 @@ def event_context(price: pd.DataFrame, timestamp: pd.Timestamp, tf: str) -> pd.D
     """Give replay enough indicator warm-up without recomputing years of history per event."""
     position = price.index.get_indexer([timestamp], method="nearest")[0]
     before = max(0, position - 260)
-    after = min(len(price), position + MAX_BARS[tf] + 2)
+    after = min(len(price), position + CONTEXT_PAD + 2)
     return price.iloc[before:after]
 
 
@@ -217,7 +219,7 @@ def run_backfill() -> pd.DataFrame:
     for index, event in enumerate(events, 1):
         price = INDICATOR_CACHE.get((event["symbol"], event["tf"]), load_data(event["symbol"], event["tf"]))
         context = event_context(price, pd.Timestamp(event["timestamp"]), event["tf"])
-        result = _eval_breakout(event, context) if "breakout" in event["strategy"].lower() else evaluate(event, context, MAX_BARS[event["tf"]])
+        result = _eval_breakout(event, context) if "breakout" in event["strategy"].lower() else evaluate(event, context)
         if "exit_date" not in result and result["bars"]:
             future = context[context.index > pd.Timestamp(event["timestamp"])].head(result["bars"])
             result["exit_date"] = future.index[-1].isoformat() if not future.empty else ""

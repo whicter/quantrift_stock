@@ -36,6 +36,69 @@ def signal_params(row: pd.Series | dict) -> dict:
     return {}
 
 
+# Per-day bar counts under regular trading hours, used to express a holding cap
+# in trading days.  4h yields 2 bars/day (08:00, 12:00) -- not 6 -- because RTH
+# is only 6.5 hours long.
+BARS_PER_DAY = {"1h": 7, "4h": 2, "1d": 1}
+
+# Fallback holding caps mirroring each strategy's own backtest defaults, used
+# only when a signal predates params_json or was logged without one.
+#   RSI2  -> rsi2_backtest.DEFAULT_PARAMS[tf]["max_hold_bars"]
+#   MR    -> mr_backtest.DEFAULT_PARAMS[tf]["max_hold_bars"]
+#   Breakout -> breakout_backtest.DEFAULT_PARAMS["max_hold_bars"] (daily only)
+# Confluence has no max_hold_bars parameter at all -- it exits via staged TP and
+# the utTS/sslExit trail.  The replay still needs a bound, so these approximate
+# ~2 trading weeks per timeframe: long enough that the trail almost always fires
+# first, short enough that an unresolved signal doesn't stay open indefinitely.
+_FALLBACK_HOLD_BARS = {
+    ("rsi2", "1h"): 48, ("rsi2", "4h"): 20, ("rsi2", "1d"): 10,
+    ("mr", "1h"): 48, ("mr", "4h"): 20, ("mr", "1d"): 60,
+    ("breakout", "1d"): 20,
+    ("confluence", "1h"): 70, ("confluence", "4h"): 20, ("confluence", "1d"): 10,
+}
+
+
+def _strategy_key(row: pd.Series | dict) -> str:
+    """Normalize a ledger strategy name (incl. shadow suffixes) to its family."""
+    name = str(row.get("strategy", "")).lower()
+    if "rsi2" in name:
+        return "rsi2"
+    if "breakout" in name:
+        return "breakout"
+    # Prefix match only: "MRVL_WideExit" contains "mr" but is Confluence-based.
+    if name == "mr" or name.startswith("mr_"):
+        return "mr"
+    return "confluence"
+
+
+def hold_bars(row: pd.Series | dict, tf: str | None = None) -> int:
+    """Resolve how many bars a signal may be held, in that signal's own timeframe.
+
+    Priority: the parameter snapshot taken when the alert fired, then the
+    owning strategy's backtest default.  A single shared constant cannot work
+    here -- RSI2 1h holds 48 bars while its 1d variant holds 10, and grid-tuned
+    symbols carry their own values -- so reading the snapshot is what keeps the
+    replay aligned with what the strategy would actually have done.
+    """
+    tf = tf or str(row.get("tf", "")) or "1d"
+    snapshot = _num(signal_params(row).get("max_hold_bars"), 0)
+    if snapshot > 0:
+        return int(snapshot)
+    return _FALLBACK_HOLD_BARS.get((_strategy_key(row), tf), 20)
+
+
+def hold_description(row: pd.Series | dict, tf: str | None = None) -> str:
+    """Human-readable holding cap: bar count plus its trading-day equivalent."""
+    tf = tf or str(row.get("tf", "")) or "1d"
+    bars = hold_bars(row, tf)
+    per_day = BARS_PER_DAY.get(tf)
+    if not per_day:
+        return f"最长 {bars} 根 {tf} bar"
+    days = bars / per_day
+    days_text = f"{days:.0f}" if abs(days - round(days)) < 0.05 else f"{days:.1f}"
+    return f"最长 {bars} 根 {tf} bar（约 {days_text} 交易日）"
+
+
 def _future_bars(row: pd.Series | dict, price: pd.DataFrame, max_bars: int) -> pd.DataFrame:
     timestamp = pd.to_datetime(row.get("bar_date") or row.get("timestamp"))
     index = pd.to_datetime(price.index).tz_localize(None)
@@ -227,14 +290,20 @@ def eval_mr(row: pd.Series | dict, price: pd.DataFrame, max_bars: int) -> dict:
             "bars": len(future), "exit_model": "close"}
 
 
-def evaluate(row: pd.Series | dict, price: pd.DataFrame | None, max_bars: int) -> dict:
+def evaluate(row: pd.Series | dict, price: pd.DataFrame | None, max_bars: int | None = None) -> dict:
+    """Replay one signal.  max_bars defaults to the signal's own holding cap.
+
+    Callers should normally omit max_bars so each signal is replayed under the
+    parameters it was actually issued with; passing a value stays supported for
+    tests and for deliberate what-if runs.
+    """
     if price is None or price.empty:
         return {"outcome": "数据失败", "r_mult": None, "bars": 0}
-    strategy = str(row.get("strategy", "")).lower()
-    if "rsi2" in strategy:
+    if max_bars is None:
+        max_bars = hold_bars(row)
+    family = _strategy_key(row)
+    if family == "rsi2":
         return eval_rsi2(row, price, max_bars)
-    # Exact/prefix match only -- "mr" as a plain substring also matches names like
-    # "MRVL_WideExit" (a Confluence-based shadow variant), which must NOT be routed here.
-    if strategy == "mr" or strategy.startswith("mr_"):
+    if family == "mr":
         return eval_mr(row, price, max_bars)
     return eval_confluence(row, price, max_bars)

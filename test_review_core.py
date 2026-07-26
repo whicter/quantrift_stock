@@ -4,7 +4,8 @@ import unittest
 import pandas as pd
 
 from meta_label import MIN_SAMPLES, train
-from review_core import eval_confluence, eval_mr, eval_rsi2, evaluate
+from review_core import (BARS_PER_DAY, eval_confluence, eval_mr, eval_rsi2,
+                         evaluate, hold_bars, hold_description)
 
 
 def _price(rows):
@@ -66,6 +67,50 @@ class ReviewCoreTests(unittest.TestCase):
            "atr": 1, "tp1": 105, "tp2": 110, "sl": 95, "direction": "做多"}
     result = evaluate(row, price, 2)
     self.assertIn("ambiguity", result)  # only eval_confluence's return shape has this key
+
+
+ def test_hold_bars_prefers_signal_snapshot(self):
+    """The cap recorded when the alert fired wins over any strategy default."""
+    row = {"strategy": "RSI2", "tf": "1h", "params_json": json.dumps({"max_hold_bars": 15})}
+    self.assertEqual(hold_bars(row), 15)
+
+
+ def test_hold_bars_falls_back_per_strategy_and_timeframe(self):
+    """Without a snapshot, each strategy/timeframe keeps its own backtest default.
+
+    A single shared constant is what previously force-closed RSI2 1h signals at
+    10 bars instead of 48, so these must not collapse to one number.
+    """
+    self.assertEqual(hold_bars({"strategy": "RSI2", "tf": "1h"}), 48)
+    self.assertEqual(hold_bars({"strategy": "RSI2", "tf": "1d"}), 10)
+    self.assertEqual(hold_bars({"strategy": "MR", "tf": "1h"}), 48)
+    self.assertEqual(hold_bars({"strategy": "Breakout52W", "tf": "1d"}), 20)
+
+
+ def test_hold_bars_routes_shadow_names_to_their_family(self):
+    self.assertEqual(hold_bars({"strategy": "RSI2_IBS_shadow", "tf": "1h"}), 48)
+    # MRVL_WideExit is Confluence-based despite containing "mr".
+    self.assertEqual(hold_bars({"strategy": "MRVL_WideExit_shadow", "tf": "1h"}), 70)
+
+
+ def test_hold_description_converts_4h_bars_by_rth_day(self):
+    """RTH yields 2 4h bars per day, so 10 bars is 5 trading days, not 2."""
+    self.assertEqual(BARS_PER_DAY["4h"], 2)
+    text = hold_description({"strategy": "RSI2", "tf": "4h",
+                             "params_json": json.dumps({"max_hold_bars": 10})}, "4h")
+    self.assertIn("10 根 4h bar", text)
+    self.assertIn("5 交易日", text)
+
+
+ def test_evaluate_defaults_to_signal_hold_cap(self):
+    """evaluate() without max_bars must honor the signal's own window."""
+    price = _price([{"Open": 100, "High": 101, "Low": 99, "Close": 100}] * 30)
+    row = {"strategy": "RSI2", "tf": "1h", "bar_date": "2026-01-01",
+           "entry_price": 100, "atr": 1, "direction": "做多",
+           "params_json": json.dumps({"max_hold_bars": 3, "atr_trail_mult": 99, "atr_sl_mult": 99})}
+    result = evaluate(row, price)
+    self.assertEqual(result["outcome"], "时间止损")
+    self.assertEqual(result["bars"], 3)
 
 
  def test_meta_label_refuses_small_sample(self):
