@@ -859,6 +859,12 @@ def _regime_line(market_score: float, vix: float | None) -> str:
     return f"  Regime: {score_str}"
 
 
+# The 0-10 quality score is still computed and logged (multi-timeframe resonance
+# and meta_label consume it), but it is no longer shown in alerts: across 15,969
+# replayed trades its correlation with realized R is +0.002, and RSI2's is
+# slightly negative, so the stars conveyed confidence the data does not support.
+
+
 def _hold_text(strategy: str, tf: str, params: dict) -> str:
     """Holding cap for this specific signal, in bars and trading days.
 
@@ -875,10 +881,9 @@ def build_confluence_alert(symbol: str, tf: str, sig: dict) -> str:
     d = sig["direction"]
     emoji = "📈" if d == "做多" else "📉"
     ts = datetime.now().strftime("%Y-%m-%d %H:%M")
-    quality = sig.get("quality", 0)
     hold = _hold_text("Confluence", tf, get_params(symbol, tf))
     return (
-        f"{emoji} {symbol} {tf} {d}信号 [Confluence]  ⭐ {quality}/10\n"
+        f"{emoji} {symbol} {tf} {d}信号 [Confluence]\n"
         f"  价格: ${sig['close']:.2f}  ATR: ${sig['atr']:.2f}\n"
         f"  Bull: {sig['bull_score']}/6  Bear: {sig['bear_score']}/6  ADX: {sig['adx']:.1f}\n"
         f"  TP1: ${sig['tp1']:.2f}  TP2: ${sig['tp2']:.2f}\n"
@@ -892,10 +897,9 @@ def build_confluence_alert(symbol: str, tf: str, sig: dict) -> str:
 def build_rsi2_alert(symbol: str, tf: str, sig: dict) -> str:
     ts = datetime.now().strftime("%Y-%m-%d %H:%M")
     p = RSI2_PARAMS.get((symbol, tf), {})
-    quality = sig.get("quality", 0)
     hold = _hold_text("RSI2", tf, p)
     return (
-        f"📊 {symbol} {tf} 做多信号 [RSI2 v2]  ⭐ {quality}/10\n"
+        f"📊 {symbol} {tf} 做多信号 [RSI2 v2]\n"
         f"  价格: ${sig['close']:.2f}  ATR: ${sig['atr']:.2f}\n"
         f"  RSI2: {sig['rsi2']:.1f}  SMA200: ${sig['sma200']:.2f}\n"
         f"  SL(ATR trail ×{p.get('atr_trail_mult', 2.5)}): ${sig['sl']:.2f}  持仓: {hold}\n"
@@ -908,10 +912,9 @@ def build_rsi2_alert(symbol: str, tf: str, sig: dict) -> str:
 def build_mr_alert(symbol: str, tf: str, sig: dict) -> str:
     ts = datetime.now().strftime("%Y-%m-%d %H:%M")
     p = MR_PARAMS.get((symbol, tf), {})
-    quality = sig.get("quality", 0)
     hold = _hold_text("MR", tf, p)
     return (
-        f"🔄 {symbol} {tf} 做多信号 [MR 均值回归]  ⭐ {quality}/10\n"
+        f"🔄 {symbol} {tf} 做多信号 [MR 均值回归]\n"
         f"  价格: ${sig['close']:.2f}  ATR: ${sig['atr']:.2f}\n"
         f"  z-score: {sig['z_score']:.2f}  RSI: {sig['rsi']:.1f}  ADX: {sig['adx']:.1f}\n"
         f"  SL(初始 ATR×{p.get('atr_sl_mult', 2.0)}，之后转追踪): ${sig['sl']:.2f}  持仓: {hold}\n"

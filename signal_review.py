@@ -28,7 +28,7 @@ import pandas as pd
 import yfinance as yf
 
 from meta_label import train as train_meta_model
-from review_core import evaluate, hold_bars
+from review_core import _strategy_key as review_family, evaluate, hold_bars
 
 SIGNAL_LOG = Path("logs/signal_log.csv")
 LOG_FIELDS = [
@@ -183,6 +183,37 @@ def _quality_report(rdf: pd.DataFrame) -> None:
 
 
 MIN_MONITOR_SAMPLES = 5
+EXPECTATIONS_PATH = Path("strategy_expectations.json")
+
+
+def _load_expectations() -> dict:
+    """Historical replay expectations; absent file degrades to the 0R baseline."""
+    if not EXPECTATIONS_PATH.exists():
+        return {}
+    try:
+        return json.loads(EXPECTATIONS_PATH.read_text())
+    except (OSError, json.JSONDecodeError):
+        return {}
+
+
+def _expected_r(expectations: dict, strategy: str, symbol: str, tf: str) -> tuple[float, str]:
+    """Baseline mean R for one combination, plus where it came from.
+
+    Shadow variants fall back to their strategy family (RSI2_IBS_shadow ->
+    RSI2), since they differ only in exit or filter handling and have no
+    expectation rows of their own.
+    """
+    table = expectations.get("expectations", {})
+    candidates = [strategy]
+    if strategy.endswith("_shadow"):
+        family = review_family({"strategy": strategy})
+        candidates.append({"rsi2": "RSI2", "mr": "MR",
+                           "breakout": "Breakout52W"}.get(family, "Confluence"))
+    for name in candidates:
+        entry = table.get(name, {}).get(symbol, {}).get(tf)
+        if entry:
+            return float(entry["mean_r"]), "backtest"
+    return 0.0, "placeholder"
 
 
 def _monitor(rdf: pd.DataFrame) -> None:
@@ -191,14 +222,20 @@ def _monitor(rdf: pd.DataFrame) -> None:
     if decided.empty:
         print("\n🚦 衰减监控：暂无已决信号")
         return
+    expectations = _load_expectations()
     path = Path("logs/review_history.csv")
     rows = []
-    for (strategy, symbol), group in decided.groupby(["strategy", "symbol"]):
+    # Grouped per timeframe as well: the same symbol can behave very differently
+    # on 1h vs 1d, and the expectation table is keyed that way.
+    for (strategy, symbol, tf), group in decided.groupby(["strategy", "symbol", "tf"]):
         recent = group.sort_values("timestamp").tail(20)
         mean = float(recent["r_mult"].mean())
         sigma = float(recent["r_mult"].std(ddof=0) / max(len(recent) ** 0.5, 1))
-        # Before an expectation table has enough validated rows, use zero-R neutral baseline.
-        z = mean / sigma if sigma > 0 else 0.0
+        baseline, baseline_kind = _expected_r(expectations, strategy, symbol, tf)
+        # Measuring against this combination's own historical replay answers
+        # "is it behaving worse than it ever did", rather than the far weaker
+        # "did it lose money recently" that a 0R baseline tests.
+        z = (mean - baseline) / sigma if sigma > 0 else 0.0
         # A handful of trades cannot support a degradation verdict; flagging
         # N=1 as "red" is noise that invites acting on nothing.
         if len(recent) < MIN_MONITOR_SAMPLES:
@@ -206,18 +243,26 @@ def _monitor(rdf: pd.DataFrame) -> None:
         else:
             level = "红" if z < -2 else "黄" if z < -1 else "绿"
         rows.append({"timestamp": datetime.now().isoformat(timespec="seconds"), "strategy": strategy,
-                     "symbol": symbol, "n": len(recent), "mean_r": round(mean, 4), "se": round(sigma, 4),
-                     "z_vs_baseline": round(z, 3), "status": level})
+                     "symbol": symbol, "tf": tf, "n": len(recent), "mean_r": round(mean, 4),
+                     "se": round(sigma, 4), "baseline_r": round(baseline, 4),
+                     "baseline_kind": baseline_kind, "z_vs_baseline": round(z, 3), "status": level})
     hist = pd.DataFrame(rows)
     path.parent.mkdir(exist_ok=True)
     hist.to_csv(path, mode="a", index=False, header=not path.exists())
     graded = [r for r in rows if r["status"] != "样本不足"]
     pending = [r for r in rows if r["status"] == "样本不足"]
-    print(f"\n🚦 衰减监控（最近20笔；基准=0R 临时占位，非回测期望值；N<{MIN_MONITOR_SAMPLES} 不判级）")
+    meta = expectations.get("_meta", {})
+    if meta:
+        src = f"回测期望表（{meta.get('combinations', '?')} 组合，{meta.get('generated_at', '?')} 生成）"
+    else:
+        src = "0R 占位（strategy_expectations.json 缺失，运行 build_expectations.py 生成）"
+    print(f"\n🚦 衰减监控（最近20笔；基准={src}；N<{MIN_MONITOR_SAMPLES} 不判级）")
     for row in sorted(graded, key=lambda r: r["z_vs_baseline"]):
-        print(f"  {row['status']} {row['strategy']} {row['symbol']}: N={row['n']} 均R={row['mean_r']:+.2f} z={row['z_vs_baseline']:+.2f}")
+        print(f"  {row['status']} {row['strategy']} {row['symbol']} {row['tf']}: "
+              f"N={row['n']} 均R={row['mean_r']:+.2f} 期望={row['baseline_r']:+.2f}"
+              f"{'' if row['baseline_kind'] == 'backtest' else '(占位)'} z={row['z_vs_baseline']:+.2f}")
     if pending:
-        names = ", ".join(f"{r['strategy']}/{r['symbol']}(N={r['n']})" for r in pending)
+        names = ", ".join(f"{r['strategy']}/{r['symbol']}/{r['tf']}(N={r['n']})" for r in pending)
         print(f"  样本不足未判级：{names}")
 
 
@@ -241,21 +286,26 @@ def _telegram_summary(rdf: pd.DataFrame) -> None:
             wins = (group["r_mult"] > 0).mean() * 100
             lines.append(f"· {strategy}: N={len(group)} 胜率{wins:.0f}% 均R{group['r_mult'].mean():+.2f}")
 
+        expectations = _load_expectations()
         red = []
-        for (strategy, symbol), group in decided.groupby(["strategy", "symbol"]):
+        for (strategy, symbol, tf), group in decided.groupby(["strategy", "symbol", "tf"]):
             recent = group.sort_values("timestamp").tail(20)
             if len(recent) < MIN_MONITOR_SAMPLES:
                 continue
             mean = float(recent["r_mult"].mean())
             sigma = float(recent["r_mult"].std(ddof=0) / max(len(recent) ** 0.5, 1))
-            if sigma > 0 and mean / sigma < -2:
-                red.append(f"{strategy}/{symbol}(均R{mean:+.2f}, N={len(recent)})")
+            baseline, _ = _expected_r(expectations, strategy, symbol, tf)
+            if sigma > 0 and (mean - baseline) / sigma < -2:
+                red.append(f"{strategy}/{symbol}/{tf}(均R{mean:+.2f} vs 期望{baseline:+.2f}, N={len(recent)})")
         if red:
             lines.append("")
             lines.append(f"🔴 红灯 {len(red)} 项：" + ", ".join(red))
 
     lines.append("")
-    lines.append(f"基准=0R 临时占位（非回测期望值）；N<{MIN_MONITOR_SAMPLES} 不判级")
+    meta = _load_expectations().get("_meta", {})
+    baseline_note = (f"基准=回测期望表（{meta['combinations']} 组合）" if meta
+                     else "基准=0R 占位（期望表缺失）")
+    lines.append(f"{baseline_note}；N<{MIN_MONITOR_SAMPLES} 不判级")
     lines.append("详情：logs/review_history.csv")
     try:
         requests.post(f"https://api.telegram.org/bot{token}/sendMessage",
