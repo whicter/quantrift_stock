@@ -585,7 +585,7 @@ YOU,rejected,MR,1h,-0.109,24.0,2026-07-25,MR均值回归补测(对未达标标�
 ZH,rejected,MR,1h,-0.315,19.0,2026-07-25,MR均值回归补测(对未达标标的)
 BSP,insufficient_data,,,,,2026-07-25,近期新上市，1d仅16-28行，暂缓
 RAM,insufficient_data,,,,,2026-07-25,近期新上市，1d仅16-28行，暂缓
-SPCX,insufficient_data,,,,,2026-07-25,近期新上市，1d仅16-28行，暂缓
+SPCX,promoted_unvalidated,,,,,2026-07-25,"近期新上市，1d仅16-28行，暂缓 -> 2026-07-25用户明确要求接入实盘扫描(默认confluence,未经回测验证)"
 ABBN,non_us_or_invalid,,,,,2026-07-25,瑞士ABBN.SW
 AVG,non_us_or_invalid,,,,,2026-07-25,澳洲AVG.AX
 CBE,non_us_or_invalid,,,,,2026-07-25,澳洲CBE.AX

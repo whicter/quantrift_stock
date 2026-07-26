@@ -70,8 +70,13 @@ symbols:
                        IBM, INTU, JPM, KO, LLY, LMT, LTL, LUNR, LVHI, LWLG, MKSI, MO,
                        MORN, MS, MSOS, MSTR, NFLX, NTRS, OC, OKLO, ONDS, ORCL, OSCR,
                        OUST, PB, PKW, PYPL, QCOM, RBC, RBLX, REMX, RGTI, SAP, SKM, SLS,
-                       SLV, SMCI, SNAP, SOFI, SPMO, SPXC, SPYM, STLA, TMC, TSM, UP,
+                       SLV, SMCI, SNAP, SOFI, SPCX, SPMO, SPXC, SPYM, STLA, TMC, TSM, UP,
                        USAR, USO, VC, VOO, VTI, WBD, WDC, WMT]
+  # SPCX（Space Exploration Technologies Corp，2026-06-12上市）：应用户明确要求接入实盘扫描，
+  # 但 1d 仅28行数据，任何策略都无法跑出有意义的回测（RSI2/MR需200+天，Breakout需252+天）。
+  # 未在 STRATEGY_MAP 显式指定策略 -> 默认走 confluence（1h有201根K线，够Confluence最低50根门槛）。
+  # ⚠️ 这是本系统里唯一一个未经任何回测验证就接入实盘的标的，需等1d数据积累到至少210天后补跑
+  # RSI2/MR回测、252天后补跑Breakout，重新评估是否要切换/调整策略。
 
 # ── 数据设置 ────────────────────────────────────────────────────────────
 data:
