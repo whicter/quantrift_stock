@@ -1114,6 +1114,12 @@ def build_breakout_alert(symbol: str, sig: dict) -> str:
 
 # ── 财报预警 ─────────────────────────────────────────────────────────────
 
+# 财报日期一天内不会变，缓存当日结果——原实现每小时对全部个股逐个发
+# quoteSummary 请求（~90 次/小时），占了扫描请求量的近三分之一，纯属浪费
+# yfinance 的非正式配额。
+_earnings_cache: dict = {"date": None, "result": {}}
+
+
 def _fetch_all_earnings(symbols: list[str], max_calendar_days: int = 7) -> dict[str, int]:
     """
     批量查询即将到来的财报。
@@ -1122,6 +1128,9 @@ def _fetch_all_earnings(symbols: list[str], max_calendar_days: int = 7) -> dict[
     """
     import yfinance as yf
     from datetime import date as date_type
+    today = datetime.now().date()
+    if _earnings_cache["date"] == today:
+        return _earnings_cache["result"]
     result = {}
     cutoff = datetime.now() + timedelta(days=max_calendar_days)
     for sym in symbols:
@@ -1144,6 +1153,8 @@ def _fetch_all_earnings(symbols: list[str], max_calendar_days: int = 7) -> dict[
                 result[sym] = max(1, round(delta * 5 / 7))
         except Exception:
             pass
+    _earnings_cache["date"] = today
+    _earnings_cache["result"] = result
     return result
 
 
@@ -1431,6 +1442,8 @@ def run_scan(ib=None):
         print(f"  SOXX MA50: 获取失败 ({e})")
 
     df_1d_cache: dict[str, pd.DataFrame] = {}  # 复用给 breakout 扫描，避免重复拉取
+    fetch_attempts = 0   # 数据源健康度：yfinance 是非官方接口，Yahoo 收紧限流时
+    fetch_failures = 0   # 表现为大面积拉空——不告警的话扫描会静默变瘦。
 
     for tf in TIMEFRAMES:
         # 每个周期拉一次 QQQ（用于 Market Regime Score + RS 过滤）
@@ -1463,8 +1476,10 @@ def run_scan(ib=None):
                 continue
 
             params  = get_params(symbol, tf)
+            fetch_attempts += 1
             df_raw  = fetch_bars(ib, symbol, tf)
             if df_raw is None:
+                fetch_failures += 1
                 print(f"  {symbol} {tf}: 无数据")
                 continue
             price_cache[(symbol, tf)] = df_raw
@@ -1672,7 +1687,10 @@ def run_scan(ib=None):
         if event["type"] == "pyramid":
             tg_alert(f"➕ {event['symbol']} 虚拟持仓 TP1 后继续创新高\n  纸面策略提示：可考虑补回已减半仓位，保护止损上移至 TP1。\n  仅提示，不执行任何下单。")
 
-    print(f"\n扫描完成，发现 {found} 个信号")
+    if fetch_attempts >= 20 and fetch_failures / fetch_attempts > 0.2:
+        tg_alert(f"⚠️ 数据源异常：本轮扫描 {fetch_failures}/{fetch_attempts} 次拉取失败"
+                 f"（>20%），yfinance 可能被限流，信号覆盖不完整")
+    print(f"\n扫描完成，发现 {found} 个信号（数据拉取 {fetch_attempts - fetch_failures}/{fetch_attempts}）")
     if found == 0:
         print("  (无信号)")
 
