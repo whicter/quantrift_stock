@@ -45,6 +45,15 @@ with open("config.yaml") as f:
 PASS_SHARPE, MIN_N, DD_FLOOR, PASS_BPS = 0.6, 30, -50.0, 10
 MIN_SEG = 15
 
+# 结构性排除：数值门槛筛不住这两类——货币/短债基金的近零波动会让 ATR 框架
+# 产生 Sharpe 极高的伪信号（SGOV 首轮复检就以 1.93 混进候选），杠杆/反向 ETF
+# 的衰减特性从未被本系统的参数体系验证过。除非未来专项研究解禁，永不自动推荐。
+STRUCTURAL_EXCLUDE = {
+    "SGOV", "BND", "FBND", "HYMB", "TLT", "VTEB", "VBIL", "XHLF", "BSP", "JHS",
+    "JEPI", "JEPQ", "QQQI", "SPYI", "FXAIX", "VTSAX",
+    "SOXL", "SOXS", "SPXS", "SPXU", "SQQQ", "TQQQ", "BTCI", "OILU", "RAM",
+}
+
 
 def tg_send(msg: str) -> None:
     token, chat = os.getenv("TG_TOKEN", ""), os.getenv("TG_CHAT_ID", "")
@@ -71,7 +80,7 @@ def rejected_pool() -> list[str]:
     tested = h[h["status"].isin(["rejected", "rejected_high_risk_dd"])]["symbol"].unique()
     skip = set(h[h["status"].isin(["non_us_or_invalid", "no_data_unverified",
                                    "insufficient_data", "duplicate_format"])]["symbol"])
-    return sorted(set(tested) - routed - skip)
+    return sorted(set(tested) - routed - skip - STRUCTURAL_EXCLUDE)
 
 
 def backtest_all(sym: str, qqq: dict, vix) -> list[dict]:
