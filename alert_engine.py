@@ -498,6 +498,51 @@ _YF_PERIOD = {"1h": "60d", "4h": "60d", "1d": "3y"}
 _YF_INTERVAL = {"1h": "1h", "4h": "1h", "1d": "1d"}   # yfinance 无 4h，用 1h 重采样
 
 
+def _drop_forming_bar(df: pd.DataFrame, tf: str) -> pd.DataFrame:
+    """丢弃仍在形成中的最后一根 bar，只在完整 bar 上产生信号。
+
+    yfinance 会把当前未走完的 bar 一并返回。回测信号全部产生于完整 bar
+    的收盘价——2026-07-27 早盘曾因此在 10:00 ET 把当日"半根日线"当作
+    收盘价，对着开盘急跌触发了一串 RSI2 做多（QQQ/SMH/SOXX/MRVL），
+    与回测"跌完一整天后按收盘决策"的语义完全错位。详见 TASK.md ⑨。
+    """
+    if df.empty:
+        return df
+    now = pd.Timestamp.now(tz="America/New_York").tz_localize(None)
+    if tf == "1d":
+        # 当日 bar 在 16:00 ET 收盘后才算完整（提前收盘日会推迟到当天
+        # 16:00 后的下一轮扫描才纳入，属可接受的保守行为）。
+        if df.index[-1].normalize() == now.normalize() and now.hour < 16:
+            return df.iloc[:-1]
+        return df
+    # 1h 时间戳为 bar 起始时刻；4h（label="right"）为 bin 结束时刻。
+    span = pd.Timedelta(hours=1) if tf == "1h" else pd.Timedelta(0)
+    while len(df) and df.index[-1] + span > now:
+        df = df.iloc[:-1]
+    return df
+
+
+# 完整 bar 收盘后信号保持"新鲜"的时长：超过即视为陈旧不再发。
+# 窗口取 bar 跨度的数倍，保证正常运行时 bar 完成后的首轮扫描一定落在窗口内，
+# 同时拦住数据缺口/停机重启后对多日前 bar 的补发。
+_FRESH_HOURS = {"1h": 4, "4h": 12, "1d": 30}
+
+
+def _bar_fresh(df: pd.DataFrame, tf: str) -> bool:
+    """最后一根完整 bar 是否仍在其信号有效窗口内。"""
+    if df.empty:
+        return False
+    now = pd.Timestamp.now(tz="America/New_York").tz_localize(None)
+    last = df.index[-1]
+    if tf == "1d":
+        bar_end = last.normalize() + pd.Timedelta(hours=16)
+    elif tf == "1h":
+        bar_end = last + pd.Timedelta(hours=1)   # 时间戳=起始时刻
+    else:
+        bar_end = last                            # 4h label="right"=结束时刻
+    return (now - bar_end) <= pd.Timedelta(hours=_FRESH_HOURS.get(tf, 24))
+
+
 def fetch_bars(ib, symbol: str, tf: str) -> pd.DataFrame | None:
     """拉取历史 bar（yfinance，无 IB pacing 限制）。
 
@@ -523,6 +568,7 @@ def fetch_bars(ib, symbol: str, tf: str) -> pd.DataFrame | None:
         # 去除时区（backtesting 库不接受 tz-aware index）
         if raw.index.tz is not None:
             raw.index = raw.index.tz_convert("America/New_York").tz_localize(None)
+        raw = _drop_forming_bar(raw, tf)
         return raw if not raw.empty else None
     except Exception as e:
         print(f"  fetch_bars({symbol} {tf}) yfinance 异常: {e}")
@@ -693,7 +739,11 @@ def check_rsi2_signal(df_raw: pd.DataFrame, symbol: str, tf: str,
     market_score  = 4.0
 
     # 4. Market Regime Score
-    if df_qqq is not None and not is_benchmark:
+    # benchmark 模式（QQQ/SPY）的设计意图只是跳过"与 QQQ 比相对强度"（RS 过滤），
+    # 但此前把整个 regime 计算也跳过了：market_score 停在初始值 4.0，导致
+    # 2026-07-27 大盘加速下跌的早晨 QQQ 信号仍显示 Regime 4/4 并照常放行。
+    # QQQ 相对自身均线的趋势分对 benchmark 本身同样有意义，故一并计算。
+    if df_qqq is not None:
         qqq_c   = df_qqq["Close"].reindex(df_raw.index, method="ffill")
         q_s20   = _sma(qqq_c, 20)
         q_s50   = _sma(qqq_c, 50)
@@ -1385,6 +1435,14 @@ def run_scan(ib=None):
 
             bar_date = str(df_raw.index[-1].date())
 
+            if not _bar_fresh(df_raw, tf):
+                # 完整 bar 的信号只在 bar 刚走完后的首个扫描窗口内有效。
+                # 数据源缺 bar 或引擎停机后重启时，最后完整 bar 可能是几天前
+                # 的——那根 bar 的信号早已过时，补发只会误导（2026-07-27 曾
+                # 把 07-23 收盘的 QQQ/SPY 做多当作新信号补发）。
+                print(f"  {symbol} {tf}: 最后完整bar({bar_date})已陈旧，跳过")
+                continue
+
             # Risk-off keeps this alert-only system focused on ETF pullbacks.
             if market_regime == "risk_off" and symbol not in (BENCHMARK_SYMBOLS | SECTOR_ETF_SYMBOLS):
                 print(f"  {symbol} {tf}: Risk-Off，仅保留 ETF 深度回调候选")
@@ -1520,6 +1578,9 @@ def run_scan(ib=None):
         df_raw = _cached if _cached is not None else fetch_bars(ib, symbol, "1d")
         if df_raw is not None:
             df_1d_cache[symbol] = df_raw
+        if df_raw is not None and not _bar_fresh(df_raw, "1d"):
+            print(f"  {symbol} 1d: 最后完整bar已陈旧，跳过 [Breakout]")
+            continue
         sig = check_breakout_signal(df_raw, symbol, vix_value) if df_raw is not None else None
         if sig:
             bar_date  = str(df_raw.index[-1].date())
