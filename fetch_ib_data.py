@@ -48,6 +48,9 @@ ALL_SYMBOLS = (
     + cfg["symbols"].get("pending_high_vol", [])
     + cfg["symbols"].get("sector_etf",     [])
     + cfg["symbols"].get("broad_etf",      [])
+    # 2026-07-27 补：watchlist 批次接入的标的此前不在补拉范围内，
+    # 夜间 IB 刷新（stock-nightly-ib-refresh）必须覆盖全部实盘标的
+    + cfg["symbols"].get("watchlist_2026_07", [])
 )
 
 from universes import get_universe  # noqa: E402

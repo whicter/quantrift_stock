@@ -569,10 +569,49 @@ def fetch_bars(ib, symbol: str, tf: str) -> pd.DataFrame | None:
         if raw.index.tz is not None:
             raw.index = raw.index.tz_convert("America/New_York").tz_localize(None)
         raw = _drop_forming_bar(raw, tf)
+        if tf == "1d":
+            raw = _fill_recent_gaps_from_local(raw, symbol)
         return raw if not raw.empty else None
     except Exception as e:
         print(f"  fetch_bars({symbol} {tf}) yfinance 异常: {e}")
         return None
+
+
+def _fill_recent_gaps_from_local(df: pd.DataFrame, symbol: str) -> pd.DataFrame:
+    """用本地 IB 日线补 yfinance 近期缺失的 bar（仅 1d，仅最近 10 天窗口）。
+
+    yfinance 偶发整根缺 bar（2026-07-24 的 QQQ/全池日线就缺了，IB 本地有），
+    缺口会让指标错位、并让"最后完整 bar"显得陈旧。只做两件事上的克制：
+    - 仅 1d：1h/4h 的 IB 整点锚与 yfinance 半点锚网格不同，混合会毁指标（见 WIKI）；
+    - 仅近期窗口：深历史区段两个源的复权基准可能有微小错位（分红后 yfinance
+      会重新复权而本地快照不会），只在近端补缺没有拼接风险。
+    """
+    try:
+        path = Path(f"data/{symbol}_1d.csv")
+        if df.empty or not path.exists():
+            return df
+        local = pd.read_csv(path, index_col=0, parse_dates=True)
+        local.columns = [c.capitalize() for c in local.columns]
+        local = local[["Open", "High", "Low", "Close", "Volume"]].dropna(subset=["Close"])
+        if hasattr(local.index, "tz") and local.index.tz is not None:
+            local.index = local.index.tz_localize(None)
+        window_start = df.index[-1] - pd.Timedelta(days=10)
+        candidates = local[(local.index > window_start)]
+        missing = candidates[~candidates.index.normalize().isin(df.index.normalize())]
+        # 不引入"未来"的本地 bar：只补落在 yfinance 序列范围内的缺口，
+        # 序列末端之后的 bar 交给 _bar_fresh/_drop_forming_bar 的语义处理。
+        missing = missing[missing.index <= df.index[-1] + pd.Timedelta(days=4)]
+        # 防御：盘中手动跑过 IB 补拉时本地可能存有当日半根 bar，
+        # 不能让它绕过 _drop_forming_bar 重新混进来。
+        now = pd.Timestamp.now(tz="America/New_York").tz_localize(None)
+        if now.hour < 16:
+            missing = missing[missing.index.normalize() != now.normalize()]
+        if missing.empty:
+            return df
+        merged = pd.concat([df, missing]).sort_index()
+        return merged[~merged.index.duplicated(keep="first")]
+    except Exception:
+        return df
 
 
 # ── Confluence 信号检查 ──────────────────────────────────────────────────

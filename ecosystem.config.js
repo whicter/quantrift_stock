@@ -117,6 +117,23 @@ module.exports = {
       log_date_format: "YYYY-MM-DD HH:mm:ss",
     },
     {
+      // 每交易日 14:00 PT（17:00 ET 收盘后）：IB 全池历史合并补拉。
+      // 2026-07-27 加入：期货侧收敛为单一 data fetcher 后 Gateway 额度富余，
+      // 本地 IB 数据从"手动按需补拉"升级为每日自动刷新——它是回测/回放/
+      // alert_engine 1d 缺口填补的权威数据源。
+      name: "stock-nightly-ib-refresh",
+      script: "/bin/zsh",
+      args: "run_nightly_ib_refresh.sh",
+      cwd: "/Users/congrenhan/Documents/quantrift_stock",
+      interpreter: "none",
+      autorestart: false,
+      cron_restart: "0 14 * * 1-5",
+      out_file: "logs/nightly_ib_refresh_pm2_out.log",
+      error_file: "logs/nightly_ib_refresh_pm2_err.log",
+      merge_logs: true,
+      log_date_format: "YYYY-MM-DD HH:mm:ss",
+    },
+    {
       // 每月1日 06:00 PT：rejected 池复检（四策略回测+成本/walk-forward 全套验证），
       // 通过者仅推送候选报告，接入仍需人工确认。频率刻意不高于月度：
       // 反复重测同一批标的会抬高多重比较假阳性。
