@@ -26,6 +26,7 @@ import yfinance as yf
 from dotenv import load_dotenv
 
 from universes import get_universe
+from alert_engine import _fill_recent_gaps_from_local
 
 warnings.filterwarnings("ignore")
 load_dotenv()
@@ -75,6 +76,11 @@ def scan(intraday: bool = False) -> list[str]:
                 if isinstance(df.columns, pd.MultiIndex):
                     df.columns = df.columns.get_level_values(0)
                 df = df.dropna(subset=["Close"])
+                # yfinance 偶发整根缺日线 bar（如 2026-07-27 缺 07-24），naive 的
+                # iloc[-2] 邻接比较会悄悄跨两个真实交易日却当一天算，把跌幅算
+                # 大近一倍（SMH 当天真实 -2.25% 被算成 -5.45%）。用本地 IB 数据
+                # 补齐近期缺口后再算涨跌/量比。
+                df = _fill_recent_gaps_from_local(df, sym)
                 if len(df) < 60:
                     continue
                 close, high, vol = df["Close"], df["High"], df["Volume"]
