@@ -217,6 +217,15 @@ Confluence 按周期：1h 做多 −0.74R / 做空 −0.75R；4h 做多 −1.64R
 - [x] 结论：**不接入实盘**，10 条测试记录写入 `watchlist_history.csv`；MR 1h 列入 `pending_high_vol` 观察（config.yaml），待样本量增长后复检
 - [x] SHOP 加入 `watchlist.txt`（267标的），自动纳入 daily screener + 双时段事件雷达（EOD 13:35 PT / 盘中 10:45 ET）覆盖范围——用户的实际诉求（"暴拉能否更快发现"）已由此满足，不依赖策略路由
 
+#### ⑫ 事件雷达盘中轮次 + 缺口导致的跌幅双倍计算（2026-07-27）
+
+**触发**：用户问"SHOP 这种暴拉能提前侦测吗"。回答分层：新闻驱动无法提前预测；催化剂日历（财报）可提前；发现延迟可从收盘后6小时压缩到开盘后1小时——已实现。
+
+- [x] **新增盘中事件雷达**：`stock-watchlist-events-am`（交易日 07:45 PT / 10:45 ET），`watchlist_events.py --intraday`——量比按已过时段折算（`session_frac`），避免早盘真实放量被全天均量稀释漏报。实测抓到 AAPL 盘中破52周新高。
+- [x] **SHOP 加入 watchlist**（四策略验证不达标，仅进观察名单，详见 ⑪）——已使其自动进入两次事件雷达 + daily screener 覆盖范围。
+- [x] **发现并修复：跌幅双倍计算 bug**：用户实测发现 SMH 显示"-5.5%异动"，但真实盘中跌幅仅 -2.25%。核查：yfinance 当日序列缺 07-24 那根 bar（与此前 QQQ/SPY 缺口同类问题，非一次性事故），`watchlist_events.py` 用 naive `iloc[-1]/iloc[-2]` 相邻比较，缺口导致悄悄跨 07-23→07-27 两个交易日当一天算（580.17→561.19→548.55，真实两段 -3.4%/-2.25%，误算成单日 -5.45%）。修复：接入与 `alert_engine.fetch_bars` 相同的 `_fill_recent_gaps_from_local()`，用本地 IB 数据补齐近期缺口后再计算涨跌/量比。复测 SMH 不再触发异动阈值（真实-2.25%本就低于5%门槛）。
+- [ ] **遗留观察**：yfinance 缺整根 1d bar 已出现两次（QQQ/SPY/SMH/SOXX 全池一次，SMH 单独一次），可能是频繁模式而非孤立事故；两条消费链路（alert_engine、watchlist_events）现已共用同一补丁，但若还有其他脚本直接用 yfinance 日线做相邻日比较（如 screener.py 的动量因子），需要排查是否有同类风险。
+
 #### 已在流水线中、本节不重复动作
 
 - 4 个影子实验（TSLA 出场变体 / MRVL 宽出场 / RSI2+IBS / RKLB 突破）在等样本积累
