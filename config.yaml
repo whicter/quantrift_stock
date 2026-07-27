@@ -75,10 +75,10 @@ symbols:
                        BBW, BE, CBUS, CCB, CCJ, CRCL, CRSP, CRWD, CRWV, DELL, DGRO, DJT,
                        FDVV, FOF, FOX, GE, GFS, GL, GOOG, HBM, HOOD, IBM, INTU, IREN,
                        JPM, KO, LLY, LMT, LTL, LUNR, LVHI, LWLG, MKSI, MO, MORN, MS,
-                       MSOS, MSTR, NFLX, NTRS, OC, OKLO, ONDS, ORCL, OSCR, OUST, PANW, PB,
-                       PKW, QCOM, RBC, RBLX, REMX, RGTI, SAP, SKM, SLS, SLV, SMCI, SNAP,
-                       SOFI, SPCX, SPMO, SPXC, SPYM, TMC, TSM, UP, USAR, USO, VC, VOO,
-                       VTI, WBD, WDC, WMT]
+                       MSOS, MSTR, NFLX, NTRS, OC, OKLO, ONDS, ORCL, OSCR, PANW, PB, PKW,
+                       QCOM, RBC, RBLX, REMX, RGTI, SAP, SKM, SLS, SLV, SMCI, SOFI, SPCX,
+                       SPMO, SPXC, SPYM, TMC, TSM, UP, USAR, USO, VC, VOO, VTI, WBD,
+                       WDC, WMT]
   # SPCX（Space Exploration Technologies Corp，2026-06-12上市）：应用户明确要求接入实盘扫描，
   # 但 1d 仅28行数据，任何策略都无法跑出有意义的回测（RSI2/MR需200+天，Breakout需252+天）。
   # 未在 STRATEGY_MAP 显式指定策略 -> 默认走 confluence（1h有201根K线，够Confluence最低50根门槛）。

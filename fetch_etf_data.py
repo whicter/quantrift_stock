@@ -140,6 +140,18 @@ def fetch_symbol(ib: IB, symbol: str):
     df = fetch_bars(ib, symbol)
     if df is None or df.empty:
         return
+    # 合并而非覆盖：本清单与主策略池共用 SPY/QQQ/SMH/SOXX 四个文件，直接 to_csv
+    # 会把它们的十年历史截断成本脚本的两年窗口。2026-07-24 就发生过一次——ETF 回补
+    # 跑完后这四个文件从 2512 行变成 501 行，污染了之后所有基于 1d 的回放与验证。
+    if out_path.exists():
+        try:
+            old = pd.read_csv(out_path, index_col=0, parse_dates=True)
+            old.columns = [c.capitalize() for c in old.columns]
+            merged = pd.concat([old, df])
+            merged = merged[~merged.index.duplicated(keep="last")].sort_index()
+            df = merged
+        except Exception:
+            pass  # 旧文件损坏时退回直接写入
     df.to_csv(out_path)
     print(f" ✅ {len(df)} 行 → {out_path}")
 

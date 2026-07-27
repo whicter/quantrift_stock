@@ -171,9 +171,9 @@ STRATEGY_MAP: dict[tuple[str, str], str] = {
     ("CRWV", "1h"): "confluence",  # Sharpe 1.21 N=73 WR=64.4%
     ("LMT", "1h"): "confluence",  # Sharpe 0.77 N=116 WR=65.5%
     ("OC", "4h"): "confluence",  # Sharpe 0.83 N=40 WR=62.5%
-    ("ONDS", "1d"): "confluence",  # Sharpe 0.94 N=53 WR=79.2%
+    # 降级(2026-07-27 QQQ数据修复后重验): ("ONDS", "1d"): "confluence",  # Sharpe 0.94 N=53 WR=79.2%
     ("ONDS", "1h"): "confluence",  # Sharpe 0.88 N=131 WR=65.6%
-    ("OUST", "1d"): "confluence",  # Sharpe 0.62 N=46 WR=73.9%
+    # 降级(2026-07-27 QQQ数据修复后重验): ("OUST", "1d"): "confluence",  # Sharpe 0.62 N=46 WR=73.9%
     ("AGI", "4h"): "rsi2",  # Sharpe 0.856 N=37 WR=70.3%
     ("BAC", "1h"): "rsi2",  # Sharpe 0.782 N=116 WR=61.2%
     ("BE", "4h"): "rsi2",  # Sharpe 0.698 N=41 WR=68.3%
@@ -208,7 +208,7 @@ STRATEGY_MAP: dict[tuple[str, str], str] = {
     ("QCOM", "4h"): "confluence",  # Sharpe 1.03 N=47 WR=72.3% [网格优化]
     ("SLS", "1h"): "confluence",  # Sharpe 0.76 N=105 WR=58.1% [网格优化]
     ("SMCI", "1h"): "confluence",  # Sharpe 0.60 N=294 WR=55.4% [网格优化]
-    ("SNAP", "1d"): "confluence",  # Sharpe 0.62 N=59 WR=78.0% [网格优化]
+    # 降级(2026-07-27 QQQ数据修复后重验): ("SNAP", "1d"): "confluence",  # Sharpe 0.62 N=59 WR=78.0% [网格优化]
     # 降级(2026-07-26 walk-forward): ("STLA", "4h"): "confluence",  # Sharpe 1.14 N=106 WR=64.2% [网格优化]
     ("TMC", "1d"): "confluence",  # Sharpe 0.62 N=31 WR=67.7% [网格优化]
     ("TMC", "1h"): "confluence",  # Sharpe 1.18 N=302 WR=63.2% [网格优化]
