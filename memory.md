@@ -34,26 +34,33 @@
 - **不要**在本机直接连 127.0.0.1:4001/4002。
 - **不要**在 `alert_engine.py` 里加任何下单逻辑（本项目仅发 Telegram 信号）。
 
-## 数据源架构
+## 数据源架构（2026-07-27 起为混合模式）
 
-- **alert_engine.py** 数据源已切换至 **yfinance**（无 IB pacing 限制，15分钟延时，够用）。
-  - `fetch_bars()` 内部使用 `yf.Ticker(symbol).history(period, interval)`。
-  - 4h 周期：fetch 1h 数据后 `resample("4h", label="right", closed="right")` 聚合。
-  - `ib` 参数保留签名兼容性，实际传 `None`。
-- **IB pacing 风险**：Error 162 → crash-restart 无限循环教训。`alert_engine.py` 已彻底不连 IB。
-  - `clientId=2` 仅 `fetch_ib_data.py` 使用。
-- **IB 历史数据健康状态（2026-07-24 已恢复）**：2026-07-18 发现的 `2105: HMDS data farm connection is broken: ushmds` 已解决。2026-07-24 04:55 经用户明确批准，执行 `quantrift_index_future/restart_gateway.sh` 重启 Gateway（SIGKILL + launchd `com.quantrift.ibc.plist` KeepAlive 自动拉起）；重启触发 Second Factor Authentication，用户手机 IBKR App 批准后 05:02 登录完成，4001 端口恢复监听。同机 8 个期货 bot（`ib-bot*`）重连期间 PID/重启计数未变化。
-- **恢复序列已执行**：NVDA 1d 单标的验证成功（2512行）→ `fetch_ib_data.py --merge` 42/42 请求 0 失败 → `data_audit.py --write` 复审全部 `fresh`，来源已从 `yfinance` 切回 `ib`，覆盖至 2026-07-23 → `historical_backfill.py --write` 重跑：7302 候选信号，9986 条已决，2135 条影子。
-- **ETF 扫描器数据已回补（2026-07-24）**：其 47 个 ETF/基准日线不属于 `fetch_ib_data.py` 的 24 标的池，需单独用 `fetch_etf_data.py` 拉取。Gateway 恢复后重跑，50 次请求（47 ETF + SPY/QQQ + VIX）全部成功；此前停留在 2026-06-17/18 的文件均已刷新至 2026-07-23（VIX 至 07-24）。ETF 扫描结果现可视为最新。
-- **2026-07-18 yfinance 备用回补记录（仅历史参考）**：`fetch_data.py` 支持 `--merge`、原子写入、`data/.data_sources.json` 来源清单和 20 秒请求上限，作为 IB 再次不可用时的兜底方案保留，当前数据源已是 IB。
+- **实时扫描主源 yfinance**：软限制（非官方接口，偶发瞬时拉空/整根缺bar），每小时约 200-270 请求（财报按日缓存后）。失败率 >20%/轮会发 Telegram 告警。
+- **本地 IB 数据 = data/*.csv 磁盘快照**：由 `stock-nightly-ib-refresh`（每交易日 14:00 PT）自动 `fetch_ib_data --merge` 保鲜（108标的），最多落后一个交易日。它是回测/回放/期望表的权威数据源。
+- **两级兜底**：1d 近期缺 bar 用本地 IB 实时填补（仅近10天窗口，防复权基准错位）；yfinance 整体拉空时整段回退本地 IB（整段替换不拼接，避免 IB 整点锚 vs yf 半点锚混网格）。
+- **引擎绝不直连 IB**：IB 历史接口 60请求/10分钟（Gateway 全局），每小时扫描需求超其 5 倍；直连曾致 Error 162 → crash-restart 死循环。yfinance 大面积失败时直连兜底会瞬间打爆配额——所以兜底必须走本地存储。
+- **完整 bar 语义**：信号只在完整 bar 上产生（1d 收盘后、1h/4h 丢进行中bar），且仅在新鲜窗口内发出（1h=4h/4h=12h/1d=30h）。2026-07-27 曾因半根bar缺陷在早盘急跌时发出一串 1d 做多（已作废）。
+- **共享文件写入必须合并语义**：`fetch_etf_data` 曾用覆盖写截断 QQQ/SPY/SMH/SOXX 十年历史（已改merge）；追加式 CSV 必须校验 schema（screener_results.csv 曾混入双 schema 致解析静默失败）。
 - **df_1d_cache**：主循环中按 `(symbol, "1d")` 缓存 DataFrame，breakout 扫描复用，避免重复 fetch。
   - DataFrame bool 判断要用 `_cached if _cached is not None else fetch_bars(...)`，不能用 `or`（ValueError）。
+
+## pm2 任务清单（quantrift_stock，均已 pm2 save）
+
+| 任务 | 时间 | 作用 |
+|---|---|---|
+| `stock-alert` | 常驻，每小时扫描 | 主告警引擎（103+标的） |
+| `stock-nightly-ib-refresh` | 交易日 14:00 PT | IB 全池 `--merge` 保鲜本地数据 |
+| `stock-daily-screener` | 交易日 13:20 PT | watchlist 全池因子选股 Top15 → TG |
+| `stock-watchlist-events` | 交易日 13:35 PT | 事件雷达（52W突破/放量新高/异动）→ TG |
+| `stock-weekly-review` | 周日 18:15 PT | 90天复盘+衰减监控 → TG |
+| `stock-monthly-reval` | 每月1日 06:00 PT | rejected 池复检，候选报告（不自动接入） |
 
 ## 策略速查
 
 | 文件 | 用途 |
 |------|------|
-| `alert_engine.py` | 主告警引擎，每小时扫描，yfinance 数据 |
+| `alert_engine.py` | 主告警引擎，每小时扫描，混合数据源（见上） |
 | `strategy.py` | ConfluenceStrategy |
 | `indicators.py` | compute_signals, _atr, _sma |
 | `config.yaml` | 参数、symbols 分组、STRATEGY_MAP 路由 |
@@ -83,14 +90,15 @@
 |------|---------|--------|---------|---------|-----------|------|--------|
 | TSM  | 2.0 | 40 | 25 | 2.0 | 2.5 | 48 | 1.281（N=31，勉强过30笔门槛） |
 | FDVV | 2.0 | 40 | 25 | 2.0 | 2.5 | 48 | 0.619（N=38） |
+| MKSI | 2.0 | 40 | 25 | 2.0 | 2.5 | 48 | 0.623（N=31，2026-07-25 网格批次接入） |
 
 ## pending_high_vol 观察标的
 
 | 标的 | 结论 |
 |------|------|
-| RKLB | 突破 Sharpe 0.934（13笔），继续观察至 2026 年底 |
+| RKLB | 突破 Sharpe 0.934（13笔），继续观察至 2026 年底；1d/4h 已由 watchlist 批次接入（Confluence 1d 1.06 / RSI2 4h 0.91） |
 | NBIS | 数据仅 1.7 年，全策略不达标，维持 pending |
-| IREN | 1h Confluence 1.09 但仅 11 笔，不稳定，维持 pending |
+| ~~IREN~~ | **2026-07-26 已升级接入**：数据刷新后 1h Confluence N=230 Sharpe 1.15，30bps 仍 0.72，wf 训练0.73→测试1.76 |
 
 ## 告警引擎部署
 

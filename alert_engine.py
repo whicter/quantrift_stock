@@ -77,7 +77,8 @@ TIMEFRAMES = ["1h", "4h", "1d"]
 
 # ── 策略路由 ──────────────────────────────────────────────────────────────
 # 值: "confluence" | "rsi2" | "breakout"
-# 未列出的 (symbol, tf) 默认使用 "confluence"
+# 未列出的 (symbol, tf) 不发信号（2026-07-26 起取消默认 confluence fall-through，
+# 见 TASK.md ⑤：183 个默认路由组合仅 2 个达标，曾贡献一半的实盘信号）
 STRATEGY_MAP: dict[tuple[str, str], str] = {
     # ConfluenceStrategy 主力池
     ("MU",   "1h"): "confluence",

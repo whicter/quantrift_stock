@@ -724,13 +724,11 @@ NOW,rejected,Confluence,4h,0.1,50.0,2026-07-25,第四版watchlist(293个代码)�
 OC,rejected,Confluence,1d,0.07,59.0,2026-07-25,第四版watchlist(293个代码)批量回测
 OC,rejected,RSI2,1h,-0.251,115.0,2026-07-25,第四版watchlist(293个代码)批量回测
 OC,promoted,Confluence,4h,0.83,40.0,2026-07-25,第四版watchlist(293个代码)批量回测
-ONDS,promoted,Confluence,1d,0.94,53.0,2026-07-25,第四版watchlist(293个代码)批量回测
 ONDS,promoted,Confluence,1h,0.88,131.0,2026-07-25,第四版watchlist(293个代码)批量回测
 ONDS,rejected,RSI2,4h,0.133,33.0,2026-07-25,第四版watchlist(293个代码)批量回测
 OSCR,rejected,Confluence,1d,-0.18,48.0,2026-07-25,第四版watchlist(293个代码)批量回测
 OSCR,rejected,RSI2,1h,0.572,106.0,2026-07-25,第四版watchlist(293个代码)批量回测
 OSCR,promoted,RSI2,4h,0.623,42.0,2026-07-25,第四版watchlist(293个代码)批量回测
-OUST,promoted,Confluence,1d,0.62,46.0,2026-07-25,第四版watchlist(293个代码)批量回测
 OUST,rejected,Confluence,1h,0.23,156.0,2026-07-25,第四版watchlist(293个代码)批量回测
 OUST,rejected,RSI2,4h,0.563,39.0,2026-07-25,第四版watchlist(293个代码)批量回测
 OXY,rejected,Confluence,1d,0.15,58.0,2026-07-25,第四版watchlist(293个代码)批量回测
@@ -947,7 +945,6 @@ SLS,rejected_high_risk_dd,RSI2,4h,0.825,79.0,2026-07-25,网格优化RSI2最大�
 SMCI,rejected,Confluence,1d,0.19,49.0,2026-07-25,网格优化后仍不达标
 SMCI,promoted,Confluence,1h,0.6,294.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标
 SMCI,rejected,RSI2,4h,0.95,26.0,2026-07-25,网格优化后仍不达标
-SNAP,promoted,Confluence,1d,0.62,59.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标
 SNAP,rejected,RSI2,1h,0.479,74.0,2026-07-25,网格优化后仍不达标
 SNAP,rejected,Confluence,4h,0.47,55.0,2026-07-25,网格优化后仍不达标
 SO,rejected,Confluence,1d,-0.16,42.0,2026-07-25,网格优化后仍不达标
@@ -1028,3 +1025,6 @@ KLAC,rejected,RSI2,1h,-0.21,140.0,2026-07-26,补跑从未回测标的（四策�
 KLAC,rejected,Breakout,1d,-0.407,44.0,2026-07-26,补跑从未回测标的（四策略）
 KLAC,rejected,Confluence,1h,-0.78,105.0,2026-07-26,补跑从未回测标的（四策略）
 KLAC,rejected,Confluence,4h,-0.9,45.0,2026-07-26,补跑从未回测标的（四策略）
+SNAP,demoted,Confluence,1d,0.4,107.0,2026-07-27,QQQ数据修复后重验:10bps 0.40且样本外-0.09，降级（失去唯一路由，移出扫描池）
+OUST,demoted,Confluence,1d,0.06,59.0,2026-07-27,QQQ数据修复后重验:10bps 0.06，降级（失去唯一路由，移出扫描池）
+ONDS,demoted,Confluence,1d,0.41,64.0,2026-07-27,QQQ数据修复后重验:10bps 0.41，1d降级（保留1h路由）
