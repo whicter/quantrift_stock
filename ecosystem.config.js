@@ -78,5 +78,63 @@ module.exports = {
       merge_logs: true,
       log_date_format: "YYYY-MM-DD HH:mm:ss",
     },
+    {
+      // 每交易日 13:20 PT（16:20 ET，收盘后）：watchlist 全池因子选股。
+      // 2026-07-26 加入：把周频发现机制提速为每日，并全程自动化。
+      name: "stock-daily-screener",
+      script: "/bin/zsh",
+      args: "run_daily_screener.sh",
+      cwd: "/Users/congrenhan/Documents/quantrift_stock",
+      interpreter: "none",
+      autorestart: false,
+      cron_restart: "20 13 * * 1-5",
+      env: {
+        TG_TOKEN: envVars.TG_TOKEN || "",
+        TG_CHAT_ID: envVars.TG_CHAT_ID || "",
+      },
+      out_file: "logs/daily_screener_pm2_out.log",
+      error_file: "logs/daily_screener_pm2_err.log",
+      merge_logs: true,
+      log_date_format: "YYYY-MM-DD HH:mm:ss",
+    },
+    {
+      // 每交易日 13:35 PT：watchlist 事件雷达（52W突破/放量新高/异动）。
+      // 发现型提醒，不是交易信号；覆盖没有策略路由的标的。
+      name: "stock-watchlist-events",
+      script: "/bin/zsh",
+      args: "run_watchlist_events.sh",
+      cwd: "/Users/congrenhan/Documents/quantrift_stock",
+      interpreter: "none",
+      autorestart: false,
+      cron_restart: "35 13 * * 1-5",
+      env: {
+        TG_TOKEN: envVars.TG_TOKEN || "",
+        TG_CHAT_ID: envVars.TG_CHAT_ID || "",
+      },
+      out_file: "logs/watchlist_events_pm2_out.log",
+      error_file: "logs/watchlist_events_pm2_err.log",
+      merge_logs: true,
+      log_date_format: "YYYY-MM-DD HH:mm:ss",
+    },
+    {
+      // 每月1日 06:00 PT：rejected 池复检（四策略回测+成本/walk-forward 全套验证），
+      // 通过者仅推送候选报告，接入仍需人工确认。频率刻意不高于月度：
+      // 反复重测同一批标的会抬高多重比较假阳性。
+      name: "stock-monthly-reval",
+      script: "/bin/zsh",
+      args: "run_monthly_reval.sh",
+      cwd: "/Users/congrenhan/Documents/quantrift_stock",
+      interpreter: "none",
+      autorestart: false,
+      cron_restart: "0 6 1 * *",
+      env: {
+        TG_TOKEN: envVars.TG_TOKEN || "",
+        TG_CHAT_ID: envVars.TG_CHAT_ID || "",
+      },
+      out_file: "logs/monthly_reval_pm2_out.log",
+      error_file: "logs/monthly_reval_pm2_err.log",
+      merge_logs: true,
+      log_date_format: "YYYY-MM-DD HH:mm:ss",
+    },
   ],
 };

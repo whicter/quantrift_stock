@@ -65,7 +65,11 @@ def tg_send(msg: str):
 # ── 数据加载 ──────────────────────────────────────────────────────────────────
 
 def _load_csv(sym: str) -> pd.DataFrame | None:
-    """读取本地 IB CSV（data/{sym}_1d.csv），返回标准化 DataFrame 或 None。"""
+    """读取本地 IB CSV（data/{sym}_1d.csv），返回标准化 DataFrame 或 None。
+
+    陈旧文件视为缺失：每日自动运行时，静默使用一个停更的本地快照会让
+    动量/RS 因子整体失真，比走 yfinance 兜底更糟。
+    """
     path = DATA_DIR / f"{sym}_1d.csv"
     if not path.exists():
         return None
@@ -76,7 +80,12 @@ def _load_csv(sym: str) -> pd.DataFrame | None:
         df = df[["Open", "High", "Low", "Close", "Volume"]].dropna(subset=["Close"])
         if hasattr(df.index, "tz") and df.index.tz is not None:
             df.index = df.index.tz_localize(None)
-        return df if len(df) >= 60 else None
+        if len(df) < 60:
+            return None
+        stale_cutoff = pd.Timestamp.now().normalize() - pd.Timedelta(days=4)
+        if df.index.max() < stale_cutoff:
+            return None
+        return df
     except Exception:
         return None
 
@@ -102,17 +111,40 @@ def load_data(symbols: list[str], benchmark: str) -> dict[str, pd.DataFrame]:
     """
     all_syms = symbols + ([benchmark] if benchmark not in symbols else [])
     data: dict[str, pd.DataFrame] = {}
-    yf_fallback = 0
 
+    missing = []
     for sym in all_syms:
         df = _load_csv(sym)
         if df is not None:
             data[sym] = df
         else:
-            df = _download_yf(sym)
-            if df is not None:
-                data[sym] = df
-                yf_fallback += 1
+            missing.append(sym)
+
+    # Batch the yfinance fallback: one-by-one requests get rate-limited long
+    # before a 285-symbol universe finishes, which matters now that the
+    # watchlist screener runs unattended every day.
+    yf_fallback = 0
+    if missing:
+        for i in range(0, len(missing), 50):
+            chunk = missing[i:i + 50]
+            try:
+                raw = yf.download(chunk, period="1y", interval="1d", auto_adjust=True,
+                                  progress=False, group_by="ticker", threads=True)
+            except Exception:
+                continue
+            for sym in chunk:
+                try:
+                    sub = raw[sym].copy() if len(chunk) > 1 else raw.copy()
+                    if isinstance(sub.columns, pd.MultiIndex):
+                        sub.columns = sub.columns.get_level_values(0)
+                    sub = sub[["Open", "High", "Low", "Close", "Volume"]].dropna(subset=["Close"])
+                    if hasattr(sub.index, "tz") and sub.index.tz is not None:
+                        sub.index = sub.index.tz_localize(None)
+                    if len(sub) >= 60:
+                        data[sym] = sub
+                        yf_fallback += 1
+                except Exception:
+                    continue
 
     ib_count = len(data) - yf_fallback
     print(f"数据加载完成: {len(data)} 只  "

@@ -160,8 +160,13 @@ Confluence 按周期：1h 做多 −0.74R / 做空 −0.75R；4h 做多 −1.64R
 **触发**：用户追问"没有覆盖的 ticker（尤其个股）怎么办"。核查发现此前"screener 已覆盖它们"的说法**有漏洞**——screener 只扫指数成分池（NDX100/SP500/Dow30/R2000），watchlist 里 **25 个个股既无策略路由、也不在任何指数池内，完全无人看管**（含 ASTS/RKLB/NBIS/DUOL/GEV/LINK/ZION 等）。
 
 - [x] **`universes.py` 新增 `watchlist` 宇宙**：从 `watchlist.txt` 加载（285个，按 `watchlist_history.csv` 自动过滤 non_us_or_invalid / no_data_unverified，`BRK.B`→`BRK-B` 格式转换），基准 SPY；`screener.py --universe watchlist` 已接入并实测跑通（原孤儿 GEV 排第6、LINK 第11、WDC 第7）。**周频因子选股现在覆盖用户关注的全部标的**——个股不需要常驻策略，需要的是轮换发现机制：动量转强自然进 Top 榜。
-- [x] **季度复检机制（文档化流程，不新建常驻任务）**："rejected 不是永久判决"在本会话有三个实证：`DELL`(7/2拒0.26 → 7/25收0.83)、`IREN`(旧评估11笔不稳 → 刷新后230笔Sharpe1.15接入)、`HOOD`(第二版才达标)。每季度对 `watchlist_history.csv` 中 rejected 状态的标的重跑一遍四策略回测+验证（命令：批量回测脚本 + `validate_watchlist.py`），达标者按标准流程接入。下次复检：**2026-10 月末**。
-- [x] 处置总原则已记入 LEARNING.md：不是每个标的都需要一条策略，"无策略+周频发现机制+季度复检"就是无覆盖个股的完整答案。
+- [x] **~~季度复检（文档化流程）~~ → 升级为月度自动化（2026-07-26，应用户"周/季度都太慢"反馈）**：新建 `revalidate_rejected.py`——每月1日 06:00 自动对 rejected 池重跑四策略回测，初筛通过者追加成本压力(10bps)+walk-forward 全套验证，全部通过才推送"待接入候选"报告；**不自动接入**，标的/参数变更仍需人工确认。频率刻意封顶在月度：反复重测同一批标的会抬高多重比较假阳性，脚本 docstring 内已注明"不要再加密到每周"。依据实证：`DELL`(7/2拒→7/25收)、`IREN`(旧评估不稳→刷新后接入)、`HOOD`(第二批达标)。
+- [x] **发现机制全部自动化 + 提速为每日（2026-07-26）**：pm2 新增三个定时任务（`ecosystem.config.js`，已 `pm2 save`）：
+  - `stock-daily-screener` 每交易日 13:20 PT（收盘后20分钟）：watchlist 全池因子选股 Top15 → Telegram。周频→**每日**。
+  - `stock-watchlist-events` 每交易日 13:35 PT：**新建 `watchlist_events.py` 事件雷达**——52周新高突破 / 20日新高+2×放量 / ±5%异动+放量，覆盖全部 285 个 watchlist 标的（含无策略路由的个股），消息显式标注"发现型提醒，未经过策略验证，无TP/SL"。首轮实测：LMT 放量新高+10.5%、TSLA 异动-14.5% 等 10 条。
+  - `stock-monthly-reval` 每月1日 06:00 PT：上述 rejected 池复检。
+  - 配套修复：`screener._load_csv` 加 4 天陈旧检查（每日自动跑不能静默用停更快照算因子），yfinance 兜底从逐个请求改为 50 只/批的批量下载（285 标的全量兜底也能在几分钟内完成，不会被限流拖死）。
+- [x] 处置总原则已记入 LEARNING.md：不是每个标的都需要一条策略，"无策略 + 每日发现机制 + 月度复检"就是无覆盖个股的完整答案。
 
 #### 已在流水线中、本节不重复动作
 
