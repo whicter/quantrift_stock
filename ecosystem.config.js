@@ -134,6 +134,26 @@ module.exports = {
       log_date_format: "YYYY-MM-DD HH:mm:ss",
     },
     {
+      // 每交易日 07:45 PT（10:45 ET，开盘75分钟后）：盘中事件雷达。
+      // 2026-07-27 SHOP 逆势 +12.4%（开盘 gap +5.5%，非财报）暴露收盘雷达的
+      // 时滞——新闻驱动的暴动无法从价格提前预测，但可以在启动后一小时内发现。
+      name: "stock-watchlist-events-am",
+      script: "/bin/zsh",
+      args: "run_watchlist_events_am.sh",
+      cwd: "/Users/congrenhan/Documents/quantrift_stock",
+      interpreter: "none",
+      autorestart: false,
+      cron_restart: "45 7 * * 1-5",
+      env: {
+        TG_TOKEN: envVars.TG_TOKEN || "",
+        TG_CHAT_ID: envVars.TG_CHAT_ID || "",
+      },
+      out_file: "logs/watchlist_events_am_pm2_out.log",
+      error_file: "logs/watchlist_events_am_pm2_err.log",
+      merge_logs: true,
+      log_date_format: "YYYY-MM-DD HH:mm:ss",
+    },
+    {
       // 每月1日 06:00 PT：rejected 池复检（四策略回测+成本/walk-forward 全套验证），
       // 通过者仅推送候选报告，接入仍需人工确认。频率刻意不高于月度：
       // 反复重测同一批标的会抬高多重比较假阳性。

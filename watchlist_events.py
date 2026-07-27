@@ -51,9 +51,16 @@ def tg_send(msg: str) -> None:
         print(f"[Telegram] 推送失败: {exc}")
 
 
-def scan() -> list[str]:
+def scan(intraday: bool = False) -> list[str]:
+    """intraday=True 时用于盘中轮次：当日 bar 未走完，量比按已过时段折算，
+    否则早盘的真实放量会被全日均量稀释而漏报。"""
     tickers, _, _ = get_universe("watchlist")
     events: list[tuple[float, str]] = []
+    session_frac = 1.0
+    if intraday:
+        now = pd.Timestamp.now(tz="America/New_York")
+        elapsed = (now - now.normalize() - pd.Timedelta(hours=9, minutes=30)).total_seconds() / 60
+        session_frac = min(1.0, max(0.1, elapsed / 390))
 
     for i in range(0, len(tickers), CHUNK):
         chunk = tickers[i:i + CHUNK]
@@ -73,7 +80,7 @@ def scan() -> list[str]:
                 close, high, vol = df["Close"], df["High"], df["Volume"]
                 last, prev = float(close.iloc[-1]), float(close.iloc[-2])
                 move = (last / prev - 1) * 100
-                vol_avg = float(vol.iloc[-21:-1].mean())
+                vol_avg = float(vol.iloc[-21:-1].mean()) * session_frac
                 vol_ratio = float(vol.iloc[-1]) / vol_avg if vol_avg > 0 else 0
 
                 hi252 = float(high.iloc[:-1].tail(252).max())
@@ -98,17 +105,19 @@ def scan() -> list[str]:
 def main() -> None:
     parser = argparse.ArgumentParser(description="watchlist 每日事件扫描")
     parser.add_argument("--telegram", action="store_true")
+    parser.add_argument("--intraday", action="store_true", help="盘中模式：量比按已过时段折算")
     parser.add_argument("--max", type=int, default=20, help="最多显示条数")
     args = parser.parse_args()
 
-    lines = scan()
+    lines = scan(intraday=args.intraday)
     if not lines:
         print("今日无事件")
         return
     shown = lines[:args.max]
     body = "\n".join(shown)
     extra = f"\n（另有 {len(lines) - len(shown)} 条未显示）" if len(lines) > len(shown) else ""
-    msg = (f"👀 Watchlist 事件雷达（{len(lines)} 条）\n{body}{extra}\n"
+    tag = "盘中" if args.intraday else "收盘"
+    msg = (f"👀 Watchlist 事件雷达·{tag}（{len(lines)} 条）\n{body}{extra}\n"
            f"—— 发现型提醒：未经过策略验证，无 TP/SL，仅提示值得研究")
     print(msg)
     if args.telegram:
