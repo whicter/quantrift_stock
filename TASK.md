@@ -204,6 +204,19 @@ Confluence 按周期：1h 做多 −0.74R / 做空 −0.75R；4h 做多 −1.64R
 - [x] **screener_results.csv 双重故障修复**：①schema 混入（daily screener 新格式盲目追加旧文件→解析崩溃→异常被吞且误报"不存在"，~11小时）——`save_csv` 现校验列结构、不一致归档重建，解析失败如实报错；②**更严重的无声陈旧**：7月初至自动化上线前，扫描里的"本周因子选股"一直是 6-30 的旧排名（近4周），无任何症状。教训见 LEARNING.md。
 - [x] **选股宇宙应用结构性排除**：SGOV（货币基金）曾因零波动令"风险调整动量"因子爆表排进 Top5，`_load_watchlist` 现排除与月度复检相同的结构性清单。
 
+#### ⑪ SHOP 加入 watchlist（2026-07-27，用户因当日暴拉要求）
+
+- [x] 拉取 SHOP 1d/1h/4h 历史数据（yfinance，1d 2512行覆盖10年）
+- [x] 四策略×三周期全测（`validate_watchlist.validate_one` 复用）：
+  | 策略 | 周期 | 10bps Sharpe | maxDD | 结论 |
+  |---|---|---|---|---|
+  | Confluence | 1h/4h/1d | -0.01 / -1.36 / -0.27 | 均较小 | fail（成本压力/样本内即负） |
+  | RSI2 | 1h/4h/1d | 0.07 / 0.01 / 0.34 | -28.9%/-17%/-38.4% | fail（1d wf仅marginal 0.40，风险偏高不接入） |
+  | MR | 1h | **0.93（pass）** | -0.0% | **N=22 < 30 门槛，样本不足** |
+  | Breakout | 1d | -0.296 | **-56.6%** | fail（超风控阈值） |
+- [x] 结论：**不接入实盘**，10 条测试记录写入 `watchlist_history.csv`；MR 1h 列入 `pending_high_vol` 观察（config.yaml），待样本量增长后复检
+- [x] SHOP 加入 `watchlist.txt`（267标的），自动纳入 daily screener + 双时段事件雷达（EOD 13:35 PT / 盘中 10:45 ET）覆盖范围——用户的实际诉求（"暴拉能否更快发现"）已由此满足，不依赖策略路由
+
 #### 已在流水线中、本节不重复动作
 
 - 4 个影子实验（TSLA 出场变体 / MRVL 宽出场 / RSI2+IBS / RKLB 突破）在等样本积累

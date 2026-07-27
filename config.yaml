@@ -45,7 +45,10 @@ symbols:
   # RKLB：太空/火箭；NBIS：AI基础设施（前Yandex）；IREN：AI算力/比特币矿
   # IREN 已于 2026-07-26 验证达标（1h Confluence Sharpe 1.15 N=230，30bps 仍 0.72，
   # walk-forward 训练0.73→测试1.76），升级至 watchlist_2026_07
-  pending_high_vol: [RKLB, NBIS]
+  # SHOP：2026-07-27 用户因当日 +12.4% 暴拉要求加入。四策略×三周期全测：
+  # Confluence/RSI2/Breakout 全部 fail（10bps 转负 或 maxDD 超 -50%）；
+  # MR 1h 10bps 仍 0.93 但 N=22<30 门槛，样本不足，暂不接入实盘，仅观察
+  pending_high_vol: [RKLB, NBIS, SHOP]
 
   # 半导体 ETF：RSI2（不强制 RS vs QQQ）或 MR+ATR（待重新调参）
   sector_etf:  [SOXX, SMH]

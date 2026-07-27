@@ -98,6 +98,7 @@
 |------|------|
 | RKLB | 突破 Sharpe 0.934（13笔），继续观察至 2026 年底；1d/4h 已由 watchlist 批次接入（Confluence 1d 1.06 / RSI2 4h 0.91） |
 | NBIS | 数据仅 1.7 年，全策略不达标，维持 pending |
+| SHOP | 2026-07-27 用户因当日+12.4%暴拉要求加入。四策略×三周期全测：Confluence/RSI2/Breakout fail；MR 1h 10bps=0.93 但 N=22<30，samples不足暂不接入，仅在 watchlist universe 内（daily screener + 事件雷达覆盖） |
 | ~~IREN~~ | **2026-07-26 已升级接入**：数据刷新后 1h Confluence N=230 Sharpe 1.15，30bps 仍 0.72，wf 训练0.73→测试1.76 |
 
 ## 告警引擎部署
