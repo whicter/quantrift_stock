@@ -543,8 +543,40 @@ def _bar_fresh(df: pd.DataFrame, tf: str) -> bool:
     return (now - bar_end) <= pd.Timedelta(hours=_FRESH_HOURS.get(tf, 24))
 
 
+def _local_bars(symbol: str, tf: str) -> pd.DataFrame | None:
+    """yfinance 拉空时的兜底：整段使用本地 IB 数据（夜间任务保鲜，最多落后一日）。
+
+    刻意不让引擎直连 IB：yfinance 大面积失败时兜底请求也会大面积发生，
+    直连会瞬间打爆 Gateway 的 60次/10分钟配额并波及期货 fetcher——这正是
+    当年 Error 162 → crash-restart 循环的成因。整段替换（而非与 yfinance
+    拼接）不存在采样锚点混网格问题；陈旧度仍由 _bar_fresh 统一把关。
+    """
+    try:
+        path = Path(f"data/{symbol}_{tf}.csv")
+        if not path.exists():
+            return None
+        df = pd.read_csv(path, index_col=0, parse_dates=True)
+        df.columns = [c.capitalize() for c in df.columns]
+        df = df[["Open", "High", "Low", "Close", "Volume"]].dropna(subset=["Close"])
+        if hasattr(df.index, "tz") and df.index.tz is not None:
+            df.index = df.index.tz_localize(None)
+        # 丢当日未完成 bar：本地 4h 是 label=left（时间戳=起始），跨度按 4h 算；
+        # 正常情况下夜间任务只写收盘后的完整 bar，这里防的是盘中手动补拉。
+        now = pd.Timestamp.now(tz="America/New_York").tz_localize(None)
+        span = {"1h": pd.Timedelta(hours=1), "4h": pd.Timedelta(hours=4)}.get(tf)
+        if tf == "1d":
+            if len(df) and df.index[-1].normalize() == now.normalize() and now.hour < 16:
+                df = df.iloc[:-1]
+        else:
+            while len(df) and df.index[-1] + span > now:
+                df = df.iloc[:-1]
+        return df if not df.empty else None
+    except Exception:
+        return None
+
+
 def fetch_bars(ib, symbol: str, tf: str) -> pd.DataFrame | None:
-    """拉取历史 bar（yfinance，无 IB pacing 限制）。
+    """拉取历史 bar（yfinance 为主，本地 IB 数据兜底）。
 
     ib 参数保留签名兼容性，实际不使用。
     """
@@ -554,7 +586,10 @@ def fetch_bars(ib, symbol: str, tf: str) -> pd.DataFrame | None:
         ticker   = yf.Ticker(symbol)
         raw = ticker.history(period=period, interval=interval, auto_adjust=True)
         if raw is None or raw.empty:
-            return None
+            local = _local_bars(symbol, tf)
+            if local is not None:
+                print(f"  {symbol} {tf}: yfinance 拉空，已用本地 IB 数据兜底")
+            return local
         # 标准化列名
         raw = raw[["Open", "High", "Low", "Close", "Volume"]].copy()
         raw.index.name = "Date"
@@ -571,10 +606,15 @@ def fetch_bars(ib, symbol: str, tf: str) -> pd.DataFrame | None:
         raw = _drop_forming_bar(raw, tf)
         if tf == "1d":
             raw = _fill_recent_gaps_from_local(raw, symbol)
-        return raw if not raw.empty else None
+        if raw.empty:
+            return _local_bars(symbol, tf)
+        return raw
     except Exception as e:
         print(f"  fetch_bars({symbol} {tf}) yfinance 异常: {e}")
-        return None
+        local = _local_bars(symbol, tf)
+        if local is not None:
+            print(f"  {symbol} {tf}: 已用本地 IB 数据兜底")
+        return local
 
 
 def _fill_recent_gaps_from_local(df: pd.DataFrame, symbol: str) -> pd.DataFrame:
