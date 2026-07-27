@@ -1214,7 +1214,9 @@ def _load_screener_ranks(top_n: int = 10) -> dict[str, int]:
                .sort_values("rank_in_run")
                .head(top_n))
         return {row["symbol"]: int(row["rank_in_run"]) for _, row in top.iterrows()}
-    except Exception:
+    except Exception as exc:
+        # 解析失败≠文件不存在，必须报出来——混合 schema 曾让这里静默失效
+        print(f"  ⚠ screener_results.csv 解析失败: {exc}")
         return {}
 
 

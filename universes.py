@@ -139,6 +139,13 @@ def _load_watchlist() -> list[str]:
             for row in csv.DictReader(fh):
                 if row.get("status") in ("non_us_or_invalid", "no_data_unverified"):
                     tickers.discard(row.get("symbol", "").upper())
+    # 结构性排除：货币/债券基金近零波动会让"风险调整动量"因子（ret/std）
+    # 爆表产生伪排名（SGOV 曾以此排进 Top5）；杠杆/反向 ETF 的动量排名
+    # 同样无发现价值。清单与 revalidate_rejected.STRUCTURAL_EXCLUDE 一致。
+    structural = {"SGOV", "BND", "FBND", "HYMB", "TLT", "VTEB", "VBIL", "XHLF",
+                  "BSP", "JHS", "JEPI", "JEPQ", "QQQI", "SPYI", "FXAIX", "VTSAX",
+                  "SOXL", "SOXS", "SPXS", "SPXU", "SQQQ", "TQQQ", "BTCI", "OILU", "RAM"}
+    tickers -= structural
     # yfinance 用连字符表示股类（BRK.B -> BRK-B）
     return sorted(t.replace(".", "-") for t in tickers)
 

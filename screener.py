@@ -374,7 +374,18 @@ def save_csv(df: pd.DataFrame, top_n: int, universe: str, run_date: str) -> None
     top.insert(2, "rank_in_run", range(1, len(top) + 1))
 
     if out_path.exists():
-        top.to_csv(out_path, mode="a", header=False, index=False)
+        # 追加前校验列结构：schema 变更后盲目 header=False 追加会产生
+        # 混合结构的行，下游 pd.read_csv 直接解析失败（2026-07-27 因此
+        # 导致 alert_engine 的选股排名联动整体失效）。不一致时归档重写。
+        with open(out_path) as fh:
+            existing_header = fh.readline().strip().split(",")
+        if existing_header == list(top.columns):
+            top.to_csv(out_path, mode="a", header=False, index=False)
+        else:
+            archive = out_path.with_suffix(f".schema-{run_date}.bak")
+            out_path.rename(archive)
+            top.to_csv(out_path, index=False)
+            print(f"⚠️ 旧文件列结构不同，已归档为 {archive.name} 并重建")
     else:
         top.to_csv(out_path, index=False)
     print(f"结果已追加到 {out_path}（{len(top)} 行）")
