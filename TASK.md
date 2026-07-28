@@ -226,6 +226,14 @@ Confluence 按周期：1h 做多 −0.74R / 做空 −0.75R；4h 做多 −1.64R
 - [x] **发现并修复：跌幅双倍计算 bug**：用户实测发现 SMH 显示"-5.5%异动"，但真实盘中跌幅仅 -2.25%。核查：yfinance 当日序列缺 07-24 那根 bar（与此前 QQQ/SPY 缺口同类问题，非一次性事故），`watchlist_events.py` 用 naive `iloc[-1]/iloc[-2]` 相邻比较，缺口导致悄悄跨 07-23→07-27 两个交易日当一天算（580.17→561.19→548.55，真实两段 -3.4%/-2.25%，误算成单日 -5.45%）。修复：接入与 `alert_engine.fetch_bars` 相同的 `_fill_recent_gaps_from_local()`，用本地 IB 数据补齐近期缺口后再计算涨跌/量比。复测 SMH 不再触发异动阈值（真实-2.25%本就低于5%门槛）。
 - [ ] **遗留观察**：yfinance 缺整根 1d bar 已出现两次（QQQ/SPY/SMH/SOXX 全池一次，SMH 单独一次），可能是频繁模式而非孤立事故；两条消费链路（alert_engine、watchlist_events）现已共用同一补丁，但若还有其他脚本直接用 yfinance 日线做相邻日比较（如 screener.py 的动量因子），需要排查是否有同类风险。
 
+#### ⑬ 谐波形态策略原型验证（2026-07-28，用户提议）
+
+**背景**：用户问"谐波分析是什么策略"后要求单独做原型验证 QQQ 和 SPY——不接入 alert_engine，纯研究探针。
+
+- [x] 新建 `harmonic_signals.py`（ATR阈值zigzag摆动点 + Gartley/Bat/Butterfly/Crab 比例匹配 + D点PRZ投射，逐bar扫描无lookahead）+ `harmonic_strategy.py`（复用 mr_strategy.py 的ATR追踪+时间止损机制，初始止损种子改为X点结构失效位）+ `harmonic_backtest.py`（含 `--validate` 成本压力+walk-forward）
+- [x] **结果：全部6个组合（QQQ/SPY × 1h/4h/1d）信号数均 <15 笔门槛**（QQQ 1h=9/4h=4/1d=4；SPY 1h=4/4h=3/1d=6，1d已是10年历史）。谐波形态四段比例同时匹配本身是低频事件，仅测2个标的注定样本枯竭。
+- [x] **结论：insufficient，不下有效/无效结论**——不像单标的硬凑理由，如需真正验证需池化至数十个标的（如整个watchlist）才可能凑够统计样本量，待用户决定是否扩大范围。
+
 #### 已在流水线中、本节不重复动作
 
 - 4 个影子实验（TSLA 出场变体 / MRVL 宽出场 / RSI2+IBS / RKLB 突破）在等样本积累
