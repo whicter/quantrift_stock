@@ -48,7 +48,11 @@ symbols:
   # SHOP：2026-07-27 用户因当日 +12.4% 暴拉要求加入。四策略×三周期全测：
   # Confluence/RSI2/Breakout 全部 fail（10bps 转负 或 maxDD 超 -50%）；
   # MR 1h 10bps 仍 0.93 但 N=22<30 门槛，样本不足，暂不接入实盘，仅观察
-  pending_high_vol: [RKLB, NBIS, SHOP]
+  # AXON：2026-08-02 批量加入验证。Confluence 4h 10bps=0.64 达标且 N=32
+  # 过30笔门槛，但 walk-forward 训练/测试分段各仅19/10笔，太薄看不出稳健性
+  # （非"marginal"而是"insufficient"，即两段都不足以下结论），暂不接入，
+  # 待样本量增长后复检；1h 同策略 wf 测试段虽达1.51但10bps仅0.55不过成本关
+  pending_high_vol: [RKLB, NBIS, SHOP, AXON]
 
   # 半导体 ETF：RSI2（不强制 RS vs QQQ）或 MR+ATR（待重新调参）
   sector_etf:  [SOXX, SMH]
@@ -74,13 +78,13 @@ symbols:
   # CCJ/LLY/UP 各降级一个周期但保留其他合格路由。详见 watchlist_validation.csv
   # 2026-07-26 PANW（Palo Alto Networks）应用户要求加入：四策略回测仅 1h RSI2 达标
   # (Sharpe 0.683 N=117 DD-12.2%)；成本压力 10bps 通过、walk-forward 训练0.37→测试0.84（样本外更优）
-  watchlist_2026_07: [AAOI, AGI, AIRJ, AIS, ALL, AMC, APLD, APO, BA, BABA, BAC, BB,
+  watchlist_2026_07: [AAOI, AGI, AIRJ, AIS, ALAB, ALL, AMC, APLD, APO, BA, BABA, BAC, BB,
                        BBW, BE, CBUS, CCB, CCJ, CRCL, CRSP, CRWD, CRWV, DELL, DGRO, DJT,
                        FDVV, FOF, FOX, GE, GFS, GL, GOOG, HBM, HOOD, IBM, INTU, IREN,
-                       JPM, KO, LLY, LMT, LTL, LUNR, LVHI, LWLG, MKSI, MO, MORN, MS,
+                       JPM, KO, LLY, LMT, LTL, LUNR, LVHI, LWLG, MAR, MKSI, MO, MORN, MS,
                        MSOS, MSTR, NFLX, NTRS, OC, OKLO, ONDS, ORCL, OSCR, PANW, PB, PKW,
                        QCOM, RBC, RBLX, REMX, RGTI, SAP, SKM, SLS, SLV, SMCI, SOFI, SPCX,
-                       SPMO, SPXC, SPYM, TMC, TSM, UP, USAR, USO, VC, VOO, VTI, WBD,
+                       SPMO, SPXC, SPYM, TMC, TSM, TTD, UP, USAR, USO, VC, VOO, VTI, WBD,
                        WDC, WMT]
   # SPCX（Space Exploration Technologies Corp，2026-06-12上市）：应用户明确要求接入实盘扫描，
   # 但 1d 仅28行数据，任何策略都无法跑出有意义的回测（RSI2/MR需200+天，Breakout需252+天）。

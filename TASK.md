@@ -234,6 +234,23 @@ Confluence 按周期：1h 做多 −0.74R / 做空 −0.75R；4h 做多 −1.64R
 - [x] **结果：全部6个组合（QQQ/SPY × 1h/4h/1d）信号数均 <15 笔门槛**（QQQ 1h=9/4h=4/1d=4；SPY 1h=4/4h=3/1d=6，1d已是10年历史）。谐波形态四段比例同时匹配本身是低频事件，仅测2个标的注定样本枯竭。
 - [x] **结论：insufficient，不下有效/无效结论**——不像单标的硬凑理由，如需真正验证需池化至数十个标的（如整个watchlist）才可能凑够统计样本量，待用户决定是否扩大范围。
 
+#### ⑭ 用户批量加入18个标的（2026-08-02）
+
+**输入**：MAR/SNAP/ON/AMET/MCD/ALAB/MRK/LLY/UBER/CRCL/AXON/NVO/U/ABNB/AAOI/UUUU/TTD/MP/OKLO
+
+- [x] **验真+去重**：`AMET` 经 yfinance 核实为无效代码（无价格数据，"possibly delisted"），未加入，已告知用户。SNAP/LLY/UBER/CRCL/NVO/AAOI/OKLO 已在 watchlist 中测试过，跳过重复工作。真正新增 11 个：MAR/ON/MCD/ALAB/MRK/AXON/U/ABNB/UUUU/TTD/MP
+- [x] **四策略×三周期全测**（110个组合，`validate_watchlist.validate_one` 复用）：
+  | 标的 | 达标路由 | 10bps Sharpe | N | wf |
+  |---|---|---|---|---|
+  | MAR | rsi2 1h | 0.691 | 62 | pass（训练0.51→测试1.04） |
+  | ALAB | rsi2 1h | 0.835 | 92 | marginal（训练1.00→测试0.57，样本量大予以接入） |
+  | TTD | confluence 1h | 0.65 | 102 | pass（训练0.57→测试1.71） |
+  | AXON | confluence 4h（未接入） | 0.64 | 32 | insufficient（分段各仅19/10笔太薄） |
+  | ON/MCD/MRK/U/ABNB/UUUU/MP | 无 | — | — | 全部组合10bps成本压力不达标或maxDD超阈值 |
+- [x] **接入实盘**：MAR/ALAB/TTD 三条路由写入 `STRATEGY_MAP`，加入 `config.yaml` watchlist_2026_07；AXON 放入 `pending_high_vol` 观察（cost达标但wf样本太薄，不同于SHOP-MR的"N<30"，是"N过30但wf分段不足"这种新的边界情况）
+- [x] **110 条测试记录**全部写入 `watchlist_history.csv`（含未达标的，如实记录不隐藏）
+- [x] 全部 18 个原始标的（除AMET）已在 `watchlist.txt` 中，自动进入 daily screener + 双时段事件雷达覆盖范围
+
 #### 已在流水线中、本节不重复动作
 
 - 4 个影子实验（TSLA 出场变体 / MRVL 宽出场 / RSI2+IBS / RKLB 突破）在等样本积累

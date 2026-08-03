@@ -200,6 +200,11 @@ STRATEGY_MAP: dict[tuple[str, str], str] = {
     ("HOOD", "1d"): "confluence",  # 10bps 0.71 N=38 训练0.36→测试0.68（分段样本偏少）
     ("IREN", "1h"): "confluence",  # 10bps 1.15 N=230 训练0.73→测试1.76 [2026-07-26 从 pending_high_vol 升级]
 
+    # 2026-08-02 用户批量加入18个标的，四策略×三周期验证（AMET非有效代码已剔除）
+    ("MAR", "1h"): "rsi2",  # 10bps 0.691 N=62 训练0.506→测试1.042（wf pass）
+    ("ALAB", "1h"): "rsi2",  # 10bps 0.835 N=92 训练0.998→测试0.568（wf marginal，样本量大予以接入，交衰减监控）
+    ("TTD", "1h"): "confluence",  # 10bps 0.65 N=102 训练0.57→测试1.71（wf pass）
+
     # 2026-07-25 网格优化新增（60个"默认参数接近达标"标的跑RSI2_GRID×Confluence网格，42组合达标）
     ("AMC", "1h"): "confluence",  # Sharpe 1.06 N=154 WR=63.6% [网格优化]
     ("BA", "4h"): "confluence",  # Sharpe 0.86 N=85 WR=68.2% [网格优化]
