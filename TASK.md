@@ -251,6 +251,14 @@ Confluence 按周期：1h 做多 −0.74R / 做空 −0.75R；4h 做多 −1.64R
 - [x] **110 条测试记录**全部写入 `watchlist_history.csv`（含未达标的，如实记录不隐藏）
 - [x] 全部 18 个原始标的（除AMET）已在 `watchlist.txt` 中，自动进入 daily screener + 双时段事件雷达覆盖范围
 
+#### ⑭ watchlist.txt 批量写入把11个代码挤成一行（2026-08-02，用户追问触发发现）
+
+**触发**：用户问"alab, lite, cohr, voyg 在列表里么"，查证时发现 08-02 那次18标的批量添加（commit 8aeb467）虽然回测、路由（`STRATEGY_MAP`）、`config.yaml`（`watchlist_2026_07`）三处都正确写入了 MAR/ALAB/TTD，但写 `watchlist.txt` 时把 11 个新代码（MAR/ON/MCD/ALAB/MRK/AXON/U/ABNB/UUUU/TTD/MP）**合并成一行空格分隔的字符串**，而不是每行一个。commit message 明确宣称"每个标的都进了daily screener和事件雷达覆盖"，但实际这一整行被 `universes._load_watchlist()` 当成了**一个**畸形代码，11 个标的全部**不在**实际生效的 watchlist universe 中——已路由的 3 个（MAR/ALAB/TTD）实盘信号不受影响（路由不依赖 watchlist.txt），但另外 8 个未路由标的（ON/MCD/MRK/AXON/U/ABNB/UUUU/MP）此前完全没有任何覆盖，跟从未加入过一样。
+
+- [x] **修复**：拆成 11 行，重新排序去重，验证全部 11 个标的均在 `universes.get_universe("watchlist")` 返回集合中
+- [x] **确认未受影响的部分**：`config.yaml` watchlist_2026_07（ALAB/MAR/TTD 正确的逗号分隔列表）、`STRATEGY_MAP`（ALAB/MAR/TTD 路由）、`watchlist_history.csv`（110条测试记录完整）均无问题，只有 `watchlist.txt` 这一处写坏
+- [ ] **教训待写入 LEARNING.md**：批量写入类操作（尤其是拼接多个值到一个文件）必须在写入后立即用消费方的实际读取路径验证（如这里应该跑一次 `get_universe("watchlist")` 确认计数=预期新增数），不能只看"diff 里加了一行"就当作成功——这次连 commit message 都写错了（"every ticker is now in watchlist.txt"是假的），说明单纯读 diff 也可能被表面现象误导。
+
 #### 已在流水线中、本节不重复动作
 
 - 4 个影子实验（TSLA 出场变体 / MRVL 宽出场 / RSI2+IBS / RKLB 突破）在等样本积累
