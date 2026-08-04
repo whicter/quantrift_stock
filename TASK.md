@@ -259,6 +259,18 @@ Confluence 按周期：1h 做多 −0.74R / 做空 −0.75R；4h 做多 −1.64R
 - [x] **确认未受影响的部分**：`config.yaml` watchlist_2026_07（ALAB/MAR/TTD 正确的逗号分隔列表）、`STRATEGY_MAP`（ALAB/MAR/TTD 路由）、`watchlist_history.csv`（110条测试记录完整）均无问题，只有 `watchlist.txt` 这一处写坏
 - [ ] **教训待写入 LEARNING.md**：批量写入类操作（尤其是拼接多个值到一个文件）必须在写入后立即用消费方的实际读取路径验证（如这里应该跑一次 `get_universe("watchlist")` 确认计数=预期新增数），不能只看"diff 里加了一行"就当作成功——这次连 commit message 都写错了（"every ticker is now in watchlist.txt"是假的），说明单纯读 diff 也可能被表面现象误导。
 
+#### ⑮ LITE/COHR/VOYG 加入验证（2026-08-04，用户在追问ALAB时一并要求）
+
+- [x] yfinance 验真通过（均为真实标的：Lumentum/Coherent/Voyager Technologies）；VOYG 2025-06-11上市，历史仅287个交易日
+- [x] 拉取数据时发现 **1d 最后一行 OHLC 全 NaN（volume非空）**，三个标的都撞上——不是策略问题，是这次拉取当天的数据质量问题；`dropna(subset=['close'])` 清洗后重跑 1d 验证
+- [x] 四策略×三周期全测（30个组合，含 mr/1d 等信号数0的空结果）：
+  | 标的 | 最佳组合 | 10bps Sharpe | N | 结论 |
+  |---|---|---|---|---|
+  | LITE | RSI2 1h | 0.707（过成本关） | 95 | **wf fail**：训练1.158→测试0.214，远低于训练一半，衰减明显，reject |
+  | COHR | RSI2 4h | 1.022（过成本关） | **28<30** | 样本不足，同 AXON 先例，列入 `pending_high_vol` 观察 |
+  | VOYG | RSI2 1h | 0.282（不过成本关） | 37 | wf 虽 pass 但成本关不过，reject；历史仅286个交易日，样本天花板有限 |
+- [x] 结论：**三个都不接入实盘**，30条测试记录写入 `watchlist_history.csv`；COHR RSI2 4h 加入 `config.yaml pending_high_vol`；三个标的均加入 `watchlist.txt`（**写入后立即用 `get_universe("watchlist")` 逐个验证**，吸取 ⑭ 的教训，未再犯合并成一行的错）
+
 #### 已在流水线中、本节不重复动作
 
 - 4 个影子实验（TSLA 出场变体 / MRVL 宽出场 / RSI2+IBS / RKLB 突破）在等样本积累

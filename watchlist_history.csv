@@ -1,1150 +1,1180 @@
-symbol,status,strategy,tf,sharpe,n,date_checked,note
-QQQ,pre_existing_active,,,,,2026-07-25,session开始前就在系统里跑
-META,pre_existing_active,,,,,2026-07-25,session开始前就在系统里跑
-RKLB,pre_existing_active,,,,,2026-07-25,session开始前就在系统里跑
-MSFT,pre_existing_active,,,,,2026-07-25,session开始前就在系统里跑
-NBIS,pre_existing_active,,,,,2026-07-25,session开始前就在系统里跑
-INTC,pre_existing_active,,,,,2026-07-25,session开始前就在系统里跑
-MRVL,pre_existing_active,,,,,2026-07-25,session开始前就在系统里跑
-SNDK,pre_existing_active,,,,,2026-07-25,session开始前就在系统里跑
-AAPL,pre_existing_active,,,,,2026-07-25,session开始前就在系统里跑
-AMZN,pre_existing_active,,,,,2026-07-25,session开始前就在系统里跑
-AMD,pre_existing_active,,,,,2026-07-25,session开始前就在系统里跑
-GOOGL,pre_existing_active,,,,,2026-07-25,session开始前就在系统里跑
-NVDA,pre_existing_active,,,,,2026-07-25,session开始前就在系统里跑
-TSLA,pre_existing_active,,,,,2026-07-25,session开始前就在系统里跑
-PLTR,pre_existing_active,,,,,2026-07-25,session开始前就在系统里跑
-MU,pre_existing_active,,,,,2026-07-25,session开始前就在系统里跑
-SPY,pre_existing_active,,,,,2026-07-25,session开始前就在系统里跑
-XLK,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号
-XLC,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号
-XLY,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号
-XLP,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号
-XLV,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号
-XLF,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号
-XLI,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号
-XLE,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号
-XLB,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号
-XLU,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号
-XLRE,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号
-IGV,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号
-CIBR,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号
-HACK,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号
-SKYY,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号
-CLOU,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号
-BOTZ,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号
-ARTY,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号
-AIQ,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号
-SMH,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号
-SOXX,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号
-XSD,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号
-QTUM,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号
-UFO,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号
-KBE,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号
-KRE,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号
-KIE,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号
-XBI,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号
-IBB,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号
-IHI,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号
-ITA,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号
-XAR,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号
-IYT,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号
-XHB,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号
-ITB,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号
-XRT,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号
-XOP,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号
-ICLN,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号
-TAN,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号
-GDX,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号
-GDXJ,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号
-VNQ,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号
-IYR,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号
-SRVR,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号
-DTCR,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号
-REXC,rejected,Confluence,1d,3.78,3.0,2026-07-25,第二版watchlist批量回测(默认参数)
-XHLF,rejected,Breakout,1d,2.417,34.0,2026-07-25,第二版watchlist批量回测(默认参数)
-SGOV,rejected,Breakout,1d,1.928,55.0,2026-07-25,第二版watchlist批量回测(默认参数)
-DRAM,rejected,Confluence,1d,1.84,5.0,2026-07-25,第二版watchlist批量回测(默认参数)
-BB,promoted,Confluence,4h,1.36,44.0,2026-07-25,第二版watchlist批量回测(默认参数)
-DJT,promoted,Confluence,1h,1.31,125.0,2026-07-25,第二版watchlist批量回测(默认参数)
-DIS,rejected,RSI2,4h,1.222,28.0,2026-07-25,第二版watchlist批量回测(默认参数)
-SPXU,rejected,Confluence,1h,1.22,55.0,2026-07-25,第二版watchlist批量回测(默认参数)
-LVHI,promoted,RSI2,4h,1.195,30.0,2026-07-25,第二版watchlist批量回测(默认参数)
-SOXS,rejected,Confluence,1h,1.19,87.0,2026-07-25,第二版watchlist批量回测(默认参数)
-VGRO,rejected,Confluence,1d,1.1,9.0,2026-07-25,第二版watchlist批量回测(默认参数)
-LUNR,promoted,Confluence,4h,1.08,50.0,2026-07-25,第二版watchlist批量回测(默认参数)
-SPMO,promoted,RSI2,1h,1.074,134.0,2026-07-25,第二版watchlist批量回测(默认参数)
-RBLX,promoted,Confluence,1d,1.06,38.0,2026-07-25,第二版watchlist批量回测(默认参数)
-SOXS,rejected,Confluence,4h,1.04,24.0,2026-07-25,第二版watchlist批量回测(默认参数)
-NTRS,promoted,RSI2,1h,1.017,107.0,2026-07-25,第二版watchlist批量回测(默认参数)
-VBIL,rejected,Breakout,1d,0.923,8.0,2026-07-25,第二版watchlist批量回测(默认参数)
-RBLX,promoted,RSI2,4h,0.91,38.0,2026-07-25,第二版watchlist批量回测(默认参数)
-RDDT,rejected,Confluence,1d,0.89,27.0,2026-07-25,第二版watchlist批量回测(默认参数)
-MSOS,promoted,Confluence,1d,0.87,50.0,2026-07-25,第二版watchlist批量回测(默认参数)
-SCHD,rejected,RSI2,4h,0.857,19.0,2026-07-25,第二版watchlist批量回测(默认参数)
-REMX,promoted,RSI2,4h,0.845,32.0,2026-07-25,第二版watchlist批量回测(默认参数)
-ORCL,promoted,RSI2,1h,0.842,113.0,2026-07-25,第二版watchlist批量回测(默认参数)
-TDAX,rejected,Confluence,4h,0.82,7.0,2026-07-25,第二版watchlist批量回测(默认参数)
-HVAC,rejected,Confluence,4h,0.81,7.0,2026-07-25,第二版watchlist批量回测(默认参数)
-AIS,promoted,RSI2,1h,0.784,77.0,2026-07-25,第二版watchlist批量回测(默认参数)
-TE,rejected,RSI2,4h,0.783,21.0,2026-07-25,第二版watchlist批量回测(默认参数)
-OKLO,promoted,RSI2,4h,0.766,33.0,2026-07-25,第二版watchlist批量回测(默认参数)
-CRWD,promoted,RSI2,1h,0.765,124.0,2026-07-25,第二版watchlist批量回测(默认参数)
-IBM,promoted,Confluence,4h,0.76,53.0,2026-07-25,第二版watchlist批量回测(默认参数)
-USAR,promoted,Confluence,1h,0.75,74.0,2026-07-25,第二版watchlist批量回测(默认参数)
-SLV,promoted,RSI2,4h,0.744,40.0,2026-07-25,第二版watchlist批量回测(默认参数)
-AVIV,rejected,RSI2,4h,0.73,28.0,2026-07-25,第二版watchlist批量回测(默认参数)
-BB,promoted,RSI2,1h,0.727,93.0,2026-07-25,第二版watchlist批量回测(默认参数)
-MORN,promoted,Confluence,4h,0.71,37.0,2026-07-25,第二版watchlist批量回测(默认参数)
-SOFI,promoted,Confluence,1d,0.71,42.0,2026-07-25,第二版watchlist批量回测(默认参数)
-LWLG,promoted,Confluence,1h,0.7,133.0,2026-07-25,第二版watchlist批量回测(默认参数)
-CRWD,promoted,RSI2,4h,0.69,42.0,2026-07-25,第二版watchlist批量回测(默认参数)
-GME,promoted,Confluence,1h,0.69,129.0,2026-07-25,第二版watchlist批量回测(默认参数)
-DGRO,promoted,Breakout,1d,0.662,50.0,2026-07-25,第二版watchlist批量回测(默认参数)
-TDAX,rejected,Confluence,1d,0.66,11.0,2026-07-25,第二版watchlist批量回测(默认参数)
-DRAM,rejected,Confluence,1h,0.66,17.0,2026-07-25,第二版watchlist批量回测(默认参数)
-PYPL,promoted,Confluence,1d,0.65,53.0,2026-07-25,第二版watchlist批量回测(默认参数)
-QQQM,rejected,Breakout,1d,0.649,21.0,2026-07-25,第二版watchlist批量回测(默认参数)
-AIS,promoted,Confluence,1d,0.64,30.0,2026-07-25,第二版watchlist批量回测(默认参数)
-SPYM,promoted,Breakout,1d,0.635,51.0,2026-07-25,第二版watchlist批量回测(默认参数)
-VTI,promoted,Breakout,1d,0.627,54.0,2026-07-25,第二版watchlist批量回测(默认参数)
-JPM,promoted,RSI2,1h,0.622,107.0,2026-07-25,第二版watchlist批量回测(默认参数)
-BABA,promoted,RSI2,4h,0.621,30.0,2026-07-25,第二版watchlist批量回测(默认参数)
-PKW,promoted,RSI2,4h,0.614,40.0,2026-07-25,第二版watchlist批量回测(默认参数)
-VOO,promoted,Breakout,1d,0.611,52.0,2026-07-25,第二版watchlist批量回测(默认参数)
-AVGV,rejected,Confluence,1d,0.61,18.0,2026-07-25,第二版watchlist批量回测(默认参数)
-JPM,promoted,RSI2,4h,0.604,47.0,2026-07-25,第二版watchlist批量回测(默认参数)
-CEG,promoted,RSI2,1h,0.603,109.0,2026-07-25,第二版watchlist批量回测(默认参数)
-INTU,promoted,Confluence,4h,0.6,34.0,2026-07-25,第二版watchlist批量回测(默认参数)
-SPXU,rejected,Confluence,1d,0.6,84.0,2026-07-25,第二版watchlist批量回测(默认参数)
-TDAX,rejected,Confluence,1h,0.59,29.0,2026-07-25,第二版watchlist批量回测(默认参数)
-SOXS,rejected,Confluence,1d,0.58,26.0,2026-07-25,第二版watchlist批量回测(默认参数)
-SQQQ,rejected,Confluence,1d,0.57,93.0,2026-07-25,第二版watchlist批量回测(默认参数)
-SCHG,rejected,Breakout,1d,0.532,50.0,2026-07-25,第二版watchlist批量回测(默认参数)
-LWLG,rejected,Confluence,4h,0.53,50.0,2026-07-25,第二版watchlist批量回测(默认参数)
-LUNR,rejected,RSI2,1h,0.521,114.0,2026-07-25,第二版watchlist批量回测(默认参数)
-TE,rejected,RSI2,1h,0.516,61.0,2026-07-25,第二版watchlist批量回测(默认参数)
-GS,rejected,Breakout,1d,0.51,31.0,2026-07-25,第二版watchlist批量回测(默认参数)
-APO,rejected,Confluence,4h,0.5,52.0,2026-07-25,第二版watchlist批量回测(默认参数)
-BND,rejected,Breakout,1d,0.49,18.0,2026-07-25,第二版watchlist批量回测(默认参数)
-SPXS,rejected,Confluence,1d,0.48,84.0,2026-07-25,第二版watchlist批量回测(默认参数)
-IBM,rejected,RSI2,1h,0.479,94.0,2026-07-25,第二版watchlist批量回测(默认参数)
-AVGO,rejected,RSI2,1d,0.473,21.0,2026-07-25,第二版watchlist批量回测(默认参数)
-NTRS,rejected,RSI2,4h,0.468,45.0,2026-07-25,第二版watchlist批量回测(默认参数)
-QQQX,rejected,RSI2,4h,0.467,23.0,2026-07-25,第二版watchlist批量回测(默认参数)
-NFLX,rejected,Breakout,1d,0.457,35.0,2026-07-25,第二版watchlist批量回测(默认参数)
-LVHI,rejected,Breakout,1d,0.456,40.0,2026-07-25,第二版watchlist批量回测(默认参数)
-TSM,rejected,RSI2,1d,0.452,26.0,2026-07-25,第二版watchlist批量回测(默认参数)
-AAOI,rejected,Confluence,1d,0.45,74.0,2026-07-25,第二版watchlist批量回测(默认参数)
-VUG,rejected,RSI2,1d,0.444,18.0,2026-07-25,第二版watchlist批量回测(默认参数)
-CVX,rejected,Breakout,1d,0.442,19.0,2026-07-25,第二版watchlist批量回测(默认参数)
-SMCI,rejected,Breakout,1d,0.441,16.0,2026-07-25,第二版watchlist批量回测(默认参数)
-NOK,rejected,Breakout,1d,0.441,12.0,2026-07-25,第二版watchlist批量回测(默认参数)
-JEPQ,rejected,Breakout,1d,0.438,27.0,2026-07-25,第二版watchlist批量回测(默认参数)
-LWLG,rejected,Confluence,1d,0.43,62.0,2026-07-25,第二版watchlist批量回测(默认参数)
-NOK,rejected,RSI2,4h,0.426,43.0,2026-07-25,第二版watchlist批量回测(默认参数)
-SQQQ,rejected,Confluence,1h,0.42,50.0,2026-07-25,第二版watchlist批量回测(默认参数)
-TE,rejected,Confluence,1d,0.42,47.0,2026-07-25,第二版watchlist批量回测(默认参数)
-VUG,rejected,RSI2,4h,0.416,43.0,2026-07-25,第二版watchlist批量回测(默认参数)
-PKW,rejected,Breakout,1d,0.416,39.0,2026-07-25,第二版watchlist批量回测(默认参数)
-SOXL,rejected,RSI2,1h,0.415,161.0,2026-07-25,第二版watchlist批量回测(默认参数)
-BABA,rejected,RSI2,1h,0.412,95.0,2026-07-25,第二版watchlist批量回测(默认参数)
-FLCA,rejected,RSI2,4h,0.41,35.0,2026-07-25,第二版watchlist批量回测(默认参数)
-OKLO,rejected,RSI2,1h,0.403,85.0,2026-07-25,第二版watchlist批量回测(默认参数)
-BABA,rejected,Breakout,1d,0.4,19.0,2026-07-25,第二版watchlist批量回测(默认参数)
-SPYI,rejected,Breakout,1d,0.396,26.0,2026-07-25,第二版watchlist批量回测(默认参数)
-MO,rejected,Breakout,1d,0.395,23.0,2026-07-25,第二版watchlist批量回测(默认参数)
-RTH,rejected,Breakout,1d,0.391,41.0,2026-07-25,第二版watchlist批量回测(默认参数)
-RSP,rejected,Breakout,1d,0.382,40.0,2026-07-25,第二版watchlist批量回测(默认参数)
-VPL,rejected,Breakout,1d,0.372,37.0,2026-07-25,第二版watchlist批量回测(默认参数)
-AVGO,rejected,Confluence,1h,0.37,151.0,2026-07-25,第二版watchlist批量回测(默认参数)
-FDVV,rejected,Breakout,1d,0.366,46.0,2026-07-25,第二版watchlist批量回测(默认参数)
-CRWD,rejected,RSI2,1d,0.365,26.0,2026-07-25,第二版watchlist批量回测(默认参数)
-SPMO,rejected,RSI2,4h,0.365,47.0,2026-07-25,第二版watchlist批量回测(默认参数)
-QQQM,rejected,Confluence,4h,0.36,36.0,2026-07-25,第二版watchlist批量回测(默认参数)
-AVIV,rejected,Breakout,1d,0.35,19.0,2026-07-25,第二版watchlist批量回测(默认参数)
-TQQQ,rejected,Confluence,1d,0.35,53.0,2026-07-25,第二版watchlist批量回测(默认参数)
-REI,rejected,RSI2,1h,0.348,62.0,2026-07-25,第二版watchlist批量回测(默认参数)
-SCHW,rejected,RSI2,4h,0.347,33.0,2026-07-25,第二版watchlist批量回测(默认参数)
-GME,rejected,RSI2,4h,0.347,26.0,2026-07-25,第二版watchlist批量回测(默认参数)
-PL,rejected,RSI2,1h,0.345,116.0,2026-07-25,第二版watchlist批量回测(默认参数)
-VGK,rejected,RSI2,4h,0.342,28.0,2026-07-25,第二版watchlist批量回测(默认参数)
-GS,rejected,RSI2,4h,0.34,49.0,2026-07-25,第二版watchlist批量回测(默认参数)
-PBOC,rejected,Breakout,1d,0.33,12.0,2026-07-25,第二版watchlist批量回测(默认参数)
-SLV,rejected,Breakout,1d,0.328,13.0,2026-07-25,第二版watchlist批量回测(默认参数)
-AVGO,rejected,RSI2,4h,0.323,55.0,2026-07-25,第二版watchlist批量回测(默认参数)
-REM,rejected,Confluence,1d,0.32,62.0,2026-07-25,第二版watchlist批量回测(默认参数)
-VYMI,rejected,RSI2,4h,0.313,28.0,2026-07-25,第二版watchlist批量回测(默认参数)
-GS,rejected,RSI2,1h,0.312,124.0,2026-07-25,第二版watchlist批量回测(默认参数)
-SOXL,rejected,Confluence,1d,0.31,59.0,2026-07-25,第二版watchlist批量回测(默认参数)
-AVGV,rejected,RSI2,4h,0.309,32.0,2026-07-25,第二版watchlist批量回测(默认参数)
-SOFI,rejected,RSI2,4h,0.308,39.0,2026-07-25,第二版watchlist批量回测(默认参数)
-REMX,rejected,RSI2,1d,0.291,15.0,2026-07-25,第二版watchlist批量回测(默认参数)
-MSOS,rejected,RSI2,4h,0.291,30.0,2026-07-25,第二版watchlist批量回测(默认参数)
-MSOS,rejected,RSI2,1h,0.287,85.0,2026-07-25,第二版watchlist批量回测(默认参数)
-NLST,rejected,RSI2,4h,0.283,23.0,2026-07-25,第二版watchlist批量回测(默认参数)
-HYMB,rejected,Breakout,1d,0.28,28.0,2026-07-25,第二版watchlist批量回测(默认参数)
-BTCI,rejected,Confluence,1d,0.28,15.0,2026-07-25,第二版watchlist批量回测(默认参数)
-FXAIX,rejected,Breakout,1d,0.28,77.0,2026-07-25,第二版watchlist批量回测(默认参数)
-VTEB,rejected,Breakout,1d,0.276,30.0,2026-07-25,第二版watchlist批量回测(默认参数)
-DPZ,rejected,RSI2,4h,0.274,18.0,2026-07-25,第二版watchlist批量回测(默认参数)
-SPMO,rejected,RSI2,1d,0.273,22.0,2026-07-25,第二版watchlist批量回测(默认参数)
-USAR,rejected,Confluence,4h,0.27,24.0,2026-07-25,第二版watchlist批量回测(默认参数)
-SO,rejected,Breakout,1d,0.267,29.0,2026-07-25,第二版watchlist批量回测(默认参数)
-VTI,rejected,RSI2,1h,0.264,93.0,2026-07-25,第二版watchlist批量回测(默认参数)
-XSMO,rejected,RSI2,1d,0.261,15.0,2026-07-25,第二版watchlist批量回测(默认参数)
-AVDV,rejected,RSI2,4h,0.257,32.0,2026-07-25,第二版watchlist批量回测(默认参数)
-ONTO,rejected,RSI2,1d,0.254,18.0,2026-07-25,第二版watchlist批量回测(默认参数)
-PL,rejected,Breakout,1d,0.253,8.0,2026-07-25,第二版watchlist批量回测(默认参数)
-AMFN,rejected,Breakout,1d,0.25,8.0,2026-07-25,第二版watchlist批量回测(默认参数)
-PL,rejected,RSI2,4h,0.248,43.0,2026-07-25,第二版watchlist批量回测(默认参数)
-JEPI,rejected,Breakout,1d,0.246,28.0,2026-07-25,第二版watchlist批量回测(默认参数)
-FOF,rejected,Breakout,1d,0.246,35.0,2026-07-25,第二版watchlist批量回测(默认参数)
-SLV,rejected,RSI2,1h,0.245,115.0,2026-07-25,第二版watchlist批量回测(默认参数)
-APO,rejected,Breakout,1d,0.241,33.0,2026-07-25,第二版watchlist批量回测(默认参数)
-ASTS,rejected,Confluence,4h,0.24,45.0,2026-07-25,第二版watchlist批量回测(默认参数)
-SCHD,rejected,Breakout,1d,0.237,42.0,2026-07-25,第二版watchlist批量回测(默认参数)
-TLT,rejected,RSI2,1h,0.233,57.0,2026-07-25,第二版watchlist批量回测(默认参数)
-BB,rejected,Breakout,1d,0.23,10.0,2026-07-25,第二版watchlist批量回测(默认参数)
-SCHG,rejected,RSI2,4h,0.221,40.0,2026-07-25,第二版watchlist批量回测(默认参数)
-HVAC,rejected,Confluence,1d,0.22,11.0,2026-07-25,第二版watchlist批量回测(默认参数)
-VGRO,rejected,Confluence,1h,0.22,4.0,2026-07-25,第二版watchlist批量回测(默认参数)
-NTRS,rejected,Breakout,1d,0.219,26.0,2026-07-25,第二版watchlist批量回测(默认参数)
-AOK,rejected,Breakout,1d,0.215,49.0,2026-07-25,第二版watchlist批量回测(默认参数)
-JPM,rejected,Breakout,1d,0.211,38.0,2026-07-25,第二版watchlist批量回测(默认参数)
-UBER,rejected,Breakout,1d,0.211,13.0,2026-07-25,第二版watchlist批量回测(默认参数)
-DIS,rejected,RSI2,1h,0.203,83.0,2026-07-25,第二版watchlist批量回测(默认参数)
-MGA,rejected,Breakout,1d,0.202,20.0,2026-07-25,第二版watchlist批量回测(默认参数)
-YOU,rejected,Confluence,1d,0.2,36.0,2026-07-25,第二版watchlist批量回测(默认参数)
-SPXS,rejected,Confluence,1h,0.2,52.0,2026-07-25,第二版watchlist批量回测(默认参数)
-VYM,rejected,Breakout,1d,0.198,42.0,2026-07-25,第二版watchlist批量回测(默认参数)
-FBND,rejected,Breakout,1d,0.197,22.0,2026-07-25,第二版watchlist批量回测(默认参数)
-OKLO,rejected,RSI2,1d,0.197,22.0,2026-07-25,第二版watchlist批量回测(默认参数)
-ICF,rejected,Breakout,1d,0.188,23.0,2026-07-25,第二版watchlist批量回测(默认参数)
-ZH,rejected,RSI2,1h,0.184,73.0,2026-07-25,第二版watchlist批量回测(默认参数)
-IBBQ,rejected,Confluence,4h,0.18,36.0,2026-07-25,第二版watchlist批量回测(默认参数)
-CIK,rejected,Confluence,1d,0.18,54.0,2026-07-25,第二版watchlist批量回测(默认参数)
-INTU,rejected,Confluence,1h,0.18,115.0,2026-07-25,第二版watchlist批量回测(默认参数)
-FXAIX,rejected,RSI2,1h,0.178,19.0,2026-07-25,第二版watchlist批量回测(默认参数)
-SAP,rejected,Breakout,1d,0.169,33.0,2026-07-25,第二版watchlist批量回测(默认参数)
-YOU,rejected,RSI2,4h,0.167,32.0,2026-07-25,第二版watchlist批量回测(默认参数)
-DFAW,rejected,Breakout,1d,0.167,13.0,2026-07-25,第二版watchlist批量回测(默认参数)
-TLT,rejected,Breakout,1d,0.166,8.0,2026-07-25,第二版watchlist批量回测(默认参数)
-QQQM,rejected,RSI2,1h,0.166,156.0,2026-07-25,第二版watchlist批量回测(默认参数)
-ASML,rejected,Breakout,1d,0.15,46.0,2026-07-25,第二版watchlist批量回测(默认参数)
-VCR,rejected,Breakout,1d,0.137,41.0,2026-07-25,第二版watchlist批量回测(默认参数)
-SCHW,rejected,RSI2,1d,0.133,15.0,2026-07-25,第二版watchlist批量回测(默认参数)
-BLK,rejected,Confluence,1h,0.13,130.0,2026-07-25,第二版watchlist批量回测(默认参数)
-PCYO,rejected,Breakout,1d,0.122,16.0,2026-07-25,第二版watchlist批量回测(默认参数)
-BRK-B,rejected,Breakout,1d,0.121,31.0,2026-07-25,第二版watchlist批量回测(默认参数)
-REMX,rejected,Confluence,1h,0.12,154.0,2026-07-25,第二版watchlist批量回测(默认参数)
-AOR,rejected,Breakout,1d,0.119,52.0,2026-07-25,第二版watchlist批量回测(默认参数)
-NOK,rejected,RSI2,1h,0.114,104.0,2026-07-25,第二版watchlist批量回测(默认参数)
-FLCA,rejected,Confluence,1d,0.11,43.0,2026-07-25,第二版watchlist批量回测(默认参数)
-VB,rejected,RSI2,4h,0.088,35.0,2026-07-25,第二版watchlist批量回测(默认参数)
-EBAY,rejected,Breakout,1d,0.084,27.0,2026-07-25,第二版watchlist批量回测(默认参数)
-VB,rejected,Breakout,1d,0.081,34.0,2026-07-25,第二版watchlist批量回测(默认参数)
-YOU,rejected,Confluence,1h,0.08,119.0,2026-07-25,第二版watchlist批量回测(默认参数)
-VTI,rejected,Confluence,4h,0.08,38.0,2026-07-25,第二版watchlist批量回测(默认参数)
-ORCL,rejected,Confluence,1d,0.08,53.0,2026-07-25,第二版watchlist批量回测(默认参数)
-DIS,rejected,Breakout,1d,0.079,14.0,2026-07-25,第二版watchlist批量回测(默认参数)
-SQQQ,rejected,Confluence,4h,0.07,14.0,2026-07-25,第二版watchlist批量回测(默认参数)
-ONTO,rejected,Confluence,4h,0.07,45.0,2026-07-25,第二版watchlist批量回测(默认参数)
-PYPL,rejected,RSI2,4h,0.069,22.0,2026-07-25,第二版watchlist批量回测(默认参数)
-AIS,rejected,RSI2,4h,0.061,30.0,2026-07-25,第二版watchlist批量回测(默认参数)
-IMAX,rejected,Confluence,4h,0.06,31.0,2026-07-25,第二版watchlist批量回测(默认参数)
-ASTS,rejected,Confluence,1h,0.06,129.0,2026-07-25,第二版watchlist批量回测(默认参数)
-TQQQ,rejected,RSI2,1h,0.058,163.0,2026-07-25,第二版watchlist批量回测(默认参数)
-EBAY,rejected,RSI2,4h,0.054,36.0,2026-07-25,第二版watchlist批量回测(默认参数)
-TSM,rejected,RSI2,4h,0.053,70.0,2026-07-25,第二版watchlist批量回测(默认参数)
-SOFI,rejected,RSI2,1h,0.05,124.0,2026-07-25,第二版watchlist批量回测(默认参数)
-AVNM,rejected,RSI2,4h,0.046,27.0,2026-07-25,第二版watchlist批量回测(默认参数)
-JHS,rejected,RSI2,1h,0.045,48.0,2026-07-25,第二版watchlist批量回测(默认参数)
-BLK,rejected,Breakout,1d,0.044,30.0,2026-07-25,第二版watchlist批量回测(默认参数)
-IBM,rejected,Breakout,1d,0.043,23.0,2026-07-25,第二版watchlist批量回测(默认参数)
-ADBE,rejected,Breakout,1d,0.04,34.0,2026-07-25,第二版watchlist批量回测(默认参数)
-ASTS,rejected,Breakout,1d,0.04,13.0,2026-07-25,第二版watchlist批量回测(默认参数)
-AVGE,rejected,RSI2,4h,0.038,36.0,2026-07-25,第二版watchlist批量回测(默认参数)
-VTSAX,rejected,Breakout,1d,0.035,74.0,2026-07-25,第二版watchlist批量回测(默认参数)
-BTCI,rejected,RSI2,1h,0.032,40.0,2026-07-25,第二版watchlist批量回测(默认参数)
-CRM,rejected,Confluence,4h,0.03,48.0,2026-07-25,第二版watchlist批量回测(默认参数)
-VT,rejected,Breakout,1d,0.03,54.0,2026-07-25,第二版watchlist批量回测(默认参数)
-AVNM,rejected,Confluence,1d,0.03,17.0,2026-07-25,第二版watchlist批量回测(默认参数)
-CSGP,rejected,Breakout,1d,0.026,24.0,2026-07-25,第二版watchlist批量回测(默认参数)
-LUNR,rejected,RSI2,1d,0.022,23.0,2026-07-25,第二版watchlist批量回测(默认参数)
-RTH,rejected,RSI2,1h,0.021,69.0,2026-07-25,第二版watchlist批量回测(默认参数)
-REI,rejected,RSI2,4h,0.021,16.0,2026-07-25,第二版watchlist批量回测(默认参数)
-SOXL,rejected,Confluence,4h,0.02,44.0,2026-07-25,第二版watchlist批量回测(默认参数)
-NAT,rejected,Confluence,1d,0.02,81.0,2026-07-25,第二版watchlist批量回测(默认参数)
-VWO,rejected,Breakout,1d,0.018,31.0,2026-07-25,第二版watchlist批量回测(默认参数)
-INTU,rejected,Breakout,1d,0.018,39.0,2026-07-25,第二版watchlist批量回测(默认参数)
-CEG,rejected,Breakout,1d,0.011,14.0,2026-07-25,第二版watchlist批量回测(默认参数)
-TPS,rejected,Confluence,1d,0.01,1.0,2026-07-25,第二版watchlist批量回测(默认参数)
-JHS,rejected,Confluence,4h,0.01,22.0,2026-07-25,第二版watchlist批量回测(默认参数)
-QQQI,rejected,Confluence,1d,0.01,28.0,2026-07-25,第二版watchlist批量回测(默认参数)
-CEG,rejected,RSI2,4h,-0.002,41.0,2026-07-25,第二版watchlist批量回测(默认参数)
-IMAX,rejected,RSI2,1h,-0.005,85.0,2026-07-25,第二版watchlist批量回测(默认参数)
-GME,rejected,Confluence,1d,-0.01,73.0,2026-07-25,第二版watchlist批量回测(默认参数)
-TQQQ,rejected,Confluence,4h,-0.01,40.0,2026-07-25,第二版watchlist批量回测(默认参数)
-CIK,rejected,RSI2,1h,-0.012,35.0,2026-07-25,第二版watchlist批量回测(默认参数)
-FYC,rejected,Breakout,1d,-0.012,40.0,2026-07-25,第二版watchlist批量回测(默认参数)
-QQQX,rejected,Breakout,1d,-0.017,42.0,2026-07-25,第二版watchlist批量回测(默认参数)
-VO,rejected,Breakout,1d,-0.024,47.0,2026-07-25,第二版watchlist批量回测(默认参数)
-ORCL,rejected,RSI2,4h,-0.025,47.0,2026-07-25,第二版watchlist批量回测(默认参数)
-PEP,rejected,Breakout,1d,-0.027,26.0,2026-07-25,第二版watchlist批量回测(默认参数)
-AVDV,rejected,Breakout,1d,-0.027,26.0,2026-07-25,第二版watchlist批量回测(默认参数)
-DJT,rejected,Confluence,1d,-0.03,39.0,2026-07-25,第二版watchlist批量回测(默认参数)
-UBER,rejected,RSI2,4h,-0.032,23.0,2026-07-25,第二版watchlist批量回测(默认参数)
-AOA,rejected,Confluence,1d,-0.04,40.0,2026-07-25,第二版watchlist批量回测(默认参数)
-XSMO,rejected,RSI2,4h,-0.045,39.0,2026-07-25,第二版watchlist批量回测(默认参数)
-VYMI,rejected,Breakout,1d,-0.049,42.0,2026-07-25,第二版watchlist批量回测(默认参数)
-ZH,rejected,RSI2,4h,-0.049,23.0,2026-07-25,第二版watchlist批量回测(默认参数)
-CRM,rejected,Breakout,1d,-0.054,26.0,2026-07-25,第二版watchlist批量回测(默认参数)
-AVGE,rejected,Breakout,1d,-0.072,21.0,2026-07-25,第二版watchlist批量回测(默认参数)
-VGRO,rejected,Confluence,4h,-0.08,1.0,2026-07-25,第二版watchlist批量回测(默认参数)
-REI,rejected,Confluence,1d,-0.08,71.0,2026-07-25,第二版watchlist批量回测(默认参数)
-MORN,rejected,Breakout,1d,-0.084,26.0,2026-07-25,第二版watchlist批量回测(默认参数)
-IJR,rejected,Breakout,1d,-0.085,30.0,2026-07-25,第二版watchlist批量回测(默认参数)
-RBLX,rejected,RSI2,1h,-0.087,112.0,2026-07-25,第二版watchlist批量回测(默认参数)
-CVX,rejected,Confluence,4h,-0.09,28.0,2026-07-25,第二版watchlist批量回测(默认参数)
-PYPL,rejected,RSI2,1h,-0.091,97.0,2026-07-25,第二版watchlist批量回测(默认参数)
-VUG,rejected,RSI2,1h,-0.114,117.0,2026-07-25,第二版watchlist批量回测(默认参数)
-VB,rejected,RSI2,1h,-0.115,90.0,2026-07-25,第二版watchlist批量回测(默认参数)
-DGRO,rejected,RSI2,4h,-0.12,28.0,2026-07-25,第二版watchlist批量回测(默认参数)
-IMAX,rejected,RSI2,1d,-0.125,21.0,2026-07-25,第二版watchlist批量回测(默认参数)
-OILU,rejected,RSI2,4h,-0.125,24.0,2026-07-25,第二版watchlist批量回测(默认参数)
-VYM,rejected,RSI2,4h,-0.129,31.0,2026-07-25,第二版watchlist批量回测(默认参数)
-JHS,rejected,Confluence,1d,-0.13,43.0,2026-07-25,第二版watchlist批量回测(默认参数)
-AMFN,rejected,Confluence,1h,-0.14,22.0,2026-07-25,第二版watchlist批量回测(默认参数)
-AVUV,rejected,Confluence,1d,-0.14,42.0,2026-07-25,第二版watchlist批量回测(默认参数)
-RW,rejected,Confluence,1d,-0.14,5.0,2026-07-25,第二版watchlist批量回测(默认参数)
-AMFN,rejected,Confluence,4h,-0.14,4.0,2026-07-25,第二版watchlist批量回测(默认参数)
-ABT,rejected,Breakout,1d,-0.142,28.0,2026-07-25,第二版watchlist批量回测(默认参数)
-VXUS,rejected,Confluence,1d,-0.15,57.0,2026-07-25,第二版watchlist批量回测(默认参数)
-TSM,rejected,RSI2,1h,-0.17,152.0,2026-07-25,第二版watchlist批量回测(默认参数)
-JEPI,rejected,RSI2,4h,-0.173,16.0,2026-07-25,第二版watchlist批量回测(默认参数)
-CSGP,rejected,Confluence,4h,-0.18,36.0,2026-07-25,第二版watchlist批量回测(默认参数)
-PEP,rejected,RSI2,4h,-0.183,19.0,2026-07-25,第二版watchlist批量回测(默认参数)
-RSP,rejected,RSI2,4h,-0.193,31.0,2026-07-25,第二版watchlist批量回测(默认参数)
-VOO,rejected,Confluence,4h,-0.2,41.0,2026-07-25,第二版watchlist批量回测(默认参数)
-VEU,rejected,Breakout,1d,-0.21,44.0,2026-07-25,第二版watchlist批量回测(默认参数)
-FDVV,rejected,RSI2,4h,-0.212,32.0,2026-07-25,第二版watchlist批量回测(默认参数)
-BRK-B,rejected,RSI2,4h,-0.212,30.0,2026-07-25,第二版watchlist批量回测(默认参数)
-EBAY,rejected,RSI2,1h,-0.213,115.0,2026-07-25,第二版watchlist批量回测(默认参数)
-MGA,rejected,RSI2,1h,-0.213,106.0,2026-07-25,第二版watchlist批量回测(默认参数)
-VGK,rejected,Breakout,1d,-0.223,44.0,2026-07-25,第二版watchlist批量回测(默认参数)
-VTSAX,rejected,RSI2,1h,-0.224,17.0,2026-07-25,第二版watchlist批量回测(默认参数)
-IBII,rejected,Breakout,1d,-0.224,9.0,2026-07-25,第二版watchlist批量回测(默认参数)
-VGK,rejected,RSI2,1h,-0.226,102.0,2026-07-25,第二版watchlist批量回测(默认参数)
-CSGP,rejected,RSI2,1h,-0.229,74.0,2026-07-25,第二版watchlist批量回测(默认参数)
-SPXS,rejected,Confluence,4h,-0.24,14.0,2026-07-25,第二版watchlist批量回测(默认参数)
-ZH,rejected,Confluence,1d,-0.24,35.0,2026-07-25,第二版watchlist批量回测(默认参数)
-VOO,rejected,RSI2,1h,-0.244,106.0,2026-07-25,第二版watchlist批量回测(默认参数)
-PTMC,rejected,Breakout,1d,-0.25,27.0,2026-07-25,第二版watchlist批量回测(默认参数)
-MFI,rejected,Confluence,1d,-0.25,15.0,2026-07-25,第二版watchlist批量回测(默认参数)
-MGA,rejected,RSI2,4h,-0.255,27.0,2026-07-25,第二版watchlist批量回测(默认参数)
-AVUV,rejected,RSI2,4h,-0.26,35.0,2026-07-25,第二版watchlist批量回测(默认参数)
-BRK-B,rejected,RSI2,1h,-0.262,80.0,2026-07-25,第二版watchlist批量回测(默认参数)
-PCYO,rejected,RSI2,4h,-0.269,22.0,2026-07-25,第二版watchlist批量回测(默认参数)
-SCHW,rejected,Confluence,1h,-0.27,120.0,2026-07-25,第二版watchlist批量回测(默认参数)
-BTCI,rejected,Confluence,4h,-0.27,24.0,2026-07-25,第二版watchlist批量回测(默认参数)
-SMCI,rejected,RSI2,1h,-0.275,116.0,2026-07-25,第二版watchlist批量回测(默认参数)
-FDVV,rejected,RSI2,1h,-0.28,85.0,2026-07-25,第二版watchlist批量回测(默认参数)
-IJR,rejected,RSI2,4h,-0.299,36.0,2026-07-25,第二版watchlist批量回测(默认参数)
-NLST,rejected,RSI2,1h,-0.306,65.0,2026-07-25,第二版watchlist批量回测(默认参数)
-IJR,rejected,RSI2,1h,-0.308,92.0,2026-07-25,第二版watchlist批量回测(默认参数)
-JEPQ,rejected,Confluence,4h,-0.31,37.0,2026-07-25,第二版watchlist批量回测(默认参数)
-ICF,rejected,RSI2,1h,-0.318,83.0,2026-07-25,第二版watchlist批量回测(默认参数)
-VXUS,rejected,RSI2,4h,-0.32,29.0,2026-07-25,第二版watchlist批量回测(默认参数)
-AOA,rejected,Confluence,4h,-0.32,32.0,2026-07-25,第二版watchlist批量回测(默认参数)
-DPZ,rejected,Confluence,1h,-0.32,105.0,2026-07-25,第二版watchlist批量回测(默认参数)
-DPZ,rejected,Breakout,1d,-0.33,20.0,2026-07-25,第二版watchlist批量回测(默认参数)
-DJT,rejected,Confluence,4h,-0.34,35.0,2026-07-25,第二版watchlist批量回测(默认参数)
-VCR,rejected,RSI2,4h,-0.348,38.0,2026-07-25,第二版watchlist批量回测(默认参数)
-OILU,rejected,Confluence,1h,-0.36,108.0,2026-07-25,第二版watchlist批量回测(默认参数)
-AVNM,rejected,RSI2,1h,-0.372,90.0,2026-07-25,第二版watchlist批量回测(默认参数)
-MORN,rejected,Confluence,1h,-0.38,100.0,2026-07-25,第二版watchlist批量回测(默认参数)
-VT,rejected,RSI2,1h,-0.38,104.0,2026-07-25,第二版watchlist批量回测(默认参数)
-ONTO,rejected,RSI2,1h,-0.386,138.0,2026-07-25,第二版watchlist批量回测(默认参数)
-SCHG,rejected,RSI2,1h,-0.391,136.0,2026-07-25,第二版watchlist批量回测(默认参数)
-AMC,rejected,RSI2,4h,-0.394,20.0,2026-07-25,第二版watchlist批量回测(默认参数)
-NLST,rejected,Confluence,1d,-0.4,52.0,2026-07-25,第二版watchlist批量回测(默认参数)
-ICF,rejected,Confluence,4h,-0.41,30.0,2026-07-25,第二版watchlist批量回测(默认参数)
-VT,rejected,RSI2,4h,-0.417,31.0,2026-07-25,第二版watchlist批量回测(默认参数)
-XSMO,rejected,Confluence,1h,-0.44,101.0,2026-07-25,第二版watchlist批量回测(默认参数)
-CIK,rejected,Confluence,4h,-0.45,30.0,2026-07-25,第二版watchlist批量回测(默认参数)
-UBER,rejected,Confluence,1h,-0.45,133.0,2026-07-25,第二版watchlist批量回测(默认参数)
-SPXU,rejected,Confluence,4h,-0.45,17.0,2026-07-25,第二版watchlist批量回测(默认参数)
-ADBE,rejected,Confluence,4h,-0.46,39.0,2026-07-25,第二版watchlist批量回测(默认参数)
-SCHD,rejected,RSI2,1h,-0.462,89.0,2026-07-25,第二版watchlist批量回测(默认参数)
-NAT,rejected,RSI2,4h,-0.466,24.0,2026-07-25,第二版watchlist批量回测(默认参数)
-TLT,rejected,Confluence,4h,-0.48,38.0,2026-07-25,第二版watchlist批量回测(默认参数)
-VWO,rejected,RSI2,4h,-0.496,30.0,2026-07-25,第二版watchlist批量回测(默认参数)
-RSP,rejected,RSI2,1h,-0.499,85.0,2026-07-25,第二版watchlist批量回测(默认参数)
-CRM,rejected,RSI2,1h,-0.524,105.0,2026-07-25,第二版watchlist批量回测(默认参数)
-SPYM,rejected,Confluence,4h,-0.53,4.0,2026-07-25,第二版watchlist批量回测(默认参数)
-WR,rejected,Confluence,1d,-0.54,4.0,2026-07-25,第二版watchlist批量回测(默认参数)
-OILU,rejected,Confluence,1d,-0.54,31.0,2026-07-25,第二版watchlist批量回测(默认参数)
-DGRO,rejected,RSI2,1h,-0.548,99.0,2026-07-25,第二版watchlist批量回测(默认参数)
-NAT,rejected,Confluence,1h,-0.55,105.0,2026-07-25,第二版watchlist批量回测(默认参数)
-VPL,rejected,Confluence,4h,-0.57,33.0,2026-07-25,第二版watchlist批量回测(默认参数)
-RW,rejected,Confluence,4h,-0.58,5.0,2026-07-25,第二版watchlist批量回测(默认参数)
-VPL,rejected,RSI2,1h,-0.592,117.0,2026-07-25,第二版watchlist批量回测(默认参数)
-REM,rejected,RSI2,1h,-0.6,89.0,2026-07-25,第二版watchlist批量回测(默认参数)
-AVUV,rejected,Confluence,1h,-0.61,114.0,2026-07-25,第二版watchlist批量回测(默认参数)
-AOK,rejected,Confluence,4h,-0.61,28.0,2026-07-25,第二版watchlist批量回测(默认参数)
-BND,rejected,Confluence,4h,-0.63,31.0,2026-07-25,第二版watchlist批量回测(默认参数)
-HVAC,rejected,RSI2,1h,-0.633,36.0,2026-07-25,第二版watchlist批量回测(默认参数)
-HYMB,rejected,Confluence,4h,-0.64,29.0,2026-07-25,第二版watchlist批量回测(默认参数)
-MLPI,rejected,Confluence,1d,-0.64,3.0,2026-07-25,第二版watchlist批量回测(默认参数)
-USAR,rejected,Confluence,1d,-0.65,31.0,2026-07-25,第二版watchlist批量回测(默认参数)
-REXC,rejected,Confluence,1h,-0.65,13.0,2026-07-25,第二版watchlist批量回测(默认参数)
-OMAH,rejected,Confluence,1d,-0.65,12.0,2026-07-25,第二版watchlist批量回测(默认参数)
-REM,rejected,RSI2,4h,-0.667,16.0,2026-07-25,第二版watchlist批量回测(默认参数)
-VYM,rejected,RSI2,1h,-0.679,93.0,2026-07-25,第二版watchlist批量回测(默认参数)
-VXUS,rejected,RSI2,1h,-0.699,96.0,2026-07-25,第二版watchlist批量回测(默认参数)
-AVGE,rejected,RSI2,1h,-0.71,112.0,2026-07-25,第二版watchlist批量回测(默认参数)
-OMAH,rejected,Confluence,4h,-0.72,10.0,2026-07-25,第二版watchlist批量回测(默认参数)
-LVHI,rejected,RSI2,1h,-0.739,85.0,2026-07-25,第二版watchlist批量回测(默认参数)
-BLK,rejected,RSI2,4h,-0.747,33.0,2026-07-25,第二版watchlist批量回测(默认参数)
-RTH,rejected,Confluence,4h,-0.8,25.0,2026-07-25,第二版watchlist批量回测(默认参数)
-PEP,rejected,Confluence,1h,-0.82,98.0,2026-07-25,第二版watchlist批量回测(默认参数)
-PKW,rejected,Confluence,1h,-0.82,92.0,2026-07-25,第二版watchlist批量回测(默认参数)
-VWO,rejected,RSI2,1h,-0.851,101.0,2026-07-25,第二版watchlist批量回测(默认参数)
-AVGV,rejected,RSI2,1h,-0.851,85.0,2026-07-25,第二版watchlist批量回测(默认参数)
-FXAIX,rejected,RSI2,4h,-0.869,17.0,2026-07-25,第二版watchlist批量回测(默认参数)
-AVIV,rejected,RSI2,1h,-0.883,114.0,2026-07-25,第二版watchlist批量回测(默认参数)
-VTSAX,rejected,RSI2,4h,-0.9,16.0,2026-07-25,第二版watchlist批量回测(默认参数)
-AVDV,rejected,RSI2,1h,-0.957,93.0,2026-07-25,第二版watchlist批量回测(默认参数)
-VTEB,rejected,RSI2,1h,-0.976,54.0,2026-07-25,第二版watchlist批量回测(默认参数)
-REXC,rejected,Confluence,4h,-1.0,2.0,2026-07-25,第二版watchlist批量回测(默认参数)
-JEPQ,rejected,Confluence,1h,-1.02,117.0,2026-07-25,第二版watchlist批量回测(默认参数)
-AOR,rejected,Confluence,4h,-1.02,31.0,2026-07-25,第二版watchlist批量回测(默认参数)
-VCR,rejected,RSI2,1h,-1.021,105.0,2026-07-25,第二版watchlist批量回测(默认参数)
-SPYM,rejected,Confluence,1h,-1.03,12.0,2026-07-25,第二版watchlist批量回测(默认参数)
-HYMB,rejected,RSI2,1h,-1.036,52.0,2026-07-25,第二版watchlist批量回测(默认参数)
-FBND,rejected,RSI2,1h,-1.037,46.0,2026-07-25,第二版watchlist批量回测(默认参数)
-AOA,rejected,RSI2,1h,-1.048,78.0,2026-07-25,第二版watchlist批量回测(默认参数)
-AOK,rejected,RSI2,1h,-1.048,55.0,2026-07-25,第二版watchlist批量回测(默认参数)
-VYMI,rejected,RSI2,1h,-1.087,91.0,2026-07-25,第二版watchlist批量回测(默认参数)
-BND,rejected,RSI2,1h,-1.195,54.0,2026-07-25,第二版watchlist批量回测(默认参数)
-QQQX,rejected,RSI2,1h,-1.252,106.0,2026-07-25,第二版watchlist批量回测(默认参数)
-AOR,rejected,RSI2,1h,-1.335,80.0,2026-07-25,第二版watchlist批量回测(默认参数)
-PCYO,rejected,RSI2,1h,-1.366,78.0,2026-07-25,第二版watchlist批量回测(默认参数)
-VTEB,rejected,Confluence,4h,-1.39,40.0,2026-07-25,第二版watchlist批量回测(默认参数)
-FBND,rejected,Confluence,4h,-1.45,29.0,2026-07-25,第二版watchlist批量回测(默认参数)
-RW,rejected,Confluence,1h,-1.52,10.0,2026-07-25,第二版watchlist批量回测(默认参数)
-FLCA,rejected,RSI2,1h,-1.543,108.0,2026-07-25,第二版watchlist批量回测(默认参数)
-MLPI,rejected,Confluence,1h,-1.65,20.0,2026-07-25,第二版watchlist批量回测(默认参数)
-JEPI,rejected,RSI2,1h,-1.762,70.0,2026-07-25,第二版watchlist批量回测(默认参数)
-MLPI,rejected,Confluence,4h,-1.87,4.0,2026-07-25,第二版watchlist批量回测(默认参数)
-DRAM,rejected,Confluence,4h,-2.06,8.0,2026-07-25,第二版watchlist批量回测(默认参数)
-OMAH,rejected,RSI2,1h,-2.282,24.0,2026-07-25,第二版watchlist批量回测(默认参数)
-SGOV,rejected,RSI2,1h,-2.984,37.0,2026-07-25,第二版watchlist批量回测(默认参数)
-XHLF,rejected,RSI2,1h,-3.124,40.0,2026-07-25,第二版watchlist批量回测(默认参数)
-VBIL,rejected,RSI2,1h,-3.305,25.0,2026-07-25,第二版watchlist批量回测(默认参数)
-XHLF,rejected,Confluence,4h,-6.08,68.0,2026-07-25,第二版watchlist批量回测(默认参数)
-SGOV,rejected,Confluence,4h,-6.71,79.0,2026-07-25,第二版watchlist批量回测(默认参数)
-VBIL,rejected,Confluence,4h,-6.88,37.0,2026-07-25,第二版watchlist批量回测(默认参数)
-COIN,rejected,RSI2,1d,0.275,17.0,2026-07-25,用户追问补跑(HOOD/EU/XYZ/COIN/DELL)
-COIN,rejected,RSI2,1h,0.211,104.0,2026-07-25,用户追问补跑(HOOD/EU/XYZ/COIN/DELL)
-COIN,rejected,RSI2,4h,0.032,27.0,2026-07-25,用户追问补跑(HOOD/EU/XYZ/COIN/DELL)
-DELL,rejected,RSI2,1d,0.48,19.0,2026-07-25,用户追问补跑(HOOD/EU/XYZ/COIN/DELL)
-DELL,promoted,Confluence,1h,0.83,70.0,2026-07-25,用户追问补跑(HOOD/EU/XYZ/COIN/DELL)
-DELL,promoted,RSI2,4h,0.853,38.0,2026-07-25,用户追问补跑(HOOD/EU/XYZ/COIN/DELL)
-EU,rejected,Breakout,1d,0.127,12.0,2026-07-25,用户追问补跑(HOOD/EU/XYZ/COIN/DELL)
-EU,rejected,Confluence,1h,-0.55,106.0,2026-07-25,用户追问补跑(HOOD/EU/XYZ/COIN/DELL)
-EU,rejected,Confluence,4h,-0.31,43.0,2026-07-25,用户追问补跑(HOOD/EU/XYZ/COIN/DELL)
-HOOD,rejected,Breakout,1d,0.845,12.0,2026-07-25,用户追问补跑(HOOD/EU/XYZ/COIN/DELL)
-HOOD,promoted,RSI2,1h,1.108,142.0,2026-07-25,用户追问补跑(HOOD/EU/XYZ/COIN/DELL)
-HOOD,promoted,RSI2,4h,0.644,51.0,2026-07-25,用户追问补跑(HOOD/EU/XYZ/COIN/DELL)
-XYZ,rejected,Breakout,1d,0.557,22.0,2026-07-25,用户追问补跑(HOOD/EU/XYZ/COIN/DELL)
-XYZ,rejected,Confluence,4h,-1.02,14.0,2026-07-25,用户追问补跑(HOOD/EU/XYZ/COIN/DELL)
-AAOI,rejected,MR,1h,-0.015,24.0,2026-07-25,MR均值回归补测(对未达标标的)
-ABT,rejected,MR,1d,0.233,15.0,2026-07-25,MR均值回归补测(对未达标标的)
-ADBE,rejected,MR,1d,0.378,15.0,2026-07-25,MR均值回归补测(对未达标标的)
-AOA,rejected,MR,1d,0.324,20.0,2026-07-25,MR均值回归补测(对未达标标的)
-AOA,rejected,MR,1h,-0.527,32.0,2026-07-25,MR均值回归补测(对未达标标的)
-AOK,rejected,MR,1d,0.334,16.0,2026-07-25,MR均值回归补测(对未达标标的)
-AOK,rejected,MR,1h,-0.405,33.0,2026-07-25,MR均值回归补测(对未达标标的)
-AOR,rejected,MR,1d,0.236,22.0,2026-07-25,MR均值回归补测(对未达标标的)
-AOR,rejected,MR,1h,-0.781,36.0,2026-07-25,MR均值回归补测(对未达标标的)
-APO,rejected,MR,1h,-0.54,17.0,2026-07-25,MR均值回归补测(对未达标标的)
-ASML,rejected,MR,1d,0.468,17.0,2026-07-25,MR均值回归补测(对未达标标的)
-ASML,rejected,MR,1h,0.292,22.0,2026-07-25,MR均值回归补测(对未达标标的)
-ASTS,rejected,MR,1h,-0.329,18.0,2026-07-25,MR均值回归补测(对未达标标的)
-AVDV,rejected,MR,1d,0.197,17.0,2026-07-25,MR均值回归补测(对未达标标的)
-AVDV,rejected,MR,1h,-0.717,27.0,2026-07-25,MR均值回归补测(对未达标标的)
-AVGE,rejected,MR,1h,-0.061,34.0,2026-07-25,MR均值回归补测(对未达标标的)
-AVGO,rejected,MR,1d,0.103,23.0,2026-07-25,MR均值回归补测(对未达标标的)
-AVGO,rejected,MR,1h,0.792,22.0,2026-07-25,MR均值回归补测(对未达标标的)
-AVGV,rejected,MR,1h,-0.767,30.0,2026-07-25,MR均值回归补测(对未达标标的)
-AVIV,rejected,MR,1h,-0.023,26.0,2026-07-25,MR均值回归补测(对未达标标的)
-AVNM,rejected,MR,1h,-0.354,20.0,2026-07-25,MR均值回归补测(对未达标标的)
-AVUV,rejected,MR,1h,-0.466,32.0,2026-07-25,MR均值回归补测(对未达标标的)
-BLK,rejected,MR,1d,0.083,15.0,2026-07-25,MR均值回归补测(对未达标标的)
-BLK,rejected,MR,1h,0.345,26.0,2026-07-25,MR均值回归补测(对未达标标的)
-BRK-B,rejected,MR,1d,0.168,17.0,2026-07-25,MR均值回归补测(对未达标标的)
-BRK-B,rejected,MR,1h,0.674,28.0,2026-07-25,MR均值回归补测(对未达标标的)
-CCJ,rejected,MR,1d,0.043,20.0,2026-07-25,MR均值回归补测(对未达标标的)
-CCJ,rejected,MR,1h,-0.3,16.0,2026-07-25,MR均值回归补测(对未达标标的)
-CIK,rejected,MR,1h,-0.444,16.0,2026-07-25,MR均值回归补测(对未达标标的)
-COIN,rejected,MR,1h,-0.618,19.0,2026-07-25,MR均值回归补测(对未达标标的)
-CRM,rejected,MR,1h,-1.089,15.0,2026-07-25,MR均值回归补测(对未达标标的)
-CSGP,rejected,MR,1d,-0.402,15.0,2026-07-25,MR均值回归补测(对未达标标的)
-CSGP,rejected,MR,1h,-0.222,19.0,2026-07-25,MR均值回归补测(对未达标标的)
-CVX,rejected,MR,1h,-0.008,16.0,2026-07-25,MR均值回归补测(对未达标标的)
-DIS,rejected,MR,1h,0.108,23.0,2026-07-25,MR均值回归补测(对未达标标的)
-DPZ,rejected,MR,1h,-0.749,25.0,2026-07-25,MR均值回归补测(对未达标标的)
-EBAY,rejected,MR,1d,0.344,15.0,2026-07-25,MR均值回归补测(对未达标标的)
-EBAY,rejected,MR,1h,-0.895,22.0,2026-07-25,MR均值回归补测(对未达标标的)
-EU,rejected,MR,1h,-0.621,17.0,2026-07-25,MR均值回归补测(对未达标标的)
-FDVV,rejected,MR,1d,0.611,23.0,2026-07-25,MR均值回归补测(对未达标标的)
-FDVV,promoted,MR,1h,0.619,38.0,2026-07-25,MR均值回归补测(对未达标标的)
-FLCA,rejected,MR,1d,0.208,17.0,2026-07-25,MR均值回归补测(对未达标标的)
-FLCA,rejected,MR,1h,-0.511,31.0,2026-07-25,MR均值回归补测(对未达标标的)
-FOF,rejected,MR,1h,-0.603,21.0,2026-07-25,MR均值回归补测(对未达标标的)
-FYC,rejected,MR,1d,0.424,19.0,2026-07-25,MR均值回归补测(对未达标标的)
-FYC,rejected,MR,1h,-0.41,37.0,2026-07-25,MR均值回归补测(对未达标标的)
-GS,rejected,MR,1h,1.001,24.0,2026-07-25,MR均值回归补测(对未达标标的)
-IBBQ,rejected,MR,1h,-0.051,31.0,2026-07-25,MR均值回归补测(对未达标标的)
-ICF,rejected,MR,1h,-0.392,25.0,2026-07-25,MR均值回归补测(对未达标标的)
-IJR,rejected,MR,1d,0.404,20.0,2026-07-25,MR均值回归补测(对未达标标的)
-IJR,rejected,MR,1h,-0.669,22.0,2026-07-25,MR均值回归补测(对未达标标的)
-IMAX,rejected,MR,1h,-0.174,22.0,2026-07-25,MR均值回归补测(对未达标标的)
-JEPI,rejected,MR,1h,0.209,25.0,2026-07-25,MR均值回归补测(对未达标标的)
-JEPQ,rejected,MR,1h,-1.296,23.0,2026-07-25,MR均值回归补测(对未达标标的)
-MGA,rejected,MR,1h,0.133,22.0,2026-07-25,MR均值回归补测(对未达标标的)
-MO,rejected,MR,1h,-0.906,20.0,2026-07-25,MR均值回归补测(对未达标标的)
-NAT,rejected,MR,1h,0.345,19.0,2026-07-25,MR均值回归补测(对未达标标的)
-NFLX,rejected,MR,1d,0.59,15.0,2026-07-25,MR均值回归补测(对未达标标的)
-NFLX,rejected,MR,1h,0.093,21.0,2026-07-25,MR均值回归补测(对未达标标的)
-NOK,rejected,MR,1h,0.739,21.0,2026-07-25,MR均值回归补测(对未达标标的)
-NVO,rejected,MR,1h,0.474,19.0,2026-07-25,MR均值回归补测(对未达标标的)
-ONTO,rejected,MR,1h,-0.614,18.0,2026-07-25,MR均值回归补测(对未达标标的)
-PCYO,rejected,MR,1h,-0.153,18.0,2026-07-25,MR均值回归补测(对未达标标的)
-PEP,rejected,MR,1d,-0.158,18.0,2026-07-25,MR均值回归补测(对未达标标的)
-PL,rejected,MR,1h,0.778,21.0,2026-07-25,MR均值回归补测(对未达标标的)
-PTMC,rejected,MR,1d,0.376,17.0,2026-07-25,MR均值回归补测(对未达标标的)
-PTMC,rejected,MR,1h,-0.808,27.0,2026-07-25,MR均值回归补测(对未达标标的)
-QQQM,rejected,MR,1h,0.818,27.0,2026-07-25,MR均值回归补测(对未达标标的)
-QQQX,rejected,MR,1d,0.409,16.0,2026-07-25,MR均值回归补测(对未达标标的)
-QQQX,rejected,MR,1h,-0.438,24.0,2026-07-25,MR均值回归补测(对未达标标的)
-RBC,rejected,MR,1d,0.501,22.0,2026-07-25,MR均值回归补测(对未达标标的)
-RBC,rejected,MR,1h,-0.127,24.0,2026-07-25,MR均值回归补测(对未达标标的)
-REM,rejected,MR,1h,-0.134,24.0,2026-07-25,MR均值回归补测(对未达标标的)
-RSP,rejected,MR,1d,0.328,25.0,2026-07-25,MR均值回归补测(对未达标标的)
-RSP,rejected,MR,1h,0.076,28.0,2026-07-25,MR均值回归补测(对未达标标的)
-RTH,rejected,MR,1d,0.262,17.0,2026-07-25,MR均值回归补测(对未达标标的)
-RTH,rejected,MR,1h,0.039,27.0,2026-07-25,MR均值回归补测(对未达标标的)
-SAP,rejected,MR,1d,0.006,17.0,2026-07-25,MR均值回归补测(对未达标标的)
-SAP,rejected,MR,1h,-1.125,19.0,2026-07-25,MR均值回归补测(对未达标标的)
-SCHD,rejected,MR,1d,-0.016,16.0,2026-07-25,MR均值回归补测(对未达标标的)
-SCHD,rejected,MR,1h,-0.893,25.0,2026-07-25,MR均值回归补测(对未达标标的)
-SCHG,rejected,MR,1d,0.555,19.0,2026-07-25,MR均值回归补测(对未达标标的)
-SCHG,rejected,MR,1h,-0.135,29.0,2026-07-25,MR均值回归补测(对未达标标的)
-SCHW,rejected,MR,1d,0.052,17.0,2026-07-25,MR均值回归补测(对未达标标的)
-SCHW,rejected,MR,1h,0.246,21.0,2026-07-25,MR均值回归补测(对未达标标的)
-SKM,rejected,MR,1d,0.248,17.0,2026-07-25,MR均值回归补测(对未达标标的)
-SMCI,rejected,MR,1d,-0.023,15.0,2026-07-25,MR均值回归补测(对未达标标的)
-SMCI,rejected,MR,1h,0.482,24.0,2026-07-25,MR均值回归补测(对未达标标的)
-SO,rejected,MR,1d,0.45,16.0,2026-07-25,MR均值回归补测(对未达标标的)
-SO,rejected,MR,1h,0.268,24.0,2026-07-25,MR均值回归补测(对未达标标的)
-SPYI,rejected,MR,1h,-0.536,21.0,2026-07-25,MR均值回归补测(对未达标标的)
-TMC,rejected,MR,1h,-1.084,15.0,2026-07-25,MR均值回归补测(对未达标标的)
-TSM,promoted,MR,1h,1.281,31.0,2026-07-25,MR均值回归补测(对未达标标的)
-UBER,rejected,MR,1h,-0.612,21.0,2026-07-25,MR均值回归补测(对未达标标的)
-USO,rejected,MR,1h,0.262,17.0,2026-07-25,MR均值回归补测(对未达标标的)
-VB,rejected,MR,1d,0.339,22.0,2026-07-25,MR均值回归补测(对未达标标的)
-VB,rejected,MR,1h,-0.382,29.0,2026-07-25,MR均值回归补测(对未达标标的)
-VCR,rejected,MR,1d,0.398,19.0,2026-07-25,MR均值回归补测(对未达标标的)
-VCR,rejected,MR,1h,0.278,26.0,2026-07-25,MR均值回归补测(对未达标标的)
-VEU,rejected,MR,1d,0.429,23.0,2026-07-25,MR均值回归补测(对未达标标的)
-VEU,rejected,MR,1h,0.371,30.0,2026-07-25,MR均值回归补测(对未达标标的)
-VGK,rejected,MR,1d,0.529,22.0,2026-07-25,MR均值回归补测(对未达标标的)
-VGK,rejected,MR,1h,-0.49,24.0,2026-07-25,MR均值回归补测(对未达标标的)
-VO,rejected,MR,1d,0.416,21.0,2026-07-25,MR均值回归补测(对未达标标的)
-VO,rejected,MR,1h,-0.695,31.0,2026-07-25,MR均值回归补测(对未达标标的)
-VPL,rejected,MR,1d,0.79,16.0,2026-07-25,MR均值回归补测(对未达标标的)
-VPL,rejected,MR,1h,-0.427,25.0,2026-07-25,MR均值回归补测(对未达标标的)
-VT,rejected,MR,1d,0.56,23.0,2026-07-25,MR均值回归补测(对未达标标的)
-VT,rejected,MR,1h,-0.522,34.0,2026-07-25,MR均值回归补测(对未达标标的)
-VUG,rejected,MR,1d,0.74,20.0,2026-07-25,MR均值回归补测(对未达标标的)
-VUG,rejected,MR,1h,0.189,25.0,2026-07-25,MR均值回归补测(对未达标标的)
-VWO,rejected,MR,1d,-0.098,22.0,2026-07-25,MR均值回归补测(对未达标标的)
-VWO,rejected,MR,1h,-0.218,19.0,2026-07-25,MR均值回归补测(对未达标标的)
-VXUS,rejected,MR,1d,0.577,22.0,2026-07-25,MR均值回归补测(对未达标标的)
-VXUS,rejected,MR,1h,0.278,30.0,2026-07-25,MR均值回归补测(对未达标标的)
-VYM,rejected,MR,1d,0.341,20.0,2026-07-25,MR均值回归补测(对未达标标的)
-VYM,rejected,MR,1h,-0.899,31.0,2026-07-25,MR均值回归补测(对未达标标的)
-VYMI,rejected,MR,1d,0.394,24.0,2026-07-25,MR均值回归补测(对未达标标的)
-VYMI,rejected,MR,1h,-0.502,21.0,2026-07-25,MR均值回归补测(对未达标标的)
-XSMO,rejected,MR,1d,0.493,21.0,2026-07-25,MR均值回归补测(对未达标标的)
-XSMO,rejected,MR,1h,-0.185,29.0,2026-07-25,MR均值回归补测(对未达标标的)
-YOU,rejected,MR,1h,-0.109,24.0,2026-07-25,MR均值回归补测(对未达标标的)
-ZH,rejected,MR,1h,-0.315,19.0,2026-07-25,MR均值回归补测(对未达标标的)
-BSP,insufficient_data,,,,,2026-07-25,近期新上市，1d仅16-28行，暂缓
-RAM,insufficient_data,,,,,2026-07-25,近期新上市，1d仅16-28行，暂缓
-SPCX,promoted_unvalidated,,,,,2026-07-25,"近期新上市，1d仅16-28行，暂缓 -> 2026-07-25用户明确要求接入实盘扫描(默认confluence,未经回测验证)"
-ABBN,non_us_or_invalid,,,,,2026-07-25,瑞士ABBN.SW
-AVG,non_us_or_invalid,,,,,2026-07-25,澳洲AVG.AX
-CBE,non_us_or_invalid,,,,,2026-07-25,澳洲CBE.AX
-CESG,non_us_or_invalid,,,,,2026-07-25,伦敦CESG.L
-CVD,non_us_or_invalid,,,,,2026-07-25,加拿大CVD.TO
-DHHF,non_us_or_invalid,,,,,2026-07-25,澳洲DHHF.AX
-HHIS,non_us_or_invalid,,,,,2026-07-25,加拿大HHIS.TO
-HULC,non_us_or_invalid,,,,,2026-07-25,加拿大HULC.TO
-MSTE,non_us_or_invalid,,,,,2026-07-25,加拿大MSTE.TO
-MQG,non_us_or_invalid,,,,,2026-07-25,澳洲MQG.AX
-PRL,non_us_or_invalid,,,,,2026-07-25,加拿大PRL.TO
-TTM,non_us_or_invalid,,,,,2026-07-25,澳洲TTM.AX
-VDHG,non_us_or_invalid,,,,,2026-07-25,澳洲VDHG.AX
-VEQT,non_us_or_invalid,,,,,2026-07-25,加拿大VEQT.TO
-VOW,non_us_or_invalid,,,,,2026-07-25,德国VOW.DE
-VWRA,non_us_or_invalid,,,,,2026-07-25,瑞士VWRA.SW
-XEQT,non_us_or_invalid,,,,,2026-07-25,加拿大XEQT.TO
-DLA,non_us_or_invalid,,,,,2026-07-25,任何后缀均无法解析
-HFC,non_us_or_invalid,,,,,2026-07-25,任何后缀均无法解析
-INVEST,non_us_or_invalid,,,,,2026-07-25,任何后缀均无法解析
-KPK,non_us_or_invalid,,,,,2026-07-25,任何后缀均无法解析
-BRK,non_us_or_invalid,,,,,2026-07-25,已修正为BRK-B
-AGI,rejected,Breakout,1d,0.015,20.0,2026-07-25,第四版watchlist(293个代码)批量回测
-AGI,rejected,Confluence,1h,0.41,129.0,2026-07-25,第四版watchlist(293个代码)批量回测
-AGI,promoted,RSI2,4h,0.856,37.0,2026-07-25,第四版watchlist(293个代码)批量回测
-ALL,rejected,Breakout,1d,-0.012,33.0,2026-07-25,第四版watchlist(293个代码)批量回测
-AM,rejected,Confluence,1d,0.23,49.0,2026-07-25,第四版watchlist(293个代码)批量回测
-API,rejected,Confluence,1d,0.28,51.0,2026-07-25,第四版watchlist(293个代码)批量回测
-API,rejected,RSI2,1h,0.208,112.0,2026-07-25,第四版watchlist(293个代码)批量回测
-API,rejected,Confluence,4h,-0.27,36.0,2026-07-25,第四版watchlist(293个代码)批量回测
-APLD,rejected,MR,1h,0.5,21.0,2026-07-25,第四版watchlist(293个代码)批量回测
-BA,rejected,Breakout,1d,0.24,22.0,2026-07-25,第四版watchlist(293个代码)批量回测
-BA,rejected,MR,1h,-0.2,15.0,2026-07-25,第四版watchlist(293个代码)批量回测
-BAC,rejected,Breakout,1d,0.742,24.0,2026-07-25,第四版watchlist(293个代码)批量回测
-BAC,promoted,RSI2,1h,0.782,116.0,2026-07-25,第四版watchlist(293个代码)批量回测
-BAC,rejected,Confluence,4h,-0.48,45.0,2026-07-25,第四版watchlist(293个代码)批量回测
-BATL,rejected,Confluence,1d,-0.57,34.0,2026-07-25,第四版watchlist(293个代码)批量回测
-BATL,rejected,RSI2,1h,0.117,55.0,2026-07-25,第四版watchlist(293个代码)批量回测
-BATL,rejected,RSI2,4h,-0.168,15.0,2026-07-25,第四版watchlist(293个代码)批量回测
-BBW,rejected,MR,1h,0.485,21.0,2026-07-25,第四版watchlist(293个代码)批量回测
-BE,rejected,Breakout,1d,0.512,13.0,2026-07-25,第四版watchlist(293个代码)批量回测
-BE,rejected,RSI2,1h,0.598,122.0,2026-07-25,第四版watchlist(293个代码)批量回测
-BE,promoted,RSI2,4h,0.698,41.0,2026-07-25,第四版watchlist(293个代码)批量回测
-CBUS,rejected,Confluence,1d,0.28,67.0,2026-07-25,第四版watchlist(293个代码)批量回测
-CBUS,promoted,Confluence,1h,0.79,110.0,2026-07-25,第四版watchlist(293个代码)批量回测
-CBUS,rejected,Confluence,4h,0.13,38.0,2026-07-25,第四版watchlist(293个代码)批量回测
-CC,rejected,Breakout,1d,0.073,19.0,2026-07-25,第四版watchlist(293个代码)批量回测
-CC,rejected,Confluence,1h,-0.34,126.0,2026-07-25,第四版watchlist(293个代码)批量回测
-CC,rejected,RSI2,4h,-0.016,18.0,2026-07-25,第四版watchlist(293个代码)批量回测
-CCB,rejected,Breakout,1d,0.411,11.0,2026-07-25,第四版watchlist(293个代码)批量回测
-CCB,rejected,MR,1h,0.654,29.0,2026-07-25,第四版watchlist(293个代码)批量回测
-CCB,promoted,RSI2,4h,0.622,38.0,2026-07-25,第四版watchlist(293个代码)批量回测
-CLX,rejected,Confluence,1d,-0.03,57.0,2026-07-25,第四版watchlist(293个代码)批量回测
-CLX,rejected,RSI2,1h,-0.871,67.0,2026-07-25,第四版watchlist(293个代码)批量回测
-CLX,rejected,Confluence,4h,0.31,45.0,2026-07-25,第四版watchlist(293个代码)批量回测
-CRCL,rejected,Confluence,1d,0.44,9.0,2026-07-25,第四版watchlist(293个代码)批量回测
-CRCL,promoted,Confluence,1h,0.92,40.0,2026-07-25,第四版watchlist(293个代码)批量回测
-CRCL,rejected,Confluence,4h,-1.24,9.0,2026-07-25,第四版watchlist(293个代码)批量回测
-CRML,rejected,Confluence,1d,0.64,28.0,2026-07-25,第四版watchlist(293个代码)批量回测
-CRML,rejected,RSI2,1h,-0.307,78.0,2026-07-25,第四版watchlist(293个代码)批量回测
-CRML,rejected,Confluence,4h,0.57,30.0,2026-07-25,第四版watchlist(293个代码)批量回测
-CRSP,rejected,Breakout,1d,0.172,13.0,2026-07-25,第四版watchlist(293个代码)批量回测
-CRWV,rejected,Confluence,1d,-1.27,14.0,2026-07-25,第四版watchlist(293个代码)批量回测
-CRWV,promoted,Confluence,1h,1.21,73.0,2026-07-25,第四版watchlist(293个代码)批量回测
-CRWV,rejected,Confluence,4h,0.1,21.0,2026-07-25,第四版watchlist(293个代码)批量回测
-ES,rejected,Breakout,1d,-0.061,20.0,2026-07-25,第四版watchlist(293个代码)批量回测
-ES,rejected,MR,1h,-0.264,28.0,2026-07-25,第四版watchlist(293个代码)批量回测
-ES,rejected,RSI2,4h,0.153,34.0,2026-07-25,第四版watchlist(293个代码)批量回测
-FCF,rejected,Confluence,1d,0.09,48.0,2026-07-25,第四版watchlist(293个代码)批量回测
-FCF,rejected,MR,1h,-0.184,23.0,2026-07-25,第四版watchlist(293个代码)批量回测
-FCF,rejected,RSI2,4h,0.092,28.0,2026-07-25,第四版watchlist(293个代码)批量回测
-FOX,rejected,Breakout,1d,0.489,11.0,2026-07-25,第四版watchlist(293个代码)批量回测
-FOX,rejected,MR,1h,-0.162,27.0,2026-07-25,第四版watchlist(293个代码)批量回测
-FOX,promoted,RSI2,4h,0.91,40.0,2026-07-25,第四版watchlist(293个代码)批量回测
-GE,rejected,Breakout,1d,0.316,29.0,2026-07-25,第四版watchlist(293个代码)批量回测
-GE,rejected,RSI2,1h,0.349,131.0,2026-07-25,第四版watchlist(293个代码)批量回测
-GE,promoted,RSI2,4h,0.837,45.0,2026-07-25,第四版watchlist(293个代码)批量回测
-GEV,rejected,RSI2,1d,0.66,23.0,2026-07-25,第四版watchlist(293个代码)批量回测
-GFS,rejected,Confluence,1d,-0.67,31.0,2026-07-25,第四版watchlist(293个代码)批量回测
-GOOG,rejected,Confluence,1d,0.37,60.0,2026-07-25,第四版watchlist(293个代码)批量回测
-GOOG,rejected,Confluence,1h,-0.1,142.0,2026-07-25,第四版watchlist(293个代码)批量回测
-GOOG,promoted,RSI2,4h,0.875,46.0,2026-07-25,第四版watchlist(293个代码)批量回测
-HBM,rejected,Breakout,1d,0.398,19.0,2026-07-25,第四版watchlist(293个代码)批量回测
-IBIT,rejected,Confluence,1d,-0.98,16.0,2026-07-25,第四版watchlist(293个代码)批量回测
-INFQ,rejected,Confluence,1d,-1.47,3.0,2026-07-25,第四版watchlist(293个代码)批量回测
-INFQ,rejected,Confluence,1h,0.87,23.0,2026-07-25,第四版watchlist(293个代码)批量回测
-INFQ,rejected,Confluence,4h,-1.7,7.0,2026-07-25,第四版watchlist(293个代码)批量回测
-IP,rejected,Breakout,1d,-0.019,16.0,2026-07-25,第四版watchlist(293个代码)批量回测
-IP,rejected,Confluence,1h,-0.1,127.0,2026-07-25,第四版watchlist(293个代码)批量回测
-IP,rejected,RSI2,4h,-0.638,28.0,2026-07-25,第四版watchlist(293个代码)批量回测
-ISRG,rejected,Breakout,1d,0.108,36.0,2026-07-25,第四版watchlist(293个代码)批量回测
-ISRG,rejected,RSI2,1h,0.059,88.0,2026-07-25,第四版watchlist(293个代码)批量回测
-ISRG,rejected,RSI2,4h,-0.456,33.0,2026-07-25,第四版watchlist(293个代码)批量回测
-IT,rejected,MR,1d,0.182,17.0,2026-07-25,第四版watchlist(293个代码)批量回测
-IT,rejected,RSI2,1h,-0.264,76.0,2026-07-25,第四版watchlist(293个代码)批量回测
-IT,rejected,Confluence,4h,0.32,40.0,2026-07-25,第四版watchlist(293个代码)批量回测
-KO,rejected,MR,1d,0.185,21.0,2026-07-25,第四版watchlist(293个代码)批量回测
-KO,rejected,MR,1h,0.347,22.0,2026-07-25,第四版watchlist(293个代码)批量回测
-LINK,rejected,RSI2,1d,-0.422,18.0,2026-07-25,第四版watchlist(293个代码)批量回测
-LINK,rejected,Confluence,1h,-0.15,58.0,2026-07-25,第四版watchlist(293个代码)批量回测
-LINK,rejected,RSI2,4h,0.342,25.0,2026-07-25,第四版watchlist(293个代码)批量回测
-LLY,rejected,Breakout,1d,0.594,34.0,2026-07-25,第四版watchlist(293个代码)批量回测
-LLY,rejected,MR,1h,0.487,17.0,2026-07-25,第四版watchlist(293个代码)批量回测
-LLY,rejected,RSI2,4h,0.258,40.0,2026-07-25,第四版watchlist(293个代码)批量回测
-LMT,rejected,Breakout,1d,0.604,23.0,2026-07-25,第四版watchlist(293个代码)批量回测
-LMT,promoted,Confluence,1h,0.77,116.0,2026-07-25,第四版watchlist(293个代码)批量回测
-LMT,rejected,RSI2,4h,1.044,25.0,2026-07-25,第四版watchlist(293个代码)批量回测
-LSL,rejected,Confluence,1d,1.76,5.0,2026-07-25,第四版watchlist(293个代码)批量回测
-LTL,rejected,MR,1d,0.275,21.0,2026-07-25,第四版watchlist(293个代码)批量回测
-LTL,promoted,RSI2,1h,0.982,73.0,2026-07-25,第四版watchlist(293个代码)批量回测
-LTL,rejected,RSI2,4h,-0.396,32.0,2026-07-25,第四版watchlist(293个代码)批量回测
-LULU,rejected,Breakout,1d,0.378,26.0,2026-07-25,第四版watchlist(293个代码)批量回测
-LULU,rejected,RSI2,1h,0.132,83.0,2026-07-25,第四版watchlist(293个代码)批量回测
-LULU,rejected,Confluence,4h,0.34,44.0,2026-07-25,第四版watchlist(293个代码)批量回测
-MINE,rejected,Confluence,1h,0.06,5.0,2026-07-25,第四版watchlist(293个代码)批量回测
-MKSI,rejected,Confluence,1d,0.25,72.0,2026-07-25,第四版watchlist(293个代码)批量回测
-MKSI,promoted,MR,1h,0.623,31.0,2026-07-25,第四版watchlist(293个代码)批量回测
-MKSI,rejected,RSI2,4h,0.503,52.0,2026-07-25,第四版watchlist(293个代码)批量回测
-MQ,rejected,Confluence,1d,0.17,26.0,2026-07-25,第四版watchlist(293个代码)批量回测
-MQ,rejected,MR,1h,-0.152,15.0,2026-07-25,第四版watchlist(293个代码)批量回测
-MQ,rejected,Confluence,4h,-1.11,27.0,2026-07-25,第四版watchlist(293个代码)批量回测
-MS,rejected,RSI2,1d,0.243,29.0,2026-07-25,第四版watchlist(293个代码)批量回测
-MS,rejected,RSI2,1h,0.58,115.0,2026-07-25,第四版watchlist(293个代码)批量回测
-MS,promoted,RSI2,4h,0.601,51.0,2026-07-25,第四版watchlist(293个代码)批量回测
-MSM,rejected,MR,1h,-0.39,18.0,2026-07-25,第四版watchlist(293个代码)批量回测
-MSTR,rejected,Breakout,1d,0.403,16.0,2026-07-25,第四版watchlist(293个代码)批量回测
-NGS,rejected,RSI2,1d,0.272,20.0,2026-07-25,第四版watchlist(293个代码)批量回测
-NGS,rejected,RSI2,1h,0.144,112.0,2026-07-25,第四版watchlist(293个代码)批量回测
-NGS,rejected,RSI2,4h,-0.253,41.0,2026-07-25,第四版watchlist(293个代码)批量回测
-NOEM,rejected,Confluence,1d,-0.85,15.0,2026-07-25,第四版watchlist(293个代码)批量回测
-NOEM,rejected,Confluence,1h,-0.05,1.0,2026-07-25,第四版watchlist(293个代码)批量回测
-NOEM,rejected,Confluence,4h,-0.54,2.0,2026-07-25,第四版watchlist(293个代码)批量回测
-NOW,rejected,MR,1d,0.145,17.0,2026-07-25,第四版watchlist(293个代码)批量回测
-NOW,rejected,MR,1h,-0.265,16.0,2026-07-25,第四版watchlist(293个代码)批量回测
-NOW,rejected,Confluence,4h,0.1,50.0,2026-07-25,第四版watchlist(293个代码)批量回测
-OC,rejected,Confluence,1d,0.07,59.0,2026-07-25,第四版watchlist(293个代码)批量回测
-OC,rejected,RSI2,1h,-0.251,115.0,2026-07-25,第四版watchlist(293个代码)批量回测
-OC,promoted,Confluence,4h,0.83,40.0,2026-07-25,第四版watchlist(293个代码)批量回测
-ONDS,promoted,Confluence,1h,0.88,131.0,2026-07-25,第四版watchlist(293个代码)批量回测
-ONDS,rejected,RSI2,4h,0.133,33.0,2026-07-25,第四版watchlist(293个代码)批量回测
-OSCR,rejected,Confluence,1d,-0.18,48.0,2026-07-25,第四版watchlist(293个代码)批量回测
-OSCR,rejected,RSI2,1h,0.572,106.0,2026-07-25,第四版watchlist(293个代码)批量回测
-OSCR,promoted,RSI2,4h,0.623,42.0,2026-07-25,第四版watchlist(293个代码)批量回测
-OUST,rejected,Confluence,1h,0.23,156.0,2026-07-25,第四版watchlist(293个代码)批量回测
-OUST,rejected,RSI2,4h,0.563,39.0,2026-07-25,第四版watchlist(293个代码)批量回测
-OXY,rejected,Confluence,1d,0.15,58.0,2026-07-25,第四版watchlist(293个代码)批量回测
-OXY,rejected,MR,1h,-0.87,19.0,2026-07-25,第四版watchlist(293个代码)批量回测
-OXY,rejected,Confluence,4h,-0.38,29.0,2026-07-25,第四版watchlist(293个代码)批量回测
-PB,rejected,Breakout,1d,-0.05,11.0,2026-07-25,第四版watchlist(293个代码)批量回测
-PG,rejected,MR,1d,0.264,21.0,2026-07-25,第四版watchlist(293个代码)批量回测
-PG,rejected,MR,1h,0.263,21.0,2026-07-25,第四版watchlist(293个代码)批量回测
-PG,rejected,RSI2,4h,-0.35,19.0,2026-07-25,第四版watchlist(293个代码)批量回测
-PINS,rejected,MR,1h,0.478,17.0,2026-07-25,第四版watchlist(293个代码)批量回测
-QCOM,rejected,MR,1h,0.537,21.0,2026-07-25,第四版watchlist(293个代码)批量回测
-RIVN,rejected,Confluence,1d,0.27,35.0,2026-07-25,第四版watchlist(293个代码)批量回测
-RIVN,rejected,RSI2,1h,-0.315,88.0,2026-07-25,第四版watchlist(293个代码)批量回测
-RIVN,rejected,RSI2,4h,-0.212,23.0,2026-07-25,第四版watchlist(293个代码)批量回测
-SGP,rejected,Confluence,1d,-0.63,2.0,2026-07-25,第四版watchlist(293个代码)批量回测
-SGP,rejected,Confluence,1h,-2.25,20.0,2026-07-25,第四版watchlist(293个代码)批量回测
-SGP,rejected,Confluence,4h,-0.36,4.0,2026-07-25,第四版watchlist(293个代码)批量回测
-SLS,rejected,RSI2,1d,0.156,20.0,2026-07-25,第四版watchlist(293个代码)批量回测
-SLS,rejected,MR,1h,0.473,19.0,2026-07-25,第四版watchlist(293个代码)批量回测
-SMA,rejected,Confluence,1d,-0.6,10.0,2026-07-25,第四版watchlist(293个代码)批量回测
-SMA,rejected,RSI2,1h,-2.376,38.0,2026-07-25,第四版watchlist(293个代码)批量回测
-SMA,rejected,Confluence,4h,-1.35,11.0,2026-07-25,第四版watchlist(293个代码)批量回测
-SMR,rejected,Confluence,1d,0.39,35.0,2026-07-25,第四版watchlist(293个代码)批量回测
-SMR,rejected_high_risk_dd,RSI2,1h,0.686,116.0,2026-07-25,最大回撤-95.12%风险过高，即使Sharpe达标也排除
-SMR,rejected_high_risk_dd,RSI2,4h,0.548,42.0,2026-07-25,最大回撤-52.69%风险过高，即使Sharpe达标也排除
-SPXC,rejected,MR,1d,0.482,15.0,2026-07-25,第四版watchlist(293个代码)批量回测
-STLA,rejected,Breakout,1d,0.545,22.0,2026-07-25,第四版watchlist(293个代码)批量回测
-TGS,rejected,Confluence,1d,-0.14,46.0,2026-07-25,第四版watchlist(293个代码)批量回测
-TGS,rejected,MR,1h,-0.159,24.0,2026-07-25,第四版watchlist(293个代码)批量回测
-TGS,rejected,RSI2,4h,0.249,38.0,2026-07-25,第四版watchlist(293个代码)批量回测
-UNH,rejected,MR,1d,0.23,15.0,2026-07-25,第四版watchlist(293个代码)批量回测
-UNH,rejected,MR,1h,1.401,17.0,2026-07-25,第四版watchlist(293个代码)批量回测
-UNH,rejected,Confluence,4h,0.06,48.0,2026-07-25,第四版watchlist(293个代码)批量回测
-VC,rejected,Breakout,1d,0.185,13.0,2026-07-25,第四版watchlist(293个代码)批量回测
-VC,rejected,MR,1h,0.217,20.0,2026-07-25,第四版watchlist(293个代码)批量回测
-WBD,rejected,Breakout,1d,0.514,10.0,2026-07-25,第四版watchlist(293个代码)批量回测
-WBD,promoted,RSI2,1h,0.969,81.0,2026-07-25,第四版watchlist(293个代码)批量回测
-WBD,promoted,RSI2,4h,0.796,32.0,2026-07-25,第四版watchlist(293个代码)批量回测
-WDC,rejected,Confluence,1d,0.56,85.0,2026-07-25,第四版watchlist(293个代码)批量回测
-WDC,promoted,RSI2,1h,1.276,141.0,2026-07-25,第四版watchlist(293个代码)批量回测
-WDC,promoted,RSI2,4h,1.01,47.0,2026-07-25,第四版watchlist(293个代码)批量回测
-WM,rejected,MR,1d,0.406,21.0,2026-07-25,第四版watchlist(293个代码)批量回测
-WM,rejected,RSI2,4h,-0.29,25.0,2026-07-25,第四版watchlist(293个代码)批量回测
-WMT,rejected,Breakout,1d,0.061,34.0,2026-07-25,第四版watchlist(293个代码)批量回测
-WMT,rejected,MR,1h,0.17,22.0,2026-07-25,第四版watchlist(293个代码)批量回测
-WMT,promoted,RSI2,4h,0.677,42.0,2026-07-25,第四版watchlist(293个代码)批量回测
-ZION,rejected,MR,1d,0.291,18.0,2026-07-25,第四版watchlist(293个代码)批量回测
-ZION,rejected,MR,1h,0.434,27.0,2026-07-25,第四版watchlist(293个代码)批量回测
-ACAC,no_data_unverified,,,,,2026-07-25,再次确认无数据(与第一版一致)
-FX,no_data_unverified,,,,,2026-07-25,再次确认无数据
-LTV,no_data_unverified,,,,,2026-07-25,再次确认无数据
-OS,no_data_unverified,,,,,2026-07-25,再次确认无数据
-RE,no_data_unverified,,,,,2026-07-25,再次确认无数据
-SMS,no_data_unverified,,,,,2026-07-25,再次确认无数据
-TITI,no_data_unverified,,,,,2026-07-25,再次确认无数据
-ETHU,insufficient_data,,,,,2026-07-25,仅1d数据(加密货币ETF，730天1h窗口不足)
-IBIT,insufficient_data,,,,,2026-07-25,仅1d数据(比特币ETF，730天1h窗口不足)
-GEV,insufficient_data,,,,,2026-07-25,仅1d数据(次新股)
-LSL,insufficient_data,,,,,2026-07-25,仅1d数据(次新股)
-RR,insufficient_data,,,,,2026-07-25,仅1d数据(次新股)
-BRK.B,duplicate_format,,,,,2026-07-25,与已处理的BRK-B同一标的，格式不同(点号vs连字符)
-CEG,rejected,MR,1h,-0.543,15.0,2026-07-25,MR补测缺口检查(已用其他策略达标接入，MR未能超越现有选择)
-CRWD,rejected,MR,1h,0.556,27.0,2026-07-25,MR补测缺口检查(已用其他策略达标接入，MR未能超越现有选择)
-DELL,rejected,MR,1h,-0.135,20.0,2026-07-25,MR补测缺口检查(已用其他策略达标接入，MR未能超越现有选择)
-DGRO,rejected,MR,1h,-0.078,31.0,2026-07-25,MR补测缺口检查(已用其他策略达标接入，MR未能超越现有选择)
-DGRO,rejected,MR,1d,0.433,20.0,2026-07-25,MR补测缺口检查(已用其他策略达标接入，MR未能超越现有选择)
-INTU,rejected,MR,1h,0.507,15.0,2026-07-25,MR补测缺口检查(已用其他策略达标接入，MR未能超越现有选择)
-JPM,rejected,MR,1h,0.193,26.0,2026-07-25,MR补测缺口检查(已用其他策略达标接入，MR未能超越现有选择)
-JPM,rejected,MR,1d,0.271,16.0,2026-07-25,MR补测缺口检查(已用其他策略达标接入，MR未能超越现有选择)
-LUNR,rejected,MR,1h,0.072,22.0,2026-07-25,MR补测缺口检查(已用其他策略达标接入，MR未能超越现有选择)
-LVHI,rejected,MR,1h,-0.357,24.0,2026-07-25,MR补测缺口检查(已用其他策略达标接入，MR未能超越现有选择)
-LVHI,rejected,MR,1d,0.174,22.0,2026-07-25,MR补测缺口检查(已用其他策略达标接入，MR未能超越现有选择)
-MORN,rejected,MR,1h,-0.789,20.0,2026-07-25,MR补测缺口检查(已用其他策略达标接入，MR未能超越现有选择)
-NTRS,rejected,MR,1h,0.517,23.0,2026-07-25,MR补测缺口检查(已用其他策略达标接入，MR未能超越现有选择)
-NTRS,rejected,MR,1d,0.173,18.0,2026-07-25,MR补测缺口检查(已用其他策略达标接入，MR未能超越现有选择)
-ORCL,rejected,MR,1h,0.094,24.0,2026-07-25,MR补测缺口检查(已用其他策略达标接入，MR未能超越现有选择)
-ORCL,rejected,MR,1d,0.209,16.0,2026-07-25,MR补测缺口检查(已用其他策略达标接入，MR未能超越现有选择)
-PKW,rejected,MR,1h,-0.098,30.0,2026-07-25,MR补测缺口检查(已用其他策略达标接入，MR未能超越现有选择)
-PKW,rejected,MR,1d,0.636,23.0,2026-07-25,MR补测缺口检查(已用其他策略达标接入，MR未能超越现有选择)
-PYPL,rejected,MR,1h,-0.011,19.0,2026-07-25,MR补测缺口检查(已用其他策略达标接入，MR未能超越现有选择)
-RBLX,rejected,MR,1h,0.651,19.0,2026-07-25,MR补测缺口检查(已用其他策略达标接入，MR未能超越现有选择)
-SLV,rejected,MR,1h,-0.733,23.0,2026-07-25,MR补测缺口检查(已用其他策略达标接入，MR未能超越现有选择)
-SPMO,rejected,MR,1h,-0.085,27.0,2026-07-25,MR补测缺口检查(已用其他策略达标接入，MR未能超越现有选择)
-SPMO,rejected,MR,1d,0.632,22.0,2026-07-25,MR补测缺口检查(已用其他策略达标接入，MR未能超越现有选择)
-SPYM,rejected,MR,1d,0.277,22.0,2026-07-25,MR补测缺口检查(已用其他策略达标接入，MR未能超越现有选择)
-VOO,rejected,MR,1h,0.252,37.0,2026-07-25,MR补测缺口检查(已用其他策略达标接入，MR未能超越现有选择)
-VOO,rejected,MR,1d,0.201,23.0,2026-07-25,MR补测缺口检查(已用其他策略达标接入，MR未能超越现有选择)
-VTI,rejected,MR,1h,-0.56,31.0,2026-07-25,MR补测缺口检查(已用其他策略达标接入，MR未能超越现有选择)
-VTI,rejected,MR,1d,0.4,26.0,2026-07-25,MR补测缺口检查(已用其他策略达标接入，MR未能超越现有选择)
-AAOI,rejected,RSI2,1d,0.451,29.0,2026-07-25,网格优化后仍不达标
-AAOI,rejected,RSI2,1h,0.485,159.0,2026-07-25,网格优化后仍不达标
-AAOI,promoted,RSI2,4h,0.672,70.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标
-ABT,rejected,Confluence,1d,-0.09,25.0,2026-07-25,网格优化后仍不达标
-ABT,rejected,RSI2,1h,0.49,56.0,2026-07-25,网格优化后仍不达标
-ABT,rejected,Confluence,4h,0.49,37.0,2026-07-25,网格优化后仍不达标
-ADBE,rejected,Confluence,1d,0.35,35.0,2026-07-25,网格优化后仍不达标
-ADBE,rejected,Confluence,1h,0.16,212.0,2026-07-25,网格优化后仍不达标
-ADBE,rejected,RSI2,4h,-0.223,23.0,2026-07-25,网格优化后仍不达标
-AGIX,rejected,RSI2,1d,1.268,16.0,2026-07-25,网格优化后仍不达标
-AIRJ,rejected,Confluence,1d,0.46,18.0,2026-07-25,网格优化后仍不达标
-AIRJ,promoted,RSI2,1h,0.614,56.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标
-AIRJ,rejected,Confluence,4h,0.5,26.0,2026-07-25,网格优化后仍不达标
-ALL,rejected,RSI2,1d,0.112,17.0,2026-07-25,网格优化后仍不达标
-ALL,promoted,RSI2,1h,1.121,55.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标
-ALL,rejected,RSI2,4h,0.411,36.0,2026-07-25,网格优化后仍不达标
-AM,rejected,RSI2,1d,0.687,16.0,2026-07-25,网格优化后仍不达标
-AM,rejected,RSI2,1h,0.478,176.0,2026-07-25,网格优化后仍不达标
-AM,rejected,RSI2,4h,0.746,17.0,2026-07-25,网格优化后仍不达标
-AMC,rejected,Confluence,1d,0.44,96.0,2026-07-25,网格优化后仍不达标
-AMC,promoted,Confluence,1h,1.06,154.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标
-AMC,rejected,Confluence,4h,0.51,65.0,2026-07-25,网格优化后仍不达标
-APLD,rejected,RSI2,1d,0.739,26.0,2026-07-25,网格优化后仍不达标
-APLD,promoted,RSI2,1h,1.029,91.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标
-APLD,rejected,RSI2,4h,0.844,29.0,2026-07-25,网格优化后仍不达标
-APO,rejected,Confluence,1d,0.29,22.0,2026-07-25,网格优化后仍不达标
-APO,promoted,RSI2,1h,0.659,72.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标
-APO,rejected,RSI2,4h,0.798,15.0,2026-07-25,网格优化后仍不达标
-ASML,rejected,RSI2,1d,0.668,22.0,2026-07-25,网格优化后仍不达标
-ASML,rejected,RSI2,1h,0.136,183.0,2026-07-25,网格优化后仍不达标
-ASML,rejected,RSI2,4h,0.387,79.0,2026-07-25,网格优化后仍不达标
-BA,rejected,Confluence,1d,0.34,23.0,2026-07-25,网格优化后仍不达标
-BA,promoted,RSI2,1h,0.98,74.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标
-BA,promoted,Confluence,4h,0.86,85.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标
-BBW,rejected,Confluence,1d,0.47,37.0,2026-07-25,网格优化后仍不达标
-BBW,rejected,RSI2,1h,0.36,104.0,2026-07-25,网格优化后仍不达标
-BBW,promoted,RSI2,4h,0.79,50.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标
-CCJ,rejected,RSI2,1d,0.469,20.0,2026-07-25,网格优化后仍不达标
-CCJ,promoted,RSI2,1h,0.67,150.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标
-CCJ,promoted,RSI2,4h,0.75,50.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标
-CRSP,rejected,RSI2,1d,-0.118,15.0,2026-07-25,网格优化后仍不达标
-CRSP,promoted,RSI2,1h,1.048,74.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标
-CRSP,rejected,RSI2,4h,0.446,33.0,2026-07-25,网格优化后仍不达标
-CVX,rejected,RSI2,1d,0.322,15.0,2026-07-25,网格优化后仍不达标
-CVX,rejected,RSI2,1h,0.444,77.0,2026-07-25,网格优化后仍不达标
-CVX,rejected,RSI2,4h,0.607,29.0,2026-07-25,网格优化后仍不达标
-DUOL,rejected,Confluence,1d,0.64,11.0,2026-07-25,网格优化后仍不达标
-DUOL,promoted,RSI2,1h,1.234,156.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标
-DUOL,rejected,RSI2,4h,0.415,43.0,2026-07-25,网格优化后仍不达标
-ETHU,rejected,Confluence,1d,0.58,36.0,2026-07-25,网格优化后仍不达标
-FOF,rejected,Confluence,1d,0.14,30.0,2026-07-25,网格优化后仍不达标
-FOF,promoted,RSI2,1h,0.879,104.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标
-FOF,rejected,RSI2,4h,0.517,24.0,2026-07-25,网格优化后仍不达标
-FWRG,rejected,Confluence,1d,-0.39,39.0,2026-07-25,网格优化后仍不达标
-FWRG,rejected,Confluence,1h,0.2,102.0,2026-07-25,网格优化后仍不达标
-FWRG,promoted,Confluence,4h,0.63,74.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标
-FYC,rejected,RSI2,1d,0.391,15.0,2026-07-25,网格优化后仍不达标
-FYC,rejected,RSI2,1h,0.197,157.0,2026-07-25,网格优化后仍不达标
-FYC,rejected,RSI2,4h,1.213,23.0,2026-07-25,网格优化后仍不达标
-GFS,rejected,RSI2,1d,0.766,19.0,2026-07-25,网格优化后仍不达标
-GFS,promoted,Confluence,1h,0.69,82.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标
-GFS,rejected,RSI2,4h,0.409,36.0,2026-07-25,网格优化后仍不达标
-GL,rejected,Confluence,1d,0.41,45.0,2026-07-25,网格优化后仍不达标
-GL,promoted,RSI2,1h,1.07,169.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标
-GL,rejected,RSI2,4h,1.122,23.0,2026-07-25,网格优化后仍不达标
-HBM,rejected,Confluence,1d,0.33,40.0,2026-07-25,网格优化后仍不达标
-HBM,rejected,RSI2,1h,0.37,111.0,2026-07-25,网格优化后仍不达标
-HBM,promoted,RSI2,4h,1.053,63.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标
-IBBQ,rejected,RSI2,1d,0.749,17.0,2026-07-25,网格优化后仍不达标
-IBBQ,rejected,RSI2,1h,0.593,46.0,2026-07-25,网格优化后仍不达标
-IBBQ,rejected,RSI2,4h,0.831,16.0,2026-07-25,网格优化后仍不达标
-KO,rejected,RSI2,1d,-0.0,16.0,2026-07-25,网格优化后仍不达标
-KO,rejected,RSI2,1h,0.374,70.0,2026-07-25,网格优化后仍不达标
-KO,promoted,Confluence,4h,0.78,41.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标
-LLY,rejected,Confluence,1d,0.18,40.0,2026-07-25,网格优化后仍不达标
-LLY,promoted,RSI2,1h,0.716,123.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标
-LLY,promoted,Confluence,4h,0.64,63.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标
-LULU,rejected,Confluence,1d,0.02,41.0,2026-07-25,网格优化后仍不达标
-LULU,rejected,Confluence,1h,0.07,173.0,2026-07-25,网格优化后仍不达标
-LULU,rejected,RSI2,4h,0.749,25.0,2026-07-25,网格优化后仍不达标
-MO,rejected,RSI2,1d,0.543,18.0,2026-07-25,网格优化后仍不达标
-MO,promoted,Confluence,1h,0.63,117.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标
-MO,rejected,RSI2,4h,0.382,45.0,2026-07-25,网格优化后仍不达标
-MSM,rejected,RSI2,1d,0.618,18.0,2026-07-25,网格优化后仍不达标
-MSM,rejected,RSI2,1h,-0.029,46.0,2026-07-25,网格优化后仍不达标
-MSM,rejected,RSI2,4h,0.66,29.0,2026-07-25,网格优化后仍不达标
-MSTR,rejected,Confluence,1d,0.47,45.0,2026-07-25,网格优化后仍不达标
-MSTR,promoted,RSI2,1h,0.909,163.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标
-MSTR,rejected,RSI2,4h,0.658,27.0,2026-07-25,网格优化后仍不达标
-NFLX,rejected,RSI2,1d,0.634,27.0,2026-07-25,网格优化后仍不达标
-NFLX,promoted,RSI2,1h,0.821,77.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标
-NFLX,rejected,RSI2,4h,0.754,21.0,2026-07-25,网格优化后仍不达标
-NUKZ,rejected,RSI2,1d,1.112,18.0,2026-07-25,网格优化后仍不达标
-NVO,rejected,Confluence,1d,0.4,44.0,2026-07-25,网格优化后仍不达标
-NVO,rejected,RSI2,1h,0.597,92.0,2026-07-25,网格优化后仍不达标
-NVO,rejected,Confluence,4h,0.04,64.0,2026-07-25,网格优化后仍不达标
-PB,rejected,Confluence,1d,-0.09,32.0,2026-07-25,网格优化后仍不达标
-PB,rejected,RSI2,1h,0.119,52.0,2026-07-25,网格优化后仍不达标
-PB,promoted,RSI2,4h,0.689,33.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标
-PINS,rejected,Confluence,1d,0.13,43.0,2026-07-25,网格优化后仍不达标
-PINS,rejected,RSI2,1h,0.476,150.0,2026-07-25,网格优化后仍不达标
-PINS,rejected,RSI2,4h,0.733,16.0,2026-07-25,网格优化后仍不达标
-PTMC,rejected,Confluence,1d,-0.06,10.0,2026-07-25,网格优化后仍不达标
-PTMC,rejected,RSI2,1h,-0.413,34.0,2026-07-25,网格优化后仍不达标
-PTMC,rejected,RSI2,4h,0.511,15.0,2026-07-25,网格优化后仍不达标
-QCOM,rejected,Confluence,1d,0.16,49.0,2026-07-25,网格优化后仍不达标
-QCOM,rejected,RSI2,1h,0.23,196.0,2026-07-25,网格优化后仍不达标
-QCOM,promoted,Confluence,4h,1.03,47.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标
-RBC,rejected,RSI2,1d,0.68,19.0,2026-07-25,网格优化后仍不达标
-RBC,rejected,RSI2,1h,0.563,124.0,2026-07-25,网格优化后仍不达标
-RBC,promoted,RSI2,4h,0.766,47.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标
-RGTI,rejected,RSI2,1d,0.65,17.0,2026-07-25,网格优化后仍不达标
-RGTI,promoted,RSI2,1h,0.984,72.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标
-RGTI,promoted,RSI2,4h,0.908,52.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标
-RR,rejected,Confluence,1d,0.54,16.0,2026-07-25,网格优化后仍不达标
-SAP,rejected,Confluence,1d,0.15,44.0,2026-07-25,网格优化后仍不达标
-SAP,rejected,RSI2,1h,0.518,81.0,2026-07-25,网格优化后仍不达标
-SAP,promoted,RSI2,4h,1.161,52.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标
-SKM,rejected,Confluence,1d,0.12,31.0,2026-07-25,网格优化后仍不达标
-SKM,promoted,RSI2,1h,0.688,71.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标
-SKM,rejected,RSI2,4h,0.393,24.0,2026-07-25,网格优化后仍不达标
-SLS,rejected,Confluence,1d,0.29,58.0,2026-07-25,网格优化后仍不达标
-SLS,promoted,Confluence,1h,0.76,105.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标
-SLS,rejected_high_risk_dd,RSI2,4h,0.825,79.0,2026-07-25,网格优化RSI2最大回撤-56.9%风险过高，改用其Confluence结果接入
-SMCI,rejected,Confluence,1d,0.19,49.0,2026-07-25,网格优化后仍不达标
-SMCI,promoted,Confluence,1h,0.6,294.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标
-SMCI,rejected,RSI2,4h,0.95,26.0,2026-07-25,网格优化后仍不达标
-SNAP,rejected,RSI2,1h,0.479,74.0,2026-07-25,网格优化后仍不达标
-SNAP,rejected,Confluence,4h,0.47,55.0,2026-07-25,网格优化后仍不达标
-SO,rejected,Confluence,1d,-0.16,42.0,2026-07-25,网格优化后仍不达标
-SO,rejected,Confluence,1h,0.07,75.0,2026-07-25,网格优化后仍不达标
-SO,rejected,RSI2,4h,0.439,27.0,2026-07-25,网格优化后仍不达标
-SPXC,rejected,RSI2,1d,0.405,20.0,2026-07-25,网格优化后仍不达标
-SPXC,promoted,RSI2,1h,1.058,99.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标
-SPXC,rejected,RSI2,4h,0.477,90.0,2026-07-25,网格优化后仍不达标
-SPYI,rejected,Confluence,1d,0.03,32.0,2026-07-25,网格优化后仍不达标
-SPYI,rejected,RSI2,1h,0.186,19.0,2026-07-25,网格优化后仍不达标
-SPYI,rejected,Confluence,4h,0.38,54.0,2026-07-25,网格优化后仍不达标
-STLA,rejected,Confluence,1d,0.52,77.0,2026-07-25,网格优化后仍不达标
-STLA,rejected,RSI2,1h,0.296,65.0,2026-07-25,网格优化后仍不达标
-STLA,promoted,Confluence,4h,1.14,106.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标
-TMC,promoted,Confluence,1d,0.62,31.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标
-TMC,promoted,Confluence,1h,1.18,302.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标
-TMC,rejected,RSI2,4h,0.456,41.0,2026-07-25,网格优化后仍不达标
-UP,promoted,Confluence,1d,0.84,37.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标
-UP,promoted,RSI2,1h,0.74,137.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标
-UP,rejected,Confluence,4h,0.56,74.0,2026-07-25,网格优化后仍不达标
-USO,rejected,Confluence,1d,0.6,20.0,2026-07-25,网格优化后仍不达标
-USO,promoted,Confluence,1h,0.63,80.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标
-USO,rejected,RSI2,4h,0.671,19.0,2026-07-25,网格优化后仍不达标
-VC,rejected,Confluence,1d,0.72,20.0,2026-07-25,网格优化后仍不达标
-VC,promoted,RSI2,1h,0.972,68.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标
-VC,rejected,RSI2,4h,0.608,18.0,2026-07-25,网格优化后仍不达标
-VEU,rejected,RSI2,1d,0.156,16.0,2026-07-25,网格优化后仍不达标
-VEU,rejected,RSI2,1h,-0.178,88.0,2026-07-25,网格优化后仍不达标
-VEU,rejected,RSI2,4h,0.253,32.0,2026-07-25,网格优化后仍不达标
-VO,rejected,Confluence,1d,0.09,48.0,2026-07-25,网格优化后仍不达标
-VO,rejected,RSI2,1h,-0.448,47.0,2026-07-25,网格优化后仍不达标
-VO,rejected,RSI2,4h,0.66,28.0,2026-07-25,网格优化后仍不达标
-WEN,rejected,Confluence,1d,0.47,38.0,2026-07-25,网格优化后仍不达标
-WEN,rejected,RSI2,1h,0.071,59.0,2026-07-25,网格优化后仍不达标
-WEN,rejected,Confluence,4h,0.08,23.0,2026-07-25,网格优化后仍不达标
-WM,rejected,Confluence,1d,0.12,14.0,2026-07-25,网格优化后仍不达标
-WM,rejected,RSI2,1h,0.303,116.0,2026-07-25,网格优化后仍不达标
-WM,rejected,Confluence,4h,-0.12,25.0,2026-07-25,网格优化后仍不达标
-XYZ,rejected,RSI2,1d,0.399,23.0,2026-07-25,网格优化后仍不达标
-XYZ,rejected,Confluence,1h,0.29,69.0,2026-07-25,网格优化后仍不达标
-XYZ,rejected,RSI2,4h,0.798,17.0,2026-07-25,网格优化后仍不达标
-ZION,rejected,RSI2,1d,0.31,23.0,2026-07-25,网格优化后仍不达标
-ZION,rejected,RSI2,1h,0.569,62.0,2026-07-25,网格优化后仍不达标
-ZION,rejected,RSI2,4h,0.559,47.0,2026-07-25,网格优化后仍不达标
-PANW,promoted,RSI2,1h,0.683,117.0,2026-07-26,用户要求加入，四策略回测；cost 10bps通过、wf训练0.37→测试0.84 已接入
-PANW,rejected,MR,1d,0.444,15.0,2026-07-26,用户要求加入，四策略回测
-PANW,rejected,MR,1h,0.265,18.0,2026-07-26,用户要求加入，四策略回测
-PANW,rejected,Breakout,1d,0.244,28.0,2026-07-26,用户要求加入，四策略回测
-PANW,rejected,Confluence,1h,0.24,156.0,2026-07-26,用户要求加入，四策略回测
-PANW,rejected,RSI2,4h,0.111,42.0,2026-07-26,用户要求加入，四策略回测
-PANW,rejected,Confluence,4h,-0.08,44.0,2026-07-26,用户要求加入，四策略回测
-PANW,rejected,Confluence,1d,-0.21,62.0,2026-07-26,用户要求加入，四策略回测
-AMAT,rejected,MR,1h,1.196,21.0,2026-07-26,补跑从未回测标的（四策略）
-AMAT,rejected,RSI2,4h,0.439,48.0,2026-07-26,补跑从未回测标的（四策略）
-AMAT,rejected,RSI2,1d,0.383,15.0,2026-07-26,补跑从未回测标的（四策略）
-AMAT,rejected,Confluence,1d,0.25,47.0,2026-07-26,补跑从未回测标的（四策略）
-AMAT,rejected,Breakout,1d,0.237,36.0,2026-07-26,补跑从未回测标的（四策略）
-AMAT,rejected,Confluence,4h,-0.09,48.0,2026-07-26,补跑从未回测标的（四策略）
-AMAT,rejected,RSI2,1h,-0.274,110.0,2026-07-26,补跑从未回测标的（四策略）
-AMAT,rejected,Confluence,1h,-0.88,98.0,2026-07-26,补跑从未回测标的（四策略）
-EYES,insufficient_data,Confluence,1h,,0.0,2026-07-26,2026-05-05上市的新ETF(Corgi Data & Surveillance)，全部历史仅55个交易日，无法回测
-EYES,insufficient_data,Confluence,4h,,0.0,2026-07-26,2026-05-05上市的新ETF(Corgi Data & Surveillance)，全部历史仅55个交易日，无法回测
-EYES,insufficient_data,Confluence,1d,,0.0,2026-07-26,2026-05-05上市的新ETF(Corgi Data & Surveillance)，全部历史仅55个交易日，无法回测
-IREN,promoted,Confluence,1h,1.15,230.0,2026-07-26,补跑从未回测标的（四策略）；cost 30bps仍0.72、wf训练0.73→测试1.76，已从 pending_high_vol 升级接入
-IREN,promoted,RSI2,1h,0.783,172.0,2026-07-26,补跑从未回测标的（四策略）
-IREN,rejected,RSI2,1d,0.485,25.0,2026-07-26,补跑从未回测标的（四策略）
-IREN,rejected,RSI2,4h,0.314,42.0,2026-07-26,补跑从未回测标的（四策略）
-IREN,rejected,Breakout,1d,0.09,9.0,2026-07-26,补跑从未回测标的（四策略）
-IREN,rejected,Confluence,1d,-0.25,41.0,2026-07-26,补跑从未回测标的（四策略）
-IREN,rejected,Confluence,4h,-0.36,67.0,2026-07-26,补跑从未回测标的（四策略）
-IREN,rejected,MR,1h,-0.765,22.0,2026-07-26,补跑从未回测标的（四策略）
-KLAC,rejected,MR,1d,0.456,17.0,2026-07-26,补跑从未回测标的（四策略）
-KLAC,rejected,RSI2,4h,0.35,52.0,2026-07-26,补跑从未回测标的（四策略）
-KLAC,rejected,RSI2,1d,0.335,25.0,2026-07-26,补跑从未回测标的（四策略）
-KLAC,rejected,MR,1h,0.086,19.0,2026-07-26,补跑从未回测标的（四策略）
-KLAC,rejected,Confluence,1d,-0.04,45.0,2026-07-26,补跑从未回测标的（四策略）
-KLAC,rejected,RSI2,1h,-0.21,140.0,2026-07-26,补跑从未回测标的（四策略）
-KLAC,rejected,Breakout,1d,-0.407,44.0,2026-07-26,补跑从未回测标的（四策略）
-KLAC,rejected,Confluence,1h,-0.78,105.0,2026-07-26,补跑从未回测标的（四策略）
-KLAC,rejected,Confluence,4h,-0.9,45.0,2026-07-26,补跑从未回测标的（四策略）
-SNAP,demoted,Confluence,1d,0.4,107.0,2026-07-27,QQQ数据修复后重验:10bps 0.40且样本外-0.09，降级（失去唯一路由，移出扫描池）
-OUST,demoted,Confluence,1d,0.06,59.0,2026-07-27,QQQ数据修复后重验:10bps 0.06，降级（失去唯一路由，移出扫描池）
-ONDS,demoted,Confluence,1d,0.41,64.0,2026-07-27,QQQ数据修复后重验:10bps 0.41，1d降级（保留1h路由）
-SHOP,rejected,confluence,1h,0.37,95.0,2026-07-27,10bps降至-0.01，成本压力不达标
-SHOP,rejected,confluence,4h,-1.26,26.0,2026-07-27,0成本即负Sharpe
-SHOP,rejected,confluence,1d,-0.22,104.0,2026-07-27,0成本即负Sharpe，wf样本内外均负
-SHOP,rejected,rsi2,1h,0.264,87.0,2026-07-27,10bps降至0.07，且maxDD-28.9%，wf样本外-3.07
-SHOP,rejected,rsi2,4h,0.098,27.0,2026-07-27,maxDD-17%，10bps 0.009
-SHOP,rejected,rsi2,1d,0.393,103.0,2026-07-27,maxDD-38.4%超过-50%阈值边缘但wf仅marginal(0.40)，风险偏高不接入
-SHOP,insufficient_data,mr,1h,1.034,22.0,2026-07-27,10bps成本压力通过(0.933)但N=22<30门槛，样本不足，列入观察名单而非接入
-SHOP,insufficient_data,mr,4h,,0.0,2026-07-27,信号数为0
-SHOP,insufficient_data,mr,1d,,0.0,2026-07-27,信号数为0
-SHOP,rejected_high_risk_dd,breakout,1d,-0.296,35.0,2026-07-27,maxDD-56.6%超过-50%风控阈值，且Sharpe为负
-MAR,rejected,confluence,1h,-0.23,74.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.23 dd=-0.0% wf=fail
-MAR,rejected,confluence,4h,-0.8,27.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.8 dd=-0.1% wf=insufficient
-MAR,rejected,confluence,1d,-0.12,111.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.12 dd=-0.1% wf=marginal
-MAR,promoted,rsi2,1h,0.691,62.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=0.691 dd=-7.6% wf=pass
-MAR,rejected,rsi2,4h,-0.648,20.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.648 dd=-12.1% wf=insufficient
-MAR,rejected,rsi2,1d,0.273,93.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=0.273 dd=-16.5% wf=marginal
-MAR,rejected,mr,1h,-1.035,15.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-1.035 dd=-0.0% wf=insufficient
-MAR,insufficient_data,mr,4h,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient
-MAR,rejected,mr,1d,0.195,21.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=0.195 dd=-0.0% wf=insufficient
-ON,rejected,confluence,1h,-1.08,79.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-1.08 dd=-0.0% wf=fail
-ON,rejected,confluence,4h,-0.29,21.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.29 dd=-0.0% wf=insufficient
-ON,rejected,confluence,1d,0.06,113.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=0.06 dd=-0.1% wf=fail
-ON,rejected,rsi2,1h,-0.119,82.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.119 dd=-17.1% wf=marginal
-ON,rejected,rsi2,4h,-0.487,21.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.487 dd=-25.3% wf=insufficient
-ON,rejected,rsi2,1d,-0.069,83.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.069 dd=-46.1% wf=fail
-ON,insufficient_data,mr,1h,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient
-ON,insufficient_data,mr,4h,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient
-ON,rejected,mr,1d,0.532,16.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=0.532 dd=-0.0% wf=insufficient
-MCD,rejected,confluence,1h,-1.17,74.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-1.17 dd=-0.0% wf=fail
-MCD,rejected,confluence,4h,-0.02,24.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.02 dd=-0.0% wf=insufficient
-MCD,rejected,confluence,1d,0.01,110.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=0.01 dd=-0.1% wf=fail
-MCD,rejected,rsi2,1h,-0.823,51.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.823 dd=-7.9% wf=insufficient
-MCD,insufficient_data,rsi2,4h,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient
-MCD,rejected,rsi2,1d,-0.165,56.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.165 dd=-14.2% wf=insufficient
-MCD,insufficient_data,mr,1h,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient
-MCD,insufficient_data,mr,4h,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient
-MCD,rejected,mr,1d,0.084,19.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=0.084 dd=-0.1% wf=insufficient
-ALAB,rejected,confluence,1h,-0.08,97.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.08 dd=-0.1% wf=marginal
-ALAB,rejected,confluence,4h,0.29,37.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=0.29 dd=-0.1% wf=insufficient
-ALAB,insufficient_data,confluence,1d,1.28,28.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=1.28 dd=-0.1% wf=insufficient
-ALAB,promoted,rsi2,1h,0.835,92.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=0.835 dd=-29.2% wf=marginal
-ALAB,rejected,rsi2,4h,0.123,23.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=0.123 dd=-33.5% wf=insufficient
-ALAB,rejected,rsi2,1d,-0.612,22.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.612 dd=-39.5% wf=insufficient
-ALAB,insufficient_data,mr,1h,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient
-ALAB,insufficient_data,mr,4h,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient
-ALAB,insufficient_data,mr,1d,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient
-MRK,rejected,confluence,1h,-1.13,84.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-1.13 dd=-0.0% wf=fail
-MRK,rejected,confluence,4h,-0.05,25.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.05 dd=-0.0% wf=insufficient
-MRK,rejected,confluence,1d,-0.37,91.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.37 dd=-0.0% wf=marginal
-MRK,rejected,rsi2,1h,-1.867,60.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-1.867 dd=-18.2% wf=fail
-MRK,rejected,rsi2,4h,-0.863,20.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.863 dd=-16.8% wf=insufficient
-MRK,rejected,rsi2,1d,0.049,51.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=0.049 dd=-19.5% wf=marginal
-MRK,rejected,mr,1h,0.087,15.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=0.087 dd=-0.0% wf=insufficient
-MRK,insufficient_data,mr,4h,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient
-MRK,insufficient_data,mr,1d,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient
-AXON,rejected,confluence,1h,0.55,89.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=0.55 dd=-0.1% wf=pass
-AXON,insufficient_data,confluence,4h,0.64,32.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=0.64 dd=-0.2% wf=insufficient
-AXON,rejected,confluence,1d,-0.21,125.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.21 dd=-0.3% wf=fail
-AXON,rejected,rsi2,1h,0.394,65.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=0.394 dd=-18.2% wf=fail
-AXON,insufficient_data,rsi2,4h,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient
-AXON,rejected,rsi2,1d,-0.186,98.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.186 dd=-48.9% wf=fail
-AXON,insufficient_data,mr,1h,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient
-AXON,insufficient_data,mr,4h,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient
-AXON,rejected,mr,1d,0.416,20.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=0.416 dd=-0.1% wf=insufficient
-U,rejected,confluence,1h,-0.56,92.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.56 dd=-0.0% wf=marginal
-U,rejected,confluence,4h,-0.64,18.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.64 dd=-0.0% wf=insufficient
-U,rejected,confluence,1d,-0.1,57.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.1 dd=-0.1% wf=fail
-U,rejected,rsi2,1h,0.522,80.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=0.522 dd=-20.2% wf=fail
-U,rejected,rsi2,4h,-0.381,24.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.381 dd=-37.4% wf=insufficient
-U,rejected,rsi2,1d,-0.426,38.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.426 dd=-61.5% wf=fail
-U,insufficient_data,mr,1h,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient
-U,insufficient_data,mr,4h,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient
-U,insufficient_data,mr,1d,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient
-ABNB,rejected,confluence,1h,-0.11,62.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.11 dd=-0.0% wf=fail
-ABNB,rejected,confluence,4h,-0.58,15.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.58 dd=-0.0% wf=insufficient
-ABNB,rejected,confluence,1d,-0.21,47.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.21 dd=-0.1% wf=fail
-ABNB,rejected,rsi2,1h,-0.607,63.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.607 dd=-12.3% wf=fail
-ABNB,rejected,rsi2,4h,-0.374,24.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.374 dd=-14.2% wf=insufficient
-ABNB,rejected,rsi2,1d,-0.17,27.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.17 dd=-28.8% wf=insufficient
-ABNB,insufficient_data,mr,1h,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient
-ABNB,insufficient_data,mr,4h,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient
-ABNB,insufficient_data,mr,1d,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient
-UUUU,rejected,confluence,1h,0.22,106.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=0.22 dd=-0.0% wf=fail
-UUUU,rejected,confluence,4h,-1.05,40.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-1.05 dd=-0.0% wf=insufficient
-UUUU,rejected,confluence,1d,-0.13,111.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.13 dd=-0.0% wf=marginal
-UUUU,rejected,rsi2,1h,-0.109,78.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.109 dd=-31.0% wf=fail
-UUUU,rejected,rsi2,4h,0.553,19.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=0.553 dd=-34.7% wf=insufficient
-UUUU,rejected,rsi2,1d,0.121,70.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=0.121 dd=-47.5% wf=fail
-UUUU,insufficient_data,mr,1h,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient
-UUUU,insufficient_data,mr,4h,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient
-UUUU,insufficient_data,mr,1d,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient
-TTD,promoted,confluence,1h,0.65,102.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=0.65 dd=-0.0% wf=pass
-TTD,insufficient_data,confluence,4h,1.26,20.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=1.26 dd=-0.0% wf=insufficient
-TTD,rejected,confluence,1d,-0.54,108.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.54 dd=-0.2% wf=marginal
-TTD,rejected,rsi2,1h,-0.659,55.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.659 dd=-51.2% wf=insufficient
-TTD,insufficient_data,rsi2,4h,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient
-TTD,rejected,rsi2,1d,0.241,96.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=0.241 dd=-53.6% wf=fail
-TTD,insufficient_data,mr,1h,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient
-TTD,insufficient_data,mr,4h,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient
-TTD,insufficient_data,mr,1d,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient
-MP,rejected,confluence,1h,0.08,104.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=0.08 dd=-0.0% wf=fail
-MP,rejected,confluence,4h,-0.04,38.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.04 dd=-0.0% wf=insufficient
-MP,rejected,confluence,1d,0.17,72.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=0.17 dd=-0.1% wf=fail
-MP,rejected,rsi2,1h,0.502,87.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=0.502 dd=-24.0% wf=fail
-MP,rejected,rsi2,4h,0.136,22.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=0.136 dd=-31.2% wf=insufficient
-MP,rejected,rsi2,1d,-0.594,24.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.594 dd=-55.6% wf=insufficient
-MP,insufficient_data,mr,1h,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient
-MP,insufficient_data,mr,4h,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient
-MP,insufficient_data,mr,1d,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient
-MAR,rejected,breakout,1d,-0.131,26.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.131 dd=-25.2% wf=insufficient
-ON,rejected,breakout,1d,0.262,22.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=0.262 dd=-29.4% wf=insufficient
-MCD,rejected,breakout,1d,-0.368,29.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.368 dd=-24.1% wf=insufficient
-ALAB,insufficient_data,breakout,1d,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient
-MRK,rejected,breakout,1d,-0.114,25.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.114 dd=-20.0% wf=insufficient
-AXON,rejected,breakout,1d,0.392,24.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=0.392 dd=-24.2% wf=insufficient
-U,insufficient_data,breakout,1d,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient
-ABNB,insufficient_data,breakout,1d,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient
-UUUU,rejected,breakout,1d,0.075,13.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=0.075 dd=-45.9% wf=insufficient
-TTD,rejected,breakout,1d,-0.169,28.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.169 dd=-36.8% wf=insufficient
-MP,rejected,breakout,1d,-0.118,8.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.118 dd=-32.2% wf=insufficient
+symbol,status,strategy,tf,sharpe,n,date_checked,note,dd
+QQQ,pre_existing_active,,,,,2026-07-25,session开始前就在系统里跑,
+META,pre_existing_active,,,,,2026-07-25,session开始前就在系统里跑,
+RKLB,pre_existing_active,,,,,2026-07-25,session开始前就在系统里跑,
+MSFT,pre_existing_active,,,,,2026-07-25,session开始前就在系统里跑,
+NBIS,pre_existing_active,,,,,2026-07-25,session开始前就在系统里跑,
+INTC,pre_existing_active,,,,,2026-07-25,session开始前就在系统里跑,
+MRVL,pre_existing_active,,,,,2026-07-25,session开始前就在系统里跑,
+SNDK,pre_existing_active,,,,,2026-07-25,session开始前就在系统里跑,
+AAPL,pre_existing_active,,,,,2026-07-25,session开始前就在系统里跑,
+AMZN,pre_existing_active,,,,,2026-07-25,session开始前就在系统里跑,
+AMD,pre_existing_active,,,,,2026-07-25,session开始前就在系统里跑,
+GOOGL,pre_existing_active,,,,,2026-07-25,session开始前就在系统里跑,
+NVDA,pre_existing_active,,,,,2026-07-25,session开始前就在系统里跑,
+TSLA,pre_existing_active,,,,,2026-07-25,session开始前就在系统里跑,
+PLTR,pre_existing_active,,,,,2026-07-25,session开始前就在系统里跑,
+MU,pre_existing_active,,,,,2026-07-25,session开始前就在系统里跑,
+SPY,pre_existing_active,,,,,2026-07-25,session开始前就在系统里跑,
+XLK,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号,
+XLC,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号,
+XLY,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号,
+XLP,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号,
+XLV,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号,
+XLF,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号,
+XLI,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号,
+XLE,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号,
+XLB,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号,
+XLU,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号,
+XLRE,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号,
+IGV,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号,
+CIBR,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号,
+HACK,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号,
+SKYY,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号,
+CLOU,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号,
+BOTZ,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号,
+ARTY,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号,
+AIQ,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号,
+SMH,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号,
+SOXX,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号,
+XSD,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号,
+QTUM,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号,
+UFO,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号,
+KBE,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号,
+KRE,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号,
+KIE,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号,
+XBI,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号,
+IBB,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号,
+IHI,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号,
+ITA,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号,
+XAR,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号,
+IYT,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号,
+XHB,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号,
+ITB,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号,
+XRT,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号,
+XOP,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号,
+ICLN,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号,
+TAN,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号,
+GDX,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号,
+GDXJ,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号,
+VNQ,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号,
+IYR,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号,
+SRVR,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号,
+DTCR,pre_existing_etf_scanner,,,,,2026-07-25,etf_scanner.py板块轮动池，非alert_engine逐信号,
+REXC,rejected,Confluence,1d,3.78,3.0,2026-07-25,第二版watchlist批量回测(默认参数),
+XHLF,rejected,Breakout,1d,2.417,34.0,2026-07-25,第二版watchlist批量回测(默认参数),
+SGOV,rejected,Breakout,1d,1.928,55.0,2026-07-25,第二版watchlist批量回测(默认参数),
+DRAM,rejected,Confluence,1d,1.84,5.0,2026-07-25,第二版watchlist批量回测(默认参数),
+BB,promoted,Confluence,4h,1.36,44.0,2026-07-25,第二版watchlist批量回测(默认参数),
+DJT,promoted,Confluence,1h,1.31,125.0,2026-07-25,第二版watchlist批量回测(默认参数),
+DIS,rejected,RSI2,4h,1.222,28.0,2026-07-25,第二版watchlist批量回测(默认参数),
+SPXU,rejected,Confluence,1h,1.22,55.0,2026-07-25,第二版watchlist批量回测(默认参数),
+LVHI,promoted,RSI2,4h,1.195,30.0,2026-07-25,第二版watchlist批量回测(默认参数),
+SOXS,rejected,Confluence,1h,1.19,87.0,2026-07-25,第二版watchlist批量回测(默认参数),
+VGRO,rejected,Confluence,1d,1.1,9.0,2026-07-25,第二版watchlist批量回测(默认参数),
+LUNR,promoted,Confluence,4h,1.08,50.0,2026-07-25,第二版watchlist批量回测(默认参数),
+SPMO,promoted,RSI2,1h,1.074,134.0,2026-07-25,第二版watchlist批量回测(默认参数),
+RBLX,promoted,Confluence,1d,1.06,38.0,2026-07-25,第二版watchlist批量回测(默认参数),
+SOXS,rejected,Confluence,4h,1.04,24.0,2026-07-25,第二版watchlist批量回测(默认参数),
+NTRS,promoted,RSI2,1h,1.017,107.0,2026-07-25,第二版watchlist批量回测(默认参数),
+VBIL,rejected,Breakout,1d,0.923,8.0,2026-07-25,第二版watchlist批量回测(默认参数),
+RBLX,promoted,RSI2,4h,0.91,38.0,2026-07-25,第二版watchlist批量回测(默认参数),
+RDDT,rejected,Confluence,1d,0.89,27.0,2026-07-25,第二版watchlist批量回测(默认参数),
+MSOS,promoted,Confluence,1d,0.87,50.0,2026-07-25,第二版watchlist批量回测(默认参数),
+SCHD,rejected,RSI2,4h,0.857,19.0,2026-07-25,第二版watchlist批量回测(默认参数),
+REMX,promoted,RSI2,4h,0.845,32.0,2026-07-25,第二版watchlist批量回测(默认参数),
+ORCL,promoted,RSI2,1h,0.842,113.0,2026-07-25,第二版watchlist批量回测(默认参数),
+TDAX,rejected,Confluence,4h,0.82,7.0,2026-07-25,第二版watchlist批量回测(默认参数),
+HVAC,rejected,Confluence,4h,0.81,7.0,2026-07-25,第二版watchlist批量回测(默认参数),
+AIS,promoted,RSI2,1h,0.784,77.0,2026-07-25,第二版watchlist批量回测(默认参数),
+TE,rejected,RSI2,4h,0.783,21.0,2026-07-25,第二版watchlist批量回测(默认参数),
+OKLO,promoted,RSI2,4h,0.766,33.0,2026-07-25,第二版watchlist批量回测(默认参数),
+CRWD,promoted,RSI2,1h,0.765,124.0,2026-07-25,第二版watchlist批量回测(默认参数),
+IBM,promoted,Confluence,4h,0.76,53.0,2026-07-25,第二版watchlist批量回测(默认参数),
+USAR,promoted,Confluence,1h,0.75,74.0,2026-07-25,第二版watchlist批量回测(默认参数),
+SLV,promoted,RSI2,4h,0.744,40.0,2026-07-25,第二版watchlist批量回测(默认参数),
+AVIV,rejected,RSI2,4h,0.73,28.0,2026-07-25,第二版watchlist批量回测(默认参数),
+BB,promoted,RSI2,1h,0.727,93.0,2026-07-25,第二版watchlist批量回测(默认参数),
+MORN,promoted,Confluence,4h,0.71,37.0,2026-07-25,第二版watchlist批量回测(默认参数),
+SOFI,promoted,Confluence,1d,0.71,42.0,2026-07-25,第二版watchlist批量回测(默认参数),
+LWLG,promoted,Confluence,1h,0.7,133.0,2026-07-25,第二版watchlist批量回测(默认参数),
+CRWD,promoted,RSI2,4h,0.69,42.0,2026-07-25,第二版watchlist批量回测(默认参数),
+GME,promoted,Confluence,1h,0.69,129.0,2026-07-25,第二版watchlist批量回测(默认参数),
+DGRO,promoted,Breakout,1d,0.662,50.0,2026-07-25,第二版watchlist批量回测(默认参数),
+TDAX,rejected,Confluence,1d,0.66,11.0,2026-07-25,第二版watchlist批量回测(默认参数),
+DRAM,rejected,Confluence,1h,0.66,17.0,2026-07-25,第二版watchlist批量回测(默认参数),
+PYPL,promoted,Confluence,1d,0.65,53.0,2026-07-25,第二版watchlist批量回测(默认参数),
+QQQM,rejected,Breakout,1d,0.649,21.0,2026-07-25,第二版watchlist批量回测(默认参数),
+AIS,promoted,Confluence,1d,0.64,30.0,2026-07-25,第二版watchlist批量回测(默认参数),
+SPYM,promoted,Breakout,1d,0.635,51.0,2026-07-25,第二版watchlist批量回测(默认参数),
+VTI,promoted,Breakout,1d,0.627,54.0,2026-07-25,第二版watchlist批量回测(默认参数),
+JPM,promoted,RSI2,1h,0.622,107.0,2026-07-25,第二版watchlist批量回测(默认参数),
+BABA,promoted,RSI2,4h,0.621,30.0,2026-07-25,第二版watchlist批量回测(默认参数),
+PKW,promoted,RSI2,4h,0.614,40.0,2026-07-25,第二版watchlist批量回测(默认参数),
+VOO,promoted,Breakout,1d,0.611,52.0,2026-07-25,第二版watchlist批量回测(默认参数),
+AVGV,rejected,Confluence,1d,0.61,18.0,2026-07-25,第二版watchlist批量回测(默认参数),
+JPM,promoted,RSI2,4h,0.604,47.0,2026-07-25,第二版watchlist批量回测(默认参数),
+CEG,promoted,RSI2,1h,0.603,109.0,2026-07-25,第二版watchlist批量回测(默认参数),
+INTU,promoted,Confluence,4h,0.6,34.0,2026-07-25,第二版watchlist批量回测(默认参数),
+SPXU,rejected,Confluence,1d,0.6,84.0,2026-07-25,第二版watchlist批量回测(默认参数),
+TDAX,rejected,Confluence,1h,0.59,29.0,2026-07-25,第二版watchlist批量回测(默认参数),
+SOXS,rejected,Confluence,1d,0.58,26.0,2026-07-25,第二版watchlist批量回测(默认参数),
+SQQQ,rejected,Confluence,1d,0.57,93.0,2026-07-25,第二版watchlist批量回测(默认参数),
+SCHG,rejected,Breakout,1d,0.532,50.0,2026-07-25,第二版watchlist批量回测(默认参数),
+LWLG,rejected,Confluence,4h,0.53,50.0,2026-07-25,第二版watchlist批量回测(默认参数),
+LUNR,rejected,RSI2,1h,0.521,114.0,2026-07-25,第二版watchlist批量回测(默认参数),
+TE,rejected,RSI2,1h,0.516,61.0,2026-07-25,第二版watchlist批量回测(默认参数),
+GS,rejected,Breakout,1d,0.51,31.0,2026-07-25,第二版watchlist批量回测(默认参数),
+APO,rejected,Confluence,4h,0.5,52.0,2026-07-25,第二版watchlist批量回测(默认参数),
+BND,rejected,Breakout,1d,0.49,18.0,2026-07-25,第二版watchlist批量回测(默认参数),
+SPXS,rejected,Confluence,1d,0.48,84.0,2026-07-25,第二版watchlist批量回测(默认参数),
+IBM,rejected,RSI2,1h,0.479,94.0,2026-07-25,第二版watchlist批量回测(默认参数),
+AVGO,rejected,RSI2,1d,0.473,21.0,2026-07-25,第二版watchlist批量回测(默认参数),
+NTRS,rejected,RSI2,4h,0.468,45.0,2026-07-25,第二版watchlist批量回测(默认参数),
+QQQX,rejected,RSI2,4h,0.467,23.0,2026-07-25,第二版watchlist批量回测(默认参数),
+NFLX,rejected,Breakout,1d,0.457,35.0,2026-07-25,第二版watchlist批量回测(默认参数),
+LVHI,rejected,Breakout,1d,0.456,40.0,2026-07-25,第二版watchlist批量回测(默认参数),
+TSM,rejected,RSI2,1d,0.452,26.0,2026-07-25,第二版watchlist批量回测(默认参数),
+AAOI,rejected,Confluence,1d,0.45,74.0,2026-07-25,第二版watchlist批量回测(默认参数),
+VUG,rejected,RSI2,1d,0.444,18.0,2026-07-25,第二版watchlist批量回测(默认参数),
+CVX,rejected,Breakout,1d,0.442,19.0,2026-07-25,第二版watchlist批量回测(默认参数),
+SMCI,rejected,Breakout,1d,0.441,16.0,2026-07-25,第二版watchlist批量回测(默认参数),
+NOK,rejected,Breakout,1d,0.441,12.0,2026-07-25,第二版watchlist批量回测(默认参数),
+JEPQ,rejected,Breakout,1d,0.438,27.0,2026-07-25,第二版watchlist批量回测(默认参数),
+LWLG,rejected,Confluence,1d,0.43,62.0,2026-07-25,第二版watchlist批量回测(默认参数),
+NOK,rejected,RSI2,4h,0.426,43.0,2026-07-25,第二版watchlist批量回测(默认参数),
+SQQQ,rejected,Confluence,1h,0.42,50.0,2026-07-25,第二版watchlist批量回测(默认参数),
+TE,rejected,Confluence,1d,0.42,47.0,2026-07-25,第二版watchlist批量回测(默认参数),
+VUG,rejected,RSI2,4h,0.416,43.0,2026-07-25,第二版watchlist批量回测(默认参数),
+PKW,rejected,Breakout,1d,0.416,39.0,2026-07-25,第二版watchlist批量回测(默认参数),
+SOXL,rejected,RSI2,1h,0.415,161.0,2026-07-25,第二版watchlist批量回测(默认参数),
+BABA,rejected,RSI2,1h,0.412,95.0,2026-07-25,第二版watchlist批量回测(默认参数),
+FLCA,rejected,RSI2,4h,0.41,35.0,2026-07-25,第二版watchlist批量回测(默认参数),
+OKLO,rejected,RSI2,1h,0.403,85.0,2026-07-25,第二版watchlist批量回测(默认参数),
+BABA,rejected,Breakout,1d,0.4,19.0,2026-07-25,第二版watchlist批量回测(默认参数),
+SPYI,rejected,Breakout,1d,0.396,26.0,2026-07-25,第二版watchlist批量回测(默认参数),
+MO,rejected,Breakout,1d,0.395,23.0,2026-07-25,第二版watchlist批量回测(默认参数),
+RTH,rejected,Breakout,1d,0.391,41.0,2026-07-25,第二版watchlist批量回测(默认参数),
+RSP,rejected,Breakout,1d,0.382,40.0,2026-07-25,第二版watchlist批量回测(默认参数),
+VPL,rejected,Breakout,1d,0.372,37.0,2026-07-25,第二版watchlist批量回测(默认参数),
+AVGO,rejected,Confluence,1h,0.37,151.0,2026-07-25,第二版watchlist批量回测(默认参数),
+FDVV,rejected,Breakout,1d,0.366,46.0,2026-07-25,第二版watchlist批量回测(默认参数),
+CRWD,rejected,RSI2,1d,0.365,26.0,2026-07-25,第二版watchlist批量回测(默认参数),
+SPMO,rejected,RSI2,4h,0.365,47.0,2026-07-25,第二版watchlist批量回测(默认参数),
+QQQM,rejected,Confluence,4h,0.36,36.0,2026-07-25,第二版watchlist批量回测(默认参数),
+AVIV,rejected,Breakout,1d,0.35,19.0,2026-07-25,第二版watchlist批量回测(默认参数),
+TQQQ,rejected,Confluence,1d,0.35,53.0,2026-07-25,第二版watchlist批量回测(默认参数),
+REI,rejected,RSI2,1h,0.348,62.0,2026-07-25,第二版watchlist批量回测(默认参数),
+SCHW,rejected,RSI2,4h,0.347,33.0,2026-07-25,第二版watchlist批量回测(默认参数),
+GME,rejected,RSI2,4h,0.347,26.0,2026-07-25,第二版watchlist批量回测(默认参数),
+PL,rejected,RSI2,1h,0.345,116.0,2026-07-25,第二版watchlist批量回测(默认参数),
+VGK,rejected,RSI2,4h,0.342,28.0,2026-07-25,第二版watchlist批量回测(默认参数),
+GS,rejected,RSI2,4h,0.34,49.0,2026-07-25,第二版watchlist批量回测(默认参数),
+PBOC,rejected,Breakout,1d,0.33,12.0,2026-07-25,第二版watchlist批量回测(默认参数),
+SLV,rejected,Breakout,1d,0.328,13.0,2026-07-25,第二版watchlist批量回测(默认参数),
+AVGO,rejected,RSI2,4h,0.323,55.0,2026-07-25,第二版watchlist批量回测(默认参数),
+REM,rejected,Confluence,1d,0.32,62.0,2026-07-25,第二版watchlist批量回测(默认参数),
+VYMI,rejected,RSI2,4h,0.313,28.0,2026-07-25,第二版watchlist批量回测(默认参数),
+GS,rejected,RSI2,1h,0.312,124.0,2026-07-25,第二版watchlist批量回测(默认参数),
+SOXL,rejected,Confluence,1d,0.31,59.0,2026-07-25,第二版watchlist批量回测(默认参数),
+AVGV,rejected,RSI2,4h,0.309,32.0,2026-07-25,第二版watchlist批量回测(默认参数),
+SOFI,rejected,RSI2,4h,0.308,39.0,2026-07-25,第二版watchlist批量回测(默认参数),
+REMX,rejected,RSI2,1d,0.291,15.0,2026-07-25,第二版watchlist批量回测(默认参数),
+MSOS,rejected,RSI2,4h,0.291,30.0,2026-07-25,第二版watchlist批量回测(默认参数),
+MSOS,rejected,RSI2,1h,0.287,85.0,2026-07-25,第二版watchlist批量回测(默认参数),
+NLST,rejected,RSI2,4h,0.283,23.0,2026-07-25,第二版watchlist批量回测(默认参数),
+HYMB,rejected,Breakout,1d,0.28,28.0,2026-07-25,第二版watchlist批量回测(默认参数),
+BTCI,rejected,Confluence,1d,0.28,15.0,2026-07-25,第二版watchlist批量回测(默认参数),
+FXAIX,rejected,Breakout,1d,0.28,77.0,2026-07-25,第二版watchlist批量回测(默认参数),
+VTEB,rejected,Breakout,1d,0.276,30.0,2026-07-25,第二版watchlist批量回测(默认参数),
+DPZ,rejected,RSI2,4h,0.274,18.0,2026-07-25,第二版watchlist批量回测(默认参数),
+SPMO,rejected,RSI2,1d,0.273,22.0,2026-07-25,第二版watchlist批量回测(默认参数),
+USAR,rejected,Confluence,4h,0.27,24.0,2026-07-25,第二版watchlist批量回测(默认参数),
+SO,rejected,Breakout,1d,0.267,29.0,2026-07-25,第二版watchlist批量回测(默认参数),
+VTI,rejected,RSI2,1h,0.264,93.0,2026-07-25,第二版watchlist批量回测(默认参数),
+XSMO,rejected,RSI2,1d,0.261,15.0,2026-07-25,第二版watchlist批量回测(默认参数),
+AVDV,rejected,RSI2,4h,0.257,32.0,2026-07-25,第二版watchlist批量回测(默认参数),
+ONTO,rejected,RSI2,1d,0.254,18.0,2026-07-25,第二版watchlist批量回测(默认参数),
+PL,rejected,Breakout,1d,0.253,8.0,2026-07-25,第二版watchlist批量回测(默认参数),
+AMFN,rejected,Breakout,1d,0.25,8.0,2026-07-25,第二版watchlist批量回测(默认参数),
+PL,rejected,RSI2,4h,0.248,43.0,2026-07-25,第二版watchlist批量回测(默认参数),
+JEPI,rejected,Breakout,1d,0.246,28.0,2026-07-25,第二版watchlist批量回测(默认参数),
+FOF,rejected,Breakout,1d,0.246,35.0,2026-07-25,第二版watchlist批量回测(默认参数),
+SLV,rejected,RSI2,1h,0.245,115.0,2026-07-25,第二版watchlist批量回测(默认参数),
+APO,rejected,Breakout,1d,0.241,33.0,2026-07-25,第二版watchlist批量回测(默认参数),
+ASTS,rejected,Confluence,4h,0.24,45.0,2026-07-25,第二版watchlist批量回测(默认参数),
+SCHD,rejected,Breakout,1d,0.237,42.0,2026-07-25,第二版watchlist批量回测(默认参数),
+TLT,rejected,RSI2,1h,0.233,57.0,2026-07-25,第二版watchlist批量回测(默认参数),
+BB,rejected,Breakout,1d,0.23,10.0,2026-07-25,第二版watchlist批量回测(默认参数),
+SCHG,rejected,RSI2,4h,0.221,40.0,2026-07-25,第二版watchlist批量回测(默认参数),
+HVAC,rejected,Confluence,1d,0.22,11.0,2026-07-25,第二版watchlist批量回测(默认参数),
+VGRO,rejected,Confluence,1h,0.22,4.0,2026-07-25,第二版watchlist批量回测(默认参数),
+NTRS,rejected,Breakout,1d,0.219,26.0,2026-07-25,第二版watchlist批量回测(默认参数),
+AOK,rejected,Breakout,1d,0.215,49.0,2026-07-25,第二版watchlist批量回测(默认参数),
+JPM,rejected,Breakout,1d,0.211,38.0,2026-07-25,第二版watchlist批量回测(默认参数),
+UBER,rejected,Breakout,1d,0.211,13.0,2026-07-25,第二版watchlist批量回测(默认参数),
+DIS,rejected,RSI2,1h,0.203,83.0,2026-07-25,第二版watchlist批量回测(默认参数),
+MGA,rejected,Breakout,1d,0.202,20.0,2026-07-25,第二版watchlist批量回测(默认参数),
+YOU,rejected,Confluence,1d,0.2,36.0,2026-07-25,第二版watchlist批量回测(默认参数),
+SPXS,rejected,Confluence,1h,0.2,52.0,2026-07-25,第二版watchlist批量回测(默认参数),
+VYM,rejected,Breakout,1d,0.198,42.0,2026-07-25,第二版watchlist批量回测(默认参数),
+FBND,rejected,Breakout,1d,0.197,22.0,2026-07-25,第二版watchlist批量回测(默认参数),
+OKLO,rejected,RSI2,1d,0.197,22.0,2026-07-25,第二版watchlist批量回测(默认参数),
+ICF,rejected,Breakout,1d,0.188,23.0,2026-07-25,第二版watchlist批量回测(默认参数),
+ZH,rejected,RSI2,1h,0.184,73.0,2026-07-25,第二版watchlist批量回测(默认参数),
+IBBQ,rejected,Confluence,4h,0.18,36.0,2026-07-25,第二版watchlist批量回测(默认参数),
+CIK,rejected,Confluence,1d,0.18,54.0,2026-07-25,第二版watchlist批量回测(默认参数),
+INTU,rejected,Confluence,1h,0.18,115.0,2026-07-25,第二版watchlist批量回测(默认参数),
+FXAIX,rejected,RSI2,1h,0.178,19.0,2026-07-25,第二版watchlist批量回测(默认参数),
+SAP,rejected,Breakout,1d,0.169,33.0,2026-07-25,第二版watchlist批量回测(默认参数),
+YOU,rejected,RSI2,4h,0.167,32.0,2026-07-25,第二版watchlist批量回测(默认参数),
+DFAW,rejected,Breakout,1d,0.167,13.0,2026-07-25,第二版watchlist批量回测(默认参数),
+TLT,rejected,Breakout,1d,0.166,8.0,2026-07-25,第二版watchlist批量回测(默认参数),
+QQQM,rejected,RSI2,1h,0.166,156.0,2026-07-25,第二版watchlist批量回测(默认参数),
+ASML,rejected,Breakout,1d,0.15,46.0,2026-07-25,第二版watchlist批量回测(默认参数),
+VCR,rejected,Breakout,1d,0.137,41.0,2026-07-25,第二版watchlist批量回测(默认参数),
+SCHW,rejected,RSI2,1d,0.133,15.0,2026-07-25,第二版watchlist批量回测(默认参数),
+BLK,rejected,Confluence,1h,0.13,130.0,2026-07-25,第二版watchlist批量回测(默认参数),
+PCYO,rejected,Breakout,1d,0.122,16.0,2026-07-25,第二版watchlist批量回测(默认参数),
+BRK-B,rejected,Breakout,1d,0.121,31.0,2026-07-25,第二版watchlist批量回测(默认参数),
+REMX,rejected,Confluence,1h,0.12,154.0,2026-07-25,第二版watchlist批量回测(默认参数),
+AOR,rejected,Breakout,1d,0.119,52.0,2026-07-25,第二版watchlist批量回测(默认参数),
+NOK,rejected,RSI2,1h,0.114,104.0,2026-07-25,第二版watchlist批量回测(默认参数),
+FLCA,rejected,Confluence,1d,0.11,43.0,2026-07-25,第二版watchlist批量回测(默认参数),
+VB,rejected,RSI2,4h,0.088,35.0,2026-07-25,第二版watchlist批量回测(默认参数),
+EBAY,rejected,Breakout,1d,0.084,27.0,2026-07-25,第二版watchlist批量回测(默认参数),
+VB,rejected,Breakout,1d,0.081,34.0,2026-07-25,第二版watchlist批量回测(默认参数),
+YOU,rejected,Confluence,1h,0.08,119.0,2026-07-25,第二版watchlist批量回测(默认参数),
+VTI,rejected,Confluence,4h,0.08,38.0,2026-07-25,第二版watchlist批量回测(默认参数),
+ORCL,rejected,Confluence,1d,0.08,53.0,2026-07-25,第二版watchlist批量回测(默认参数),
+DIS,rejected,Breakout,1d,0.079,14.0,2026-07-25,第二版watchlist批量回测(默认参数),
+SQQQ,rejected,Confluence,4h,0.07,14.0,2026-07-25,第二版watchlist批量回测(默认参数),
+ONTO,rejected,Confluence,4h,0.07,45.0,2026-07-25,第二版watchlist批量回测(默认参数),
+PYPL,rejected,RSI2,4h,0.069,22.0,2026-07-25,第二版watchlist批量回测(默认参数),
+AIS,rejected,RSI2,4h,0.061,30.0,2026-07-25,第二版watchlist批量回测(默认参数),
+IMAX,rejected,Confluence,4h,0.06,31.0,2026-07-25,第二版watchlist批量回测(默认参数),
+ASTS,rejected,Confluence,1h,0.06,129.0,2026-07-25,第二版watchlist批量回测(默认参数),
+TQQQ,rejected,RSI2,1h,0.058,163.0,2026-07-25,第二版watchlist批量回测(默认参数),
+EBAY,rejected,RSI2,4h,0.054,36.0,2026-07-25,第二版watchlist批量回测(默认参数),
+TSM,rejected,RSI2,4h,0.053,70.0,2026-07-25,第二版watchlist批量回测(默认参数),
+SOFI,rejected,RSI2,1h,0.05,124.0,2026-07-25,第二版watchlist批量回测(默认参数),
+AVNM,rejected,RSI2,4h,0.046,27.0,2026-07-25,第二版watchlist批量回测(默认参数),
+JHS,rejected,RSI2,1h,0.045,48.0,2026-07-25,第二版watchlist批量回测(默认参数),
+BLK,rejected,Breakout,1d,0.044,30.0,2026-07-25,第二版watchlist批量回测(默认参数),
+IBM,rejected,Breakout,1d,0.043,23.0,2026-07-25,第二版watchlist批量回测(默认参数),
+ADBE,rejected,Breakout,1d,0.04,34.0,2026-07-25,第二版watchlist批量回测(默认参数),
+ASTS,rejected,Breakout,1d,0.04,13.0,2026-07-25,第二版watchlist批量回测(默认参数),
+AVGE,rejected,RSI2,4h,0.038,36.0,2026-07-25,第二版watchlist批量回测(默认参数),
+VTSAX,rejected,Breakout,1d,0.035,74.0,2026-07-25,第二版watchlist批量回测(默认参数),
+BTCI,rejected,RSI2,1h,0.032,40.0,2026-07-25,第二版watchlist批量回测(默认参数),
+CRM,rejected,Confluence,4h,0.03,48.0,2026-07-25,第二版watchlist批量回测(默认参数),
+VT,rejected,Breakout,1d,0.03,54.0,2026-07-25,第二版watchlist批量回测(默认参数),
+AVNM,rejected,Confluence,1d,0.03,17.0,2026-07-25,第二版watchlist批量回测(默认参数),
+CSGP,rejected,Breakout,1d,0.026,24.0,2026-07-25,第二版watchlist批量回测(默认参数),
+LUNR,rejected,RSI2,1d,0.022,23.0,2026-07-25,第二版watchlist批量回测(默认参数),
+RTH,rejected,RSI2,1h,0.021,69.0,2026-07-25,第二版watchlist批量回测(默认参数),
+REI,rejected,RSI2,4h,0.021,16.0,2026-07-25,第二版watchlist批量回测(默认参数),
+SOXL,rejected,Confluence,4h,0.02,44.0,2026-07-25,第二版watchlist批量回测(默认参数),
+NAT,rejected,Confluence,1d,0.02,81.0,2026-07-25,第二版watchlist批量回测(默认参数),
+VWO,rejected,Breakout,1d,0.018,31.0,2026-07-25,第二版watchlist批量回测(默认参数),
+INTU,rejected,Breakout,1d,0.018,39.0,2026-07-25,第二版watchlist批量回测(默认参数),
+CEG,rejected,Breakout,1d,0.011,14.0,2026-07-25,第二版watchlist批量回测(默认参数),
+TPS,rejected,Confluence,1d,0.01,1.0,2026-07-25,第二版watchlist批量回测(默认参数),
+JHS,rejected,Confluence,4h,0.01,22.0,2026-07-25,第二版watchlist批量回测(默认参数),
+QQQI,rejected,Confluence,1d,0.01,28.0,2026-07-25,第二版watchlist批量回测(默认参数),
+CEG,rejected,RSI2,4h,-0.002,41.0,2026-07-25,第二版watchlist批量回测(默认参数),
+IMAX,rejected,RSI2,1h,-0.005,85.0,2026-07-25,第二版watchlist批量回测(默认参数),
+GME,rejected,Confluence,1d,-0.01,73.0,2026-07-25,第二版watchlist批量回测(默认参数),
+TQQQ,rejected,Confluence,4h,-0.01,40.0,2026-07-25,第二版watchlist批量回测(默认参数),
+CIK,rejected,RSI2,1h,-0.012,35.0,2026-07-25,第二版watchlist批量回测(默认参数),
+FYC,rejected,Breakout,1d,-0.012,40.0,2026-07-25,第二版watchlist批量回测(默认参数),
+QQQX,rejected,Breakout,1d,-0.017,42.0,2026-07-25,第二版watchlist批量回测(默认参数),
+VO,rejected,Breakout,1d,-0.024,47.0,2026-07-25,第二版watchlist批量回测(默认参数),
+ORCL,rejected,RSI2,4h,-0.025,47.0,2026-07-25,第二版watchlist批量回测(默认参数),
+PEP,rejected,Breakout,1d,-0.027,26.0,2026-07-25,第二版watchlist批量回测(默认参数),
+AVDV,rejected,Breakout,1d,-0.027,26.0,2026-07-25,第二版watchlist批量回测(默认参数),
+DJT,rejected,Confluence,1d,-0.03,39.0,2026-07-25,第二版watchlist批量回测(默认参数),
+UBER,rejected,RSI2,4h,-0.032,23.0,2026-07-25,第二版watchlist批量回测(默认参数),
+AOA,rejected,Confluence,1d,-0.04,40.0,2026-07-25,第二版watchlist批量回测(默认参数),
+XSMO,rejected,RSI2,4h,-0.045,39.0,2026-07-25,第二版watchlist批量回测(默认参数),
+VYMI,rejected,Breakout,1d,-0.049,42.0,2026-07-25,第二版watchlist批量回测(默认参数),
+ZH,rejected,RSI2,4h,-0.049,23.0,2026-07-25,第二版watchlist批量回测(默认参数),
+CRM,rejected,Breakout,1d,-0.054,26.0,2026-07-25,第二版watchlist批量回测(默认参数),
+AVGE,rejected,Breakout,1d,-0.072,21.0,2026-07-25,第二版watchlist批量回测(默认参数),
+VGRO,rejected,Confluence,4h,-0.08,1.0,2026-07-25,第二版watchlist批量回测(默认参数),
+REI,rejected,Confluence,1d,-0.08,71.0,2026-07-25,第二版watchlist批量回测(默认参数),
+MORN,rejected,Breakout,1d,-0.084,26.0,2026-07-25,第二版watchlist批量回测(默认参数),
+IJR,rejected,Breakout,1d,-0.085,30.0,2026-07-25,第二版watchlist批量回测(默认参数),
+RBLX,rejected,RSI2,1h,-0.087,112.0,2026-07-25,第二版watchlist批量回测(默认参数),
+CVX,rejected,Confluence,4h,-0.09,28.0,2026-07-25,第二版watchlist批量回测(默认参数),
+PYPL,rejected,RSI2,1h,-0.091,97.0,2026-07-25,第二版watchlist批量回测(默认参数),
+VUG,rejected,RSI2,1h,-0.114,117.0,2026-07-25,第二版watchlist批量回测(默认参数),
+VB,rejected,RSI2,1h,-0.115,90.0,2026-07-25,第二版watchlist批量回测(默认参数),
+DGRO,rejected,RSI2,4h,-0.12,28.0,2026-07-25,第二版watchlist批量回测(默认参数),
+IMAX,rejected,RSI2,1d,-0.125,21.0,2026-07-25,第二版watchlist批量回测(默认参数),
+OILU,rejected,RSI2,4h,-0.125,24.0,2026-07-25,第二版watchlist批量回测(默认参数),
+VYM,rejected,RSI2,4h,-0.129,31.0,2026-07-25,第二版watchlist批量回测(默认参数),
+JHS,rejected,Confluence,1d,-0.13,43.0,2026-07-25,第二版watchlist批量回测(默认参数),
+AMFN,rejected,Confluence,1h,-0.14,22.0,2026-07-25,第二版watchlist批量回测(默认参数),
+AVUV,rejected,Confluence,1d,-0.14,42.0,2026-07-25,第二版watchlist批量回测(默认参数),
+RW,rejected,Confluence,1d,-0.14,5.0,2026-07-25,第二版watchlist批量回测(默认参数),
+AMFN,rejected,Confluence,4h,-0.14,4.0,2026-07-25,第二版watchlist批量回测(默认参数),
+ABT,rejected,Breakout,1d,-0.142,28.0,2026-07-25,第二版watchlist批量回测(默认参数),
+VXUS,rejected,Confluence,1d,-0.15,57.0,2026-07-25,第二版watchlist批量回测(默认参数),
+TSM,rejected,RSI2,1h,-0.17,152.0,2026-07-25,第二版watchlist批量回测(默认参数),
+JEPI,rejected,RSI2,4h,-0.173,16.0,2026-07-25,第二版watchlist批量回测(默认参数),
+CSGP,rejected,Confluence,4h,-0.18,36.0,2026-07-25,第二版watchlist批量回测(默认参数),
+PEP,rejected,RSI2,4h,-0.183,19.0,2026-07-25,第二版watchlist批量回测(默认参数),
+RSP,rejected,RSI2,4h,-0.193,31.0,2026-07-25,第二版watchlist批量回测(默认参数),
+VOO,rejected,Confluence,4h,-0.2,41.0,2026-07-25,第二版watchlist批量回测(默认参数),
+VEU,rejected,Breakout,1d,-0.21,44.0,2026-07-25,第二版watchlist批量回测(默认参数),
+FDVV,rejected,RSI2,4h,-0.212,32.0,2026-07-25,第二版watchlist批量回测(默认参数),
+BRK-B,rejected,RSI2,4h,-0.212,30.0,2026-07-25,第二版watchlist批量回测(默认参数),
+EBAY,rejected,RSI2,1h,-0.213,115.0,2026-07-25,第二版watchlist批量回测(默认参数),
+MGA,rejected,RSI2,1h,-0.213,106.0,2026-07-25,第二版watchlist批量回测(默认参数),
+VGK,rejected,Breakout,1d,-0.223,44.0,2026-07-25,第二版watchlist批量回测(默认参数),
+VTSAX,rejected,RSI2,1h,-0.224,17.0,2026-07-25,第二版watchlist批量回测(默认参数),
+IBII,rejected,Breakout,1d,-0.224,9.0,2026-07-25,第二版watchlist批量回测(默认参数),
+VGK,rejected,RSI2,1h,-0.226,102.0,2026-07-25,第二版watchlist批量回测(默认参数),
+CSGP,rejected,RSI2,1h,-0.229,74.0,2026-07-25,第二版watchlist批量回测(默认参数),
+SPXS,rejected,Confluence,4h,-0.24,14.0,2026-07-25,第二版watchlist批量回测(默认参数),
+ZH,rejected,Confluence,1d,-0.24,35.0,2026-07-25,第二版watchlist批量回测(默认参数),
+VOO,rejected,RSI2,1h,-0.244,106.0,2026-07-25,第二版watchlist批量回测(默认参数),
+PTMC,rejected,Breakout,1d,-0.25,27.0,2026-07-25,第二版watchlist批量回测(默认参数),
+MFI,rejected,Confluence,1d,-0.25,15.0,2026-07-25,第二版watchlist批量回测(默认参数),
+MGA,rejected,RSI2,4h,-0.255,27.0,2026-07-25,第二版watchlist批量回测(默认参数),
+AVUV,rejected,RSI2,4h,-0.26,35.0,2026-07-25,第二版watchlist批量回测(默认参数),
+BRK-B,rejected,RSI2,1h,-0.262,80.0,2026-07-25,第二版watchlist批量回测(默认参数),
+PCYO,rejected,RSI2,4h,-0.269,22.0,2026-07-25,第二版watchlist批量回测(默认参数),
+SCHW,rejected,Confluence,1h,-0.27,120.0,2026-07-25,第二版watchlist批量回测(默认参数),
+BTCI,rejected,Confluence,4h,-0.27,24.0,2026-07-25,第二版watchlist批量回测(默认参数),
+SMCI,rejected,RSI2,1h,-0.275,116.0,2026-07-25,第二版watchlist批量回测(默认参数),
+FDVV,rejected,RSI2,1h,-0.28,85.0,2026-07-25,第二版watchlist批量回测(默认参数),
+IJR,rejected,RSI2,4h,-0.299,36.0,2026-07-25,第二版watchlist批量回测(默认参数),
+NLST,rejected,RSI2,1h,-0.306,65.0,2026-07-25,第二版watchlist批量回测(默认参数),
+IJR,rejected,RSI2,1h,-0.308,92.0,2026-07-25,第二版watchlist批量回测(默认参数),
+JEPQ,rejected,Confluence,4h,-0.31,37.0,2026-07-25,第二版watchlist批量回测(默认参数),
+ICF,rejected,RSI2,1h,-0.318,83.0,2026-07-25,第二版watchlist批量回测(默认参数),
+VXUS,rejected,RSI2,4h,-0.32,29.0,2026-07-25,第二版watchlist批量回测(默认参数),
+AOA,rejected,Confluence,4h,-0.32,32.0,2026-07-25,第二版watchlist批量回测(默认参数),
+DPZ,rejected,Confluence,1h,-0.32,105.0,2026-07-25,第二版watchlist批量回测(默认参数),
+DPZ,rejected,Breakout,1d,-0.33,20.0,2026-07-25,第二版watchlist批量回测(默认参数),
+DJT,rejected,Confluence,4h,-0.34,35.0,2026-07-25,第二版watchlist批量回测(默认参数),
+VCR,rejected,RSI2,4h,-0.348,38.0,2026-07-25,第二版watchlist批量回测(默认参数),
+OILU,rejected,Confluence,1h,-0.36,108.0,2026-07-25,第二版watchlist批量回测(默认参数),
+AVNM,rejected,RSI2,1h,-0.372,90.0,2026-07-25,第二版watchlist批量回测(默认参数),
+MORN,rejected,Confluence,1h,-0.38,100.0,2026-07-25,第二版watchlist批量回测(默认参数),
+VT,rejected,RSI2,1h,-0.38,104.0,2026-07-25,第二版watchlist批量回测(默认参数),
+ONTO,rejected,RSI2,1h,-0.386,138.0,2026-07-25,第二版watchlist批量回测(默认参数),
+SCHG,rejected,RSI2,1h,-0.391,136.0,2026-07-25,第二版watchlist批量回测(默认参数),
+AMC,rejected,RSI2,4h,-0.394,20.0,2026-07-25,第二版watchlist批量回测(默认参数),
+NLST,rejected,Confluence,1d,-0.4,52.0,2026-07-25,第二版watchlist批量回测(默认参数),
+ICF,rejected,Confluence,4h,-0.41,30.0,2026-07-25,第二版watchlist批量回测(默认参数),
+VT,rejected,RSI2,4h,-0.417,31.0,2026-07-25,第二版watchlist批量回测(默认参数),
+XSMO,rejected,Confluence,1h,-0.44,101.0,2026-07-25,第二版watchlist批量回测(默认参数),
+CIK,rejected,Confluence,4h,-0.45,30.0,2026-07-25,第二版watchlist批量回测(默认参数),
+UBER,rejected,Confluence,1h,-0.45,133.0,2026-07-25,第二版watchlist批量回测(默认参数),
+SPXU,rejected,Confluence,4h,-0.45,17.0,2026-07-25,第二版watchlist批量回测(默认参数),
+ADBE,rejected,Confluence,4h,-0.46,39.0,2026-07-25,第二版watchlist批量回测(默认参数),
+SCHD,rejected,RSI2,1h,-0.462,89.0,2026-07-25,第二版watchlist批量回测(默认参数),
+NAT,rejected,RSI2,4h,-0.466,24.0,2026-07-25,第二版watchlist批量回测(默认参数),
+TLT,rejected,Confluence,4h,-0.48,38.0,2026-07-25,第二版watchlist批量回测(默认参数),
+VWO,rejected,RSI2,4h,-0.496,30.0,2026-07-25,第二版watchlist批量回测(默认参数),
+RSP,rejected,RSI2,1h,-0.499,85.0,2026-07-25,第二版watchlist批量回测(默认参数),
+CRM,rejected,RSI2,1h,-0.524,105.0,2026-07-25,第二版watchlist批量回测(默认参数),
+SPYM,rejected,Confluence,4h,-0.53,4.0,2026-07-25,第二版watchlist批量回测(默认参数),
+WR,rejected,Confluence,1d,-0.54,4.0,2026-07-25,第二版watchlist批量回测(默认参数),
+OILU,rejected,Confluence,1d,-0.54,31.0,2026-07-25,第二版watchlist批量回测(默认参数),
+DGRO,rejected,RSI2,1h,-0.548,99.0,2026-07-25,第二版watchlist批量回测(默认参数),
+NAT,rejected,Confluence,1h,-0.55,105.0,2026-07-25,第二版watchlist批量回测(默认参数),
+VPL,rejected,Confluence,4h,-0.57,33.0,2026-07-25,第二版watchlist批量回测(默认参数),
+RW,rejected,Confluence,4h,-0.58,5.0,2026-07-25,第二版watchlist批量回测(默认参数),
+VPL,rejected,RSI2,1h,-0.592,117.0,2026-07-25,第二版watchlist批量回测(默认参数),
+REM,rejected,RSI2,1h,-0.6,89.0,2026-07-25,第二版watchlist批量回测(默认参数),
+AVUV,rejected,Confluence,1h,-0.61,114.0,2026-07-25,第二版watchlist批量回测(默认参数),
+AOK,rejected,Confluence,4h,-0.61,28.0,2026-07-25,第二版watchlist批量回测(默认参数),
+BND,rejected,Confluence,4h,-0.63,31.0,2026-07-25,第二版watchlist批量回测(默认参数),
+HVAC,rejected,RSI2,1h,-0.633,36.0,2026-07-25,第二版watchlist批量回测(默认参数),
+HYMB,rejected,Confluence,4h,-0.64,29.0,2026-07-25,第二版watchlist批量回测(默认参数),
+MLPI,rejected,Confluence,1d,-0.64,3.0,2026-07-25,第二版watchlist批量回测(默认参数),
+USAR,rejected,Confluence,1d,-0.65,31.0,2026-07-25,第二版watchlist批量回测(默认参数),
+REXC,rejected,Confluence,1h,-0.65,13.0,2026-07-25,第二版watchlist批量回测(默认参数),
+OMAH,rejected,Confluence,1d,-0.65,12.0,2026-07-25,第二版watchlist批量回测(默认参数),
+REM,rejected,RSI2,4h,-0.667,16.0,2026-07-25,第二版watchlist批量回测(默认参数),
+VYM,rejected,RSI2,1h,-0.679,93.0,2026-07-25,第二版watchlist批量回测(默认参数),
+VXUS,rejected,RSI2,1h,-0.699,96.0,2026-07-25,第二版watchlist批量回测(默认参数),
+AVGE,rejected,RSI2,1h,-0.71,112.0,2026-07-25,第二版watchlist批量回测(默认参数),
+OMAH,rejected,Confluence,4h,-0.72,10.0,2026-07-25,第二版watchlist批量回测(默认参数),
+LVHI,rejected,RSI2,1h,-0.739,85.0,2026-07-25,第二版watchlist批量回测(默认参数),
+BLK,rejected,RSI2,4h,-0.747,33.0,2026-07-25,第二版watchlist批量回测(默认参数),
+RTH,rejected,Confluence,4h,-0.8,25.0,2026-07-25,第二版watchlist批量回测(默认参数),
+PEP,rejected,Confluence,1h,-0.82,98.0,2026-07-25,第二版watchlist批量回测(默认参数),
+PKW,rejected,Confluence,1h,-0.82,92.0,2026-07-25,第二版watchlist批量回测(默认参数),
+VWO,rejected,RSI2,1h,-0.851,101.0,2026-07-25,第二版watchlist批量回测(默认参数),
+AVGV,rejected,RSI2,1h,-0.851,85.0,2026-07-25,第二版watchlist批量回测(默认参数),
+FXAIX,rejected,RSI2,4h,-0.869,17.0,2026-07-25,第二版watchlist批量回测(默认参数),
+AVIV,rejected,RSI2,1h,-0.883,114.0,2026-07-25,第二版watchlist批量回测(默认参数),
+VTSAX,rejected,RSI2,4h,-0.9,16.0,2026-07-25,第二版watchlist批量回测(默认参数),
+AVDV,rejected,RSI2,1h,-0.957,93.0,2026-07-25,第二版watchlist批量回测(默认参数),
+VTEB,rejected,RSI2,1h,-0.976,54.0,2026-07-25,第二版watchlist批量回测(默认参数),
+REXC,rejected,Confluence,4h,-1.0,2.0,2026-07-25,第二版watchlist批量回测(默认参数),
+JEPQ,rejected,Confluence,1h,-1.02,117.0,2026-07-25,第二版watchlist批量回测(默认参数),
+AOR,rejected,Confluence,4h,-1.02,31.0,2026-07-25,第二版watchlist批量回测(默认参数),
+VCR,rejected,RSI2,1h,-1.021,105.0,2026-07-25,第二版watchlist批量回测(默认参数),
+SPYM,rejected,Confluence,1h,-1.03,12.0,2026-07-25,第二版watchlist批量回测(默认参数),
+HYMB,rejected,RSI2,1h,-1.036,52.0,2026-07-25,第二版watchlist批量回测(默认参数),
+FBND,rejected,RSI2,1h,-1.037,46.0,2026-07-25,第二版watchlist批量回测(默认参数),
+AOA,rejected,RSI2,1h,-1.048,78.0,2026-07-25,第二版watchlist批量回测(默认参数),
+AOK,rejected,RSI2,1h,-1.048,55.0,2026-07-25,第二版watchlist批量回测(默认参数),
+VYMI,rejected,RSI2,1h,-1.087,91.0,2026-07-25,第二版watchlist批量回测(默认参数),
+BND,rejected,RSI2,1h,-1.195,54.0,2026-07-25,第二版watchlist批量回测(默认参数),
+QQQX,rejected,RSI2,1h,-1.252,106.0,2026-07-25,第二版watchlist批量回测(默认参数),
+AOR,rejected,RSI2,1h,-1.335,80.0,2026-07-25,第二版watchlist批量回测(默认参数),
+PCYO,rejected,RSI2,1h,-1.366,78.0,2026-07-25,第二版watchlist批量回测(默认参数),
+VTEB,rejected,Confluence,4h,-1.39,40.0,2026-07-25,第二版watchlist批量回测(默认参数),
+FBND,rejected,Confluence,4h,-1.45,29.0,2026-07-25,第二版watchlist批量回测(默认参数),
+RW,rejected,Confluence,1h,-1.52,10.0,2026-07-25,第二版watchlist批量回测(默认参数),
+FLCA,rejected,RSI2,1h,-1.543,108.0,2026-07-25,第二版watchlist批量回测(默认参数),
+MLPI,rejected,Confluence,1h,-1.65,20.0,2026-07-25,第二版watchlist批量回测(默认参数),
+JEPI,rejected,RSI2,1h,-1.762,70.0,2026-07-25,第二版watchlist批量回测(默认参数),
+MLPI,rejected,Confluence,4h,-1.87,4.0,2026-07-25,第二版watchlist批量回测(默认参数),
+DRAM,rejected,Confluence,4h,-2.06,8.0,2026-07-25,第二版watchlist批量回测(默认参数),
+OMAH,rejected,RSI2,1h,-2.282,24.0,2026-07-25,第二版watchlist批量回测(默认参数),
+SGOV,rejected,RSI2,1h,-2.984,37.0,2026-07-25,第二版watchlist批量回测(默认参数),
+XHLF,rejected,RSI2,1h,-3.124,40.0,2026-07-25,第二版watchlist批量回测(默认参数),
+VBIL,rejected,RSI2,1h,-3.305,25.0,2026-07-25,第二版watchlist批量回测(默认参数),
+XHLF,rejected,Confluence,4h,-6.08,68.0,2026-07-25,第二版watchlist批量回测(默认参数),
+SGOV,rejected,Confluence,4h,-6.71,79.0,2026-07-25,第二版watchlist批量回测(默认参数),
+VBIL,rejected,Confluence,4h,-6.88,37.0,2026-07-25,第二版watchlist批量回测(默认参数),
+COIN,rejected,RSI2,1d,0.275,17.0,2026-07-25,用户追问补跑(HOOD/EU/XYZ/COIN/DELL),
+COIN,rejected,RSI2,1h,0.211,104.0,2026-07-25,用户追问补跑(HOOD/EU/XYZ/COIN/DELL),
+COIN,rejected,RSI2,4h,0.032,27.0,2026-07-25,用户追问补跑(HOOD/EU/XYZ/COIN/DELL),
+DELL,rejected,RSI2,1d,0.48,19.0,2026-07-25,用户追问补跑(HOOD/EU/XYZ/COIN/DELL),
+DELL,promoted,Confluence,1h,0.83,70.0,2026-07-25,用户追问补跑(HOOD/EU/XYZ/COIN/DELL),
+DELL,promoted,RSI2,4h,0.853,38.0,2026-07-25,用户追问补跑(HOOD/EU/XYZ/COIN/DELL),
+EU,rejected,Breakout,1d,0.127,12.0,2026-07-25,用户追问补跑(HOOD/EU/XYZ/COIN/DELL),
+EU,rejected,Confluence,1h,-0.55,106.0,2026-07-25,用户追问补跑(HOOD/EU/XYZ/COIN/DELL),
+EU,rejected,Confluence,4h,-0.31,43.0,2026-07-25,用户追问补跑(HOOD/EU/XYZ/COIN/DELL),
+HOOD,rejected,Breakout,1d,0.845,12.0,2026-07-25,用户追问补跑(HOOD/EU/XYZ/COIN/DELL),
+HOOD,promoted,RSI2,1h,1.108,142.0,2026-07-25,用户追问补跑(HOOD/EU/XYZ/COIN/DELL),
+HOOD,promoted,RSI2,4h,0.644,51.0,2026-07-25,用户追问补跑(HOOD/EU/XYZ/COIN/DELL),
+XYZ,rejected,Breakout,1d,0.557,22.0,2026-07-25,用户追问补跑(HOOD/EU/XYZ/COIN/DELL),
+XYZ,rejected,Confluence,4h,-1.02,14.0,2026-07-25,用户追问补跑(HOOD/EU/XYZ/COIN/DELL),
+AAOI,rejected,MR,1h,-0.015,24.0,2026-07-25,MR均值回归补测(对未达标标的),
+ABT,rejected,MR,1d,0.233,15.0,2026-07-25,MR均值回归补测(对未达标标的),
+ADBE,rejected,MR,1d,0.378,15.0,2026-07-25,MR均值回归补测(对未达标标的),
+AOA,rejected,MR,1d,0.324,20.0,2026-07-25,MR均值回归补测(对未达标标的),
+AOA,rejected,MR,1h,-0.527,32.0,2026-07-25,MR均值回归补测(对未达标标的),
+AOK,rejected,MR,1d,0.334,16.0,2026-07-25,MR均值回归补测(对未达标标的),
+AOK,rejected,MR,1h,-0.405,33.0,2026-07-25,MR均值回归补测(对未达标标的),
+AOR,rejected,MR,1d,0.236,22.0,2026-07-25,MR均值回归补测(对未达标标的),
+AOR,rejected,MR,1h,-0.781,36.0,2026-07-25,MR均值回归补测(对未达标标的),
+APO,rejected,MR,1h,-0.54,17.0,2026-07-25,MR均值回归补测(对未达标标的),
+ASML,rejected,MR,1d,0.468,17.0,2026-07-25,MR均值回归补测(对未达标标的),
+ASML,rejected,MR,1h,0.292,22.0,2026-07-25,MR均值回归补测(对未达标标的),
+ASTS,rejected,MR,1h,-0.329,18.0,2026-07-25,MR均值回归补测(对未达标标的),
+AVDV,rejected,MR,1d,0.197,17.0,2026-07-25,MR均值回归补测(对未达标标的),
+AVDV,rejected,MR,1h,-0.717,27.0,2026-07-25,MR均值回归补测(对未达标标的),
+AVGE,rejected,MR,1h,-0.061,34.0,2026-07-25,MR均值回归补测(对未达标标的),
+AVGO,rejected,MR,1d,0.103,23.0,2026-07-25,MR均值回归补测(对未达标标的),
+AVGO,rejected,MR,1h,0.792,22.0,2026-07-25,MR均值回归补测(对未达标标的),
+AVGV,rejected,MR,1h,-0.767,30.0,2026-07-25,MR均值回归补测(对未达标标的),
+AVIV,rejected,MR,1h,-0.023,26.0,2026-07-25,MR均值回归补测(对未达标标的),
+AVNM,rejected,MR,1h,-0.354,20.0,2026-07-25,MR均值回归补测(对未达标标的),
+AVUV,rejected,MR,1h,-0.466,32.0,2026-07-25,MR均值回归补测(对未达标标的),
+BLK,rejected,MR,1d,0.083,15.0,2026-07-25,MR均值回归补测(对未达标标的),
+BLK,rejected,MR,1h,0.345,26.0,2026-07-25,MR均值回归补测(对未达标标的),
+BRK-B,rejected,MR,1d,0.168,17.0,2026-07-25,MR均值回归补测(对未达标标的),
+BRK-B,rejected,MR,1h,0.674,28.0,2026-07-25,MR均值回归补测(对未达标标的),
+CCJ,rejected,MR,1d,0.043,20.0,2026-07-25,MR均值回归补测(对未达标标的),
+CCJ,rejected,MR,1h,-0.3,16.0,2026-07-25,MR均值回归补测(对未达标标的),
+CIK,rejected,MR,1h,-0.444,16.0,2026-07-25,MR均值回归补测(对未达标标的),
+COIN,rejected,MR,1h,-0.618,19.0,2026-07-25,MR均值回归补测(对未达标标的),
+CRM,rejected,MR,1h,-1.089,15.0,2026-07-25,MR均值回归补测(对未达标标的),
+CSGP,rejected,MR,1d,-0.402,15.0,2026-07-25,MR均值回归补测(对未达标标的),
+CSGP,rejected,MR,1h,-0.222,19.0,2026-07-25,MR均值回归补测(对未达标标的),
+CVX,rejected,MR,1h,-0.008,16.0,2026-07-25,MR均值回归补测(对未达标标的),
+DIS,rejected,MR,1h,0.108,23.0,2026-07-25,MR均值回归补测(对未达标标的),
+DPZ,rejected,MR,1h,-0.749,25.0,2026-07-25,MR均值回归补测(对未达标标的),
+EBAY,rejected,MR,1d,0.344,15.0,2026-07-25,MR均值回归补测(对未达标标的),
+EBAY,rejected,MR,1h,-0.895,22.0,2026-07-25,MR均值回归补测(对未达标标的),
+EU,rejected,MR,1h,-0.621,17.0,2026-07-25,MR均值回归补测(对未达标标的),
+FDVV,rejected,MR,1d,0.611,23.0,2026-07-25,MR均值回归补测(对未达标标的),
+FDVV,promoted,MR,1h,0.619,38.0,2026-07-25,MR均值回归补测(对未达标标的),
+FLCA,rejected,MR,1d,0.208,17.0,2026-07-25,MR均值回归补测(对未达标标的),
+FLCA,rejected,MR,1h,-0.511,31.0,2026-07-25,MR均值回归补测(对未达标标的),
+FOF,rejected,MR,1h,-0.603,21.0,2026-07-25,MR均值回归补测(对未达标标的),
+FYC,rejected,MR,1d,0.424,19.0,2026-07-25,MR均值回归补测(对未达标标的),
+FYC,rejected,MR,1h,-0.41,37.0,2026-07-25,MR均值回归补测(对未达标标的),
+GS,rejected,MR,1h,1.001,24.0,2026-07-25,MR均值回归补测(对未达标标的),
+IBBQ,rejected,MR,1h,-0.051,31.0,2026-07-25,MR均值回归补测(对未达标标的),
+ICF,rejected,MR,1h,-0.392,25.0,2026-07-25,MR均值回归补测(对未达标标的),
+IJR,rejected,MR,1d,0.404,20.0,2026-07-25,MR均值回归补测(对未达标标的),
+IJR,rejected,MR,1h,-0.669,22.0,2026-07-25,MR均值回归补测(对未达标标的),
+IMAX,rejected,MR,1h,-0.174,22.0,2026-07-25,MR均值回归补测(对未达标标的),
+JEPI,rejected,MR,1h,0.209,25.0,2026-07-25,MR均值回归补测(对未达标标的),
+JEPQ,rejected,MR,1h,-1.296,23.0,2026-07-25,MR均值回归补测(对未达标标的),
+MGA,rejected,MR,1h,0.133,22.0,2026-07-25,MR均值回归补测(对未达标标的),
+MO,rejected,MR,1h,-0.906,20.0,2026-07-25,MR均值回归补测(对未达标标的),
+NAT,rejected,MR,1h,0.345,19.0,2026-07-25,MR均值回归补测(对未达标标的),
+NFLX,rejected,MR,1d,0.59,15.0,2026-07-25,MR均值回归补测(对未达标标的),
+NFLX,rejected,MR,1h,0.093,21.0,2026-07-25,MR均值回归补测(对未达标标的),
+NOK,rejected,MR,1h,0.739,21.0,2026-07-25,MR均值回归补测(对未达标标的),
+NVO,rejected,MR,1h,0.474,19.0,2026-07-25,MR均值回归补测(对未达标标的),
+ONTO,rejected,MR,1h,-0.614,18.0,2026-07-25,MR均值回归补测(对未达标标的),
+PCYO,rejected,MR,1h,-0.153,18.0,2026-07-25,MR均值回归补测(对未达标标的),
+PEP,rejected,MR,1d,-0.158,18.0,2026-07-25,MR均值回归补测(对未达标标的),
+PL,rejected,MR,1h,0.778,21.0,2026-07-25,MR均值回归补测(对未达标标的),
+PTMC,rejected,MR,1d,0.376,17.0,2026-07-25,MR均值回归补测(对未达标标的),
+PTMC,rejected,MR,1h,-0.808,27.0,2026-07-25,MR均值回归补测(对未达标标的),
+QQQM,rejected,MR,1h,0.818,27.0,2026-07-25,MR均值回归补测(对未达标标的),
+QQQX,rejected,MR,1d,0.409,16.0,2026-07-25,MR均值回归补测(对未达标标的),
+QQQX,rejected,MR,1h,-0.438,24.0,2026-07-25,MR均值回归补测(对未达标标的),
+RBC,rejected,MR,1d,0.501,22.0,2026-07-25,MR均值回归补测(对未达标标的),
+RBC,rejected,MR,1h,-0.127,24.0,2026-07-25,MR均值回归补测(对未达标标的),
+REM,rejected,MR,1h,-0.134,24.0,2026-07-25,MR均值回归补测(对未达标标的),
+RSP,rejected,MR,1d,0.328,25.0,2026-07-25,MR均值回归补测(对未达标标的),
+RSP,rejected,MR,1h,0.076,28.0,2026-07-25,MR均值回归补测(对未达标标的),
+RTH,rejected,MR,1d,0.262,17.0,2026-07-25,MR均值回归补测(对未达标标的),
+RTH,rejected,MR,1h,0.039,27.0,2026-07-25,MR均值回归补测(对未达标标的),
+SAP,rejected,MR,1d,0.006,17.0,2026-07-25,MR均值回归补测(对未达标标的),
+SAP,rejected,MR,1h,-1.125,19.0,2026-07-25,MR均值回归补测(对未达标标的),
+SCHD,rejected,MR,1d,-0.016,16.0,2026-07-25,MR均值回归补测(对未达标标的),
+SCHD,rejected,MR,1h,-0.893,25.0,2026-07-25,MR均值回归补测(对未达标标的),
+SCHG,rejected,MR,1d,0.555,19.0,2026-07-25,MR均值回归补测(对未达标标的),
+SCHG,rejected,MR,1h,-0.135,29.0,2026-07-25,MR均值回归补测(对未达标标的),
+SCHW,rejected,MR,1d,0.052,17.0,2026-07-25,MR均值回归补测(对未达标标的),
+SCHW,rejected,MR,1h,0.246,21.0,2026-07-25,MR均值回归补测(对未达标标的),
+SKM,rejected,MR,1d,0.248,17.0,2026-07-25,MR均值回归补测(对未达标标的),
+SMCI,rejected,MR,1d,-0.023,15.0,2026-07-25,MR均值回归补测(对未达标标的),
+SMCI,rejected,MR,1h,0.482,24.0,2026-07-25,MR均值回归补测(对未达标标的),
+SO,rejected,MR,1d,0.45,16.0,2026-07-25,MR均值回归补测(对未达标标的),
+SO,rejected,MR,1h,0.268,24.0,2026-07-25,MR均值回归补测(对未达标标的),
+SPYI,rejected,MR,1h,-0.536,21.0,2026-07-25,MR均值回归补测(对未达标标的),
+TMC,rejected,MR,1h,-1.084,15.0,2026-07-25,MR均值回归补测(对未达标标的),
+TSM,promoted,MR,1h,1.281,31.0,2026-07-25,MR均值回归补测(对未达标标的),
+UBER,rejected,MR,1h,-0.612,21.0,2026-07-25,MR均值回归补测(对未达标标的),
+USO,rejected,MR,1h,0.262,17.0,2026-07-25,MR均值回归补测(对未达标标的),
+VB,rejected,MR,1d,0.339,22.0,2026-07-25,MR均值回归补测(对未达标标的),
+VB,rejected,MR,1h,-0.382,29.0,2026-07-25,MR均值回归补测(对未达标标的),
+VCR,rejected,MR,1d,0.398,19.0,2026-07-25,MR均值回归补测(对未达标标的),
+VCR,rejected,MR,1h,0.278,26.0,2026-07-25,MR均值回归补测(对未达标标的),
+VEU,rejected,MR,1d,0.429,23.0,2026-07-25,MR均值回归补测(对未达标标的),
+VEU,rejected,MR,1h,0.371,30.0,2026-07-25,MR均值回归补测(对未达标标的),
+VGK,rejected,MR,1d,0.529,22.0,2026-07-25,MR均值回归补测(对未达标标的),
+VGK,rejected,MR,1h,-0.49,24.0,2026-07-25,MR均值回归补测(对未达标标的),
+VO,rejected,MR,1d,0.416,21.0,2026-07-25,MR均值回归补测(对未达标标的),
+VO,rejected,MR,1h,-0.695,31.0,2026-07-25,MR均值回归补测(对未达标标的),
+VPL,rejected,MR,1d,0.79,16.0,2026-07-25,MR均值回归补测(对未达标标的),
+VPL,rejected,MR,1h,-0.427,25.0,2026-07-25,MR均值回归补测(对未达标标的),
+VT,rejected,MR,1d,0.56,23.0,2026-07-25,MR均值回归补测(对未达标标的),
+VT,rejected,MR,1h,-0.522,34.0,2026-07-25,MR均值回归补测(对未达标标的),
+VUG,rejected,MR,1d,0.74,20.0,2026-07-25,MR均值回归补测(对未达标标的),
+VUG,rejected,MR,1h,0.189,25.0,2026-07-25,MR均值回归补测(对未达标标的),
+VWO,rejected,MR,1d,-0.098,22.0,2026-07-25,MR均值回归补测(对未达标标的),
+VWO,rejected,MR,1h,-0.218,19.0,2026-07-25,MR均值回归补测(对未达标标的),
+VXUS,rejected,MR,1d,0.577,22.0,2026-07-25,MR均值回归补测(对未达标标的),
+VXUS,rejected,MR,1h,0.278,30.0,2026-07-25,MR均值回归补测(对未达标标的),
+VYM,rejected,MR,1d,0.341,20.0,2026-07-25,MR均值回归补测(对未达标标的),
+VYM,rejected,MR,1h,-0.899,31.0,2026-07-25,MR均值回归补测(对未达标标的),
+VYMI,rejected,MR,1d,0.394,24.0,2026-07-25,MR均值回归补测(对未达标标的),
+VYMI,rejected,MR,1h,-0.502,21.0,2026-07-25,MR均值回归补测(对未达标标的),
+XSMO,rejected,MR,1d,0.493,21.0,2026-07-25,MR均值回归补测(对未达标标的),
+XSMO,rejected,MR,1h,-0.185,29.0,2026-07-25,MR均值回归补测(对未达标标的),
+YOU,rejected,MR,1h,-0.109,24.0,2026-07-25,MR均值回归补测(对未达标标的),
+ZH,rejected,MR,1h,-0.315,19.0,2026-07-25,MR均值回归补测(对未达标标的),
+BSP,insufficient_data,,,,,2026-07-25,近期新上市，1d仅16-28行，暂缓,
+RAM,insufficient_data,,,,,2026-07-25,近期新上市，1d仅16-28行，暂缓,
+SPCX,promoted_unvalidated,,,,,2026-07-25,"近期新上市，1d仅16-28行，暂缓 -> 2026-07-25用户明确要求接入实盘扫描(默认confluence,未经回测验证)",
+ABBN,non_us_or_invalid,,,,,2026-07-25,瑞士ABBN.SW,
+AVG,non_us_or_invalid,,,,,2026-07-25,澳洲AVG.AX,
+CBE,non_us_or_invalid,,,,,2026-07-25,澳洲CBE.AX,
+CESG,non_us_or_invalid,,,,,2026-07-25,伦敦CESG.L,
+CVD,non_us_or_invalid,,,,,2026-07-25,加拿大CVD.TO,
+DHHF,non_us_or_invalid,,,,,2026-07-25,澳洲DHHF.AX,
+HHIS,non_us_or_invalid,,,,,2026-07-25,加拿大HHIS.TO,
+HULC,non_us_or_invalid,,,,,2026-07-25,加拿大HULC.TO,
+MSTE,non_us_or_invalid,,,,,2026-07-25,加拿大MSTE.TO,
+MQG,non_us_or_invalid,,,,,2026-07-25,澳洲MQG.AX,
+PRL,non_us_or_invalid,,,,,2026-07-25,加拿大PRL.TO,
+TTM,non_us_or_invalid,,,,,2026-07-25,澳洲TTM.AX,
+VDHG,non_us_or_invalid,,,,,2026-07-25,澳洲VDHG.AX,
+VEQT,non_us_or_invalid,,,,,2026-07-25,加拿大VEQT.TO,
+VOW,non_us_or_invalid,,,,,2026-07-25,德国VOW.DE,
+VWRA,non_us_or_invalid,,,,,2026-07-25,瑞士VWRA.SW,
+XEQT,non_us_or_invalid,,,,,2026-07-25,加拿大XEQT.TO,
+DLA,non_us_or_invalid,,,,,2026-07-25,任何后缀均无法解析,
+HFC,non_us_or_invalid,,,,,2026-07-25,任何后缀均无法解析,
+INVEST,non_us_or_invalid,,,,,2026-07-25,任何后缀均无法解析,
+KPK,non_us_or_invalid,,,,,2026-07-25,任何后缀均无法解析,
+BRK,non_us_or_invalid,,,,,2026-07-25,已修正为BRK-B,
+AGI,rejected,Breakout,1d,0.015,20.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+AGI,rejected,Confluence,1h,0.41,129.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+AGI,promoted,RSI2,4h,0.856,37.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+ALL,rejected,Breakout,1d,-0.012,33.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+AM,rejected,Confluence,1d,0.23,49.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+API,rejected,Confluence,1d,0.28,51.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+API,rejected,RSI2,1h,0.208,112.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+API,rejected,Confluence,4h,-0.27,36.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+APLD,rejected,MR,1h,0.5,21.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+BA,rejected,Breakout,1d,0.24,22.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+BA,rejected,MR,1h,-0.2,15.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+BAC,rejected,Breakout,1d,0.742,24.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+BAC,promoted,RSI2,1h,0.782,116.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+BAC,rejected,Confluence,4h,-0.48,45.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+BATL,rejected,Confluence,1d,-0.57,34.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+BATL,rejected,RSI2,1h,0.117,55.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+BATL,rejected,RSI2,4h,-0.168,15.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+BBW,rejected,MR,1h,0.485,21.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+BE,rejected,Breakout,1d,0.512,13.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+BE,rejected,RSI2,1h,0.598,122.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+BE,promoted,RSI2,4h,0.698,41.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+CBUS,rejected,Confluence,1d,0.28,67.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+CBUS,promoted,Confluence,1h,0.79,110.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+CBUS,rejected,Confluence,4h,0.13,38.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+CC,rejected,Breakout,1d,0.073,19.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+CC,rejected,Confluence,1h,-0.34,126.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+CC,rejected,RSI2,4h,-0.016,18.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+CCB,rejected,Breakout,1d,0.411,11.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+CCB,rejected,MR,1h,0.654,29.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+CCB,promoted,RSI2,4h,0.622,38.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+CLX,rejected,Confluence,1d,-0.03,57.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+CLX,rejected,RSI2,1h,-0.871,67.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+CLX,rejected,Confluence,4h,0.31,45.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+CRCL,rejected,Confluence,1d,0.44,9.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+CRCL,promoted,Confluence,1h,0.92,40.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+CRCL,rejected,Confluence,4h,-1.24,9.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+CRML,rejected,Confluence,1d,0.64,28.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+CRML,rejected,RSI2,1h,-0.307,78.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+CRML,rejected,Confluence,4h,0.57,30.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+CRSP,rejected,Breakout,1d,0.172,13.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+CRWV,rejected,Confluence,1d,-1.27,14.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+CRWV,promoted,Confluence,1h,1.21,73.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+CRWV,rejected,Confluence,4h,0.1,21.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+ES,rejected,Breakout,1d,-0.061,20.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+ES,rejected,MR,1h,-0.264,28.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+ES,rejected,RSI2,4h,0.153,34.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+FCF,rejected,Confluence,1d,0.09,48.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+FCF,rejected,MR,1h,-0.184,23.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+FCF,rejected,RSI2,4h,0.092,28.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+FOX,rejected,Breakout,1d,0.489,11.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+FOX,rejected,MR,1h,-0.162,27.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+FOX,promoted,RSI2,4h,0.91,40.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+GE,rejected,Breakout,1d,0.316,29.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+GE,rejected,RSI2,1h,0.349,131.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+GE,promoted,RSI2,4h,0.837,45.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+GEV,rejected,RSI2,1d,0.66,23.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+GFS,rejected,Confluence,1d,-0.67,31.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+GOOG,rejected,Confluence,1d,0.37,60.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+GOOG,rejected,Confluence,1h,-0.1,142.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+GOOG,promoted,RSI2,4h,0.875,46.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+HBM,rejected,Breakout,1d,0.398,19.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+IBIT,rejected,Confluence,1d,-0.98,16.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+INFQ,rejected,Confluence,1d,-1.47,3.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+INFQ,rejected,Confluence,1h,0.87,23.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+INFQ,rejected,Confluence,4h,-1.7,7.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+IP,rejected,Breakout,1d,-0.019,16.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+IP,rejected,Confluence,1h,-0.1,127.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+IP,rejected,RSI2,4h,-0.638,28.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+ISRG,rejected,Breakout,1d,0.108,36.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+ISRG,rejected,RSI2,1h,0.059,88.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+ISRG,rejected,RSI2,4h,-0.456,33.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+IT,rejected,MR,1d,0.182,17.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+IT,rejected,RSI2,1h,-0.264,76.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+IT,rejected,Confluence,4h,0.32,40.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+KO,rejected,MR,1d,0.185,21.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+KO,rejected,MR,1h,0.347,22.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+LINK,rejected,RSI2,1d,-0.422,18.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+LINK,rejected,Confluence,1h,-0.15,58.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+LINK,rejected,RSI2,4h,0.342,25.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+LLY,rejected,Breakout,1d,0.594,34.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+LLY,rejected,MR,1h,0.487,17.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+LLY,rejected,RSI2,4h,0.258,40.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+LMT,rejected,Breakout,1d,0.604,23.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+LMT,promoted,Confluence,1h,0.77,116.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+LMT,rejected,RSI2,4h,1.044,25.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+LSL,rejected,Confluence,1d,1.76,5.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+LTL,rejected,MR,1d,0.275,21.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+LTL,promoted,RSI2,1h,0.982,73.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+LTL,rejected,RSI2,4h,-0.396,32.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+LULU,rejected,Breakout,1d,0.378,26.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+LULU,rejected,RSI2,1h,0.132,83.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+LULU,rejected,Confluence,4h,0.34,44.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+MINE,rejected,Confluence,1h,0.06,5.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+MKSI,rejected,Confluence,1d,0.25,72.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+MKSI,promoted,MR,1h,0.623,31.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+MKSI,rejected,RSI2,4h,0.503,52.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+MQ,rejected,Confluence,1d,0.17,26.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+MQ,rejected,MR,1h,-0.152,15.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+MQ,rejected,Confluence,4h,-1.11,27.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+MS,rejected,RSI2,1d,0.243,29.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+MS,rejected,RSI2,1h,0.58,115.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+MS,promoted,RSI2,4h,0.601,51.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+MSM,rejected,MR,1h,-0.39,18.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+MSTR,rejected,Breakout,1d,0.403,16.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+NGS,rejected,RSI2,1d,0.272,20.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+NGS,rejected,RSI2,1h,0.144,112.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+NGS,rejected,RSI2,4h,-0.253,41.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+NOEM,rejected,Confluence,1d,-0.85,15.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+NOEM,rejected,Confluence,1h,-0.05,1.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+NOEM,rejected,Confluence,4h,-0.54,2.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+NOW,rejected,MR,1d,0.145,17.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+NOW,rejected,MR,1h,-0.265,16.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+NOW,rejected,Confluence,4h,0.1,50.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+OC,rejected,Confluence,1d,0.07,59.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+OC,rejected,RSI2,1h,-0.251,115.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+OC,promoted,Confluence,4h,0.83,40.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+ONDS,promoted,Confluence,1h,0.88,131.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+ONDS,rejected,RSI2,4h,0.133,33.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+OSCR,rejected,Confluence,1d,-0.18,48.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+OSCR,rejected,RSI2,1h,0.572,106.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+OSCR,promoted,RSI2,4h,0.623,42.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+OUST,rejected,Confluence,1h,0.23,156.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+OUST,rejected,RSI2,4h,0.563,39.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+OXY,rejected,Confluence,1d,0.15,58.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+OXY,rejected,MR,1h,-0.87,19.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+OXY,rejected,Confluence,4h,-0.38,29.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+PB,rejected,Breakout,1d,-0.05,11.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+PG,rejected,MR,1d,0.264,21.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+PG,rejected,MR,1h,0.263,21.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+PG,rejected,RSI2,4h,-0.35,19.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+PINS,rejected,MR,1h,0.478,17.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+QCOM,rejected,MR,1h,0.537,21.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+RIVN,rejected,Confluence,1d,0.27,35.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+RIVN,rejected,RSI2,1h,-0.315,88.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+RIVN,rejected,RSI2,4h,-0.212,23.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+SGP,rejected,Confluence,1d,-0.63,2.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+SGP,rejected,Confluence,1h,-2.25,20.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+SGP,rejected,Confluence,4h,-0.36,4.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+SLS,rejected,RSI2,1d,0.156,20.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+SLS,rejected,MR,1h,0.473,19.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+SMA,rejected,Confluence,1d,-0.6,10.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+SMA,rejected,RSI2,1h,-2.376,38.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+SMA,rejected,Confluence,4h,-1.35,11.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+SMR,rejected,Confluence,1d,0.39,35.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+SMR,rejected_high_risk_dd,RSI2,1h,0.686,116.0,2026-07-25,最大回撤-95.12%风险过高，即使Sharpe达标也排除,
+SMR,rejected_high_risk_dd,RSI2,4h,0.548,42.0,2026-07-25,最大回撤-52.69%风险过高，即使Sharpe达标也排除,
+SPXC,rejected,MR,1d,0.482,15.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+STLA,rejected,Breakout,1d,0.545,22.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+TGS,rejected,Confluence,1d,-0.14,46.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+TGS,rejected,MR,1h,-0.159,24.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+TGS,rejected,RSI2,4h,0.249,38.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+UNH,rejected,MR,1d,0.23,15.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+UNH,rejected,MR,1h,1.401,17.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+UNH,rejected,Confluence,4h,0.06,48.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+VC,rejected,Breakout,1d,0.185,13.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+VC,rejected,MR,1h,0.217,20.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+WBD,rejected,Breakout,1d,0.514,10.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+WBD,promoted,RSI2,1h,0.969,81.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+WBD,promoted,RSI2,4h,0.796,32.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+WDC,rejected,Confluence,1d,0.56,85.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+WDC,promoted,RSI2,1h,1.276,141.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+WDC,promoted,RSI2,4h,1.01,47.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+WM,rejected,MR,1d,0.406,21.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+WM,rejected,RSI2,4h,-0.29,25.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+WMT,rejected,Breakout,1d,0.061,34.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+WMT,rejected,MR,1h,0.17,22.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+WMT,promoted,RSI2,4h,0.677,42.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+ZION,rejected,MR,1d,0.291,18.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+ZION,rejected,MR,1h,0.434,27.0,2026-07-25,第四版watchlist(293个代码)批量回测,
+ACAC,no_data_unverified,,,,,2026-07-25,再次确认无数据(与第一版一致),
+FX,no_data_unverified,,,,,2026-07-25,再次确认无数据,
+LTV,no_data_unverified,,,,,2026-07-25,再次确认无数据,
+OS,no_data_unverified,,,,,2026-07-25,再次确认无数据,
+RE,no_data_unverified,,,,,2026-07-25,再次确认无数据,
+SMS,no_data_unverified,,,,,2026-07-25,再次确认无数据,
+TITI,no_data_unverified,,,,,2026-07-25,再次确认无数据,
+ETHU,insufficient_data,,,,,2026-07-25,仅1d数据(加密货币ETF，730天1h窗口不足),
+IBIT,insufficient_data,,,,,2026-07-25,仅1d数据(比特币ETF，730天1h窗口不足),
+GEV,insufficient_data,,,,,2026-07-25,仅1d数据(次新股),
+LSL,insufficient_data,,,,,2026-07-25,仅1d数据(次新股),
+RR,insufficient_data,,,,,2026-07-25,仅1d数据(次新股),
+BRK.B,duplicate_format,,,,,2026-07-25,与已处理的BRK-B同一标的，格式不同(点号vs连字符),
+CEG,rejected,MR,1h,-0.543,15.0,2026-07-25,MR补测缺口检查(已用其他策略达标接入，MR未能超越现有选择),
+CRWD,rejected,MR,1h,0.556,27.0,2026-07-25,MR补测缺口检查(已用其他策略达标接入，MR未能超越现有选择),
+DELL,rejected,MR,1h,-0.135,20.0,2026-07-25,MR补测缺口检查(已用其他策略达标接入，MR未能超越现有选择),
+DGRO,rejected,MR,1h,-0.078,31.0,2026-07-25,MR补测缺口检查(已用其他策略达标接入，MR未能超越现有选择),
+DGRO,rejected,MR,1d,0.433,20.0,2026-07-25,MR补测缺口检查(已用其他策略达标接入，MR未能超越现有选择),
+INTU,rejected,MR,1h,0.507,15.0,2026-07-25,MR补测缺口检查(已用其他策略达标接入，MR未能超越现有选择),
+JPM,rejected,MR,1h,0.193,26.0,2026-07-25,MR补测缺口检查(已用其他策略达标接入，MR未能超越现有选择),
+JPM,rejected,MR,1d,0.271,16.0,2026-07-25,MR补测缺口检查(已用其他策略达标接入，MR未能超越现有选择),
+LUNR,rejected,MR,1h,0.072,22.0,2026-07-25,MR补测缺口检查(已用其他策略达标接入，MR未能超越现有选择),
+LVHI,rejected,MR,1h,-0.357,24.0,2026-07-25,MR补测缺口检查(已用其他策略达标接入，MR未能超越现有选择),
+LVHI,rejected,MR,1d,0.174,22.0,2026-07-25,MR补测缺口检查(已用其他策略达标接入，MR未能超越现有选择),
+MORN,rejected,MR,1h,-0.789,20.0,2026-07-25,MR补测缺口检查(已用其他策略达标接入，MR未能超越现有选择),
+NTRS,rejected,MR,1h,0.517,23.0,2026-07-25,MR补测缺口检查(已用其他策略达标接入，MR未能超越现有选择),
+NTRS,rejected,MR,1d,0.173,18.0,2026-07-25,MR补测缺口检查(已用其他策略达标接入，MR未能超越现有选择),
+ORCL,rejected,MR,1h,0.094,24.0,2026-07-25,MR补测缺口检查(已用其他策略达标接入，MR未能超越现有选择),
+ORCL,rejected,MR,1d,0.209,16.0,2026-07-25,MR补测缺口检查(已用其他策略达标接入，MR未能超越现有选择),
+PKW,rejected,MR,1h,-0.098,30.0,2026-07-25,MR补测缺口检查(已用其他策略达标接入，MR未能超越现有选择),
+PKW,rejected,MR,1d,0.636,23.0,2026-07-25,MR补测缺口检查(已用其他策略达标接入，MR未能超越现有选择),
+PYPL,rejected,MR,1h,-0.011,19.0,2026-07-25,MR补测缺口检查(已用其他策略达标接入，MR未能超越现有选择),
+RBLX,rejected,MR,1h,0.651,19.0,2026-07-25,MR补测缺口检查(已用其他策略达标接入，MR未能超越现有选择),
+SLV,rejected,MR,1h,-0.733,23.0,2026-07-25,MR补测缺口检查(已用其他策略达标接入，MR未能超越现有选择),
+SPMO,rejected,MR,1h,-0.085,27.0,2026-07-25,MR补测缺口检查(已用其他策略达标接入，MR未能超越现有选择),
+SPMO,rejected,MR,1d,0.632,22.0,2026-07-25,MR补测缺口检查(已用其他策略达标接入，MR未能超越现有选择),
+SPYM,rejected,MR,1d,0.277,22.0,2026-07-25,MR补测缺口检查(已用其他策略达标接入，MR未能超越现有选择),
+VOO,rejected,MR,1h,0.252,37.0,2026-07-25,MR补测缺口检查(已用其他策略达标接入，MR未能超越现有选择),
+VOO,rejected,MR,1d,0.201,23.0,2026-07-25,MR补测缺口检查(已用其他策略达标接入，MR未能超越现有选择),
+VTI,rejected,MR,1h,-0.56,31.0,2026-07-25,MR补测缺口检查(已用其他策略达标接入，MR未能超越现有选择),
+VTI,rejected,MR,1d,0.4,26.0,2026-07-25,MR补测缺口检查(已用其他策略达标接入，MR未能超越现有选择),
+AAOI,rejected,RSI2,1d,0.451,29.0,2026-07-25,网格优化后仍不达标,
+AAOI,rejected,RSI2,1h,0.485,159.0,2026-07-25,网格优化后仍不达标,
+AAOI,promoted,RSI2,4h,0.672,70.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标,
+ABT,rejected,Confluence,1d,-0.09,25.0,2026-07-25,网格优化后仍不达标,
+ABT,rejected,RSI2,1h,0.49,56.0,2026-07-25,网格优化后仍不达标,
+ABT,rejected,Confluence,4h,0.49,37.0,2026-07-25,网格优化后仍不达标,
+ADBE,rejected,Confluence,1d,0.35,35.0,2026-07-25,网格优化后仍不达标,
+ADBE,rejected,Confluence,1h,0.16,212.0,2026-07-25,网格优化后仍不达标,
+ADBE,rejected,RSI2,4h,-0.223,23.0,2026-07-25,网格优化后仍不达标,
+AGIX,rejected,RSI2,1d,1.268,16.0,2026-07-25,网格优化后仍不达标,
+AIRJ,rejected,Confluence,1d,0.46,18.0,2026-07-25,网格优化后仍不达标,
+AIRJ,promoted,RSI2,1h,0.614,56.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标,
+AIRJ,rejected,Confluence,4h,0.5,26.0,2026-07-25,网格优化后仍不达标,
+ALL,rejected,RSI2,1d,0.112,17.0,2026-07-25,网格优化后仍不达标,
+ALL,promoted,RSI2,1h,1.121,55.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标,
+ALL,rejected,RSI2,4h,0.411,36.0,2026-07-25,网格优化后仍不达标,
+AM,rejected,RSI2,1d,0.687,16.0,2026-07-25,网格优化后仍不达标,
+AM,rejected,RSI2,1h,0.478,176.0,2026-07-25,网格优化后仍不达标,
+AM,rejected,RSI2,4h,0.746,17.0,2026-07-25,网格优化后仍不达标,
+AMC,rejected,Confluence,1d,0.44,96.0,2026-07-25,网格优化后仍不达标,
+AMC,promoted,Confluence,1h,1.06,154.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标,
+AMC,rejected,Confluence,4h,0.51,65.0,2026-07-25,网格优化后仍不达标,
+APLD,rejected,RSI2,1d,0.739,26.0,2026-07-25,网格优化后仍不达标,
+APLD,promoted,RSI2,1h,1.029,91.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标,
+APLD,rejected,RSI2,4h,0.844,29.0,2026-07-25,网格优化后仍不达标,
+APO,rejected,Confluence,1d,0.29,22.0,2026-07-25,网格优化后仍不达标,
+APO,promoted,RSI2,1h,0.659,72.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标,
+APO,rejected,RSI2,4h,0.798,15.0,2026-07-25,网格优化后仍不达标,
+ASML,rejected,RSI2,1d,0.668,22.0,2026-07-25,网格优化后仍不达标,
+ASML,rejected,RSI2,1h,0.136,183.0,2026-07-25,网格优化后仍不达标,
+ASML,rejected,RSI2,4h,0.387,79.0,2026-07-25,网格优化后仍不达标,
+BA,rejected,Confluence,1d,0.34,23.0,2026-07-25,网格优化后仍不达标,
+BA,promoted,RSI2,1h,0.98,74.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标,
+BA,promoted,Confluence,4h,0.86,85.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标,
+BBW,rejected,Confluence,1d,0.47,37.0,2026-07-25,网格优化后仍不达标,
+BBW,rejected,RSI2,1h,0.36,104.0,2026-07-25,网格优化后仍不达标,
+BBW,promoted,RSI2,4h,0.79,50.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标,
+CCJ,rejected,RSI2,1d,0.469,20.0,2026-07-25,网格优化后仍不达标,
+CCJ,promoted,RSI2,1h,0.67,150.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标,
+CCJ,promoted,RSI2,4h,0.75,50.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标,
+CRSP,rejected,RSI2,1d,-0.118,15.0,2026-07-25,网格优化后仍不达标,
+CRSP,promoted,RSI2,1h,1.048,74.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标,
+CRSP,rejected,RSI2,4h,0.446,33.0,2026-07-25,网格优化后仍不达标,
+CVX,rejected,RSI2,1d,0.322,15.0,2026-07-25,网格优化后仍不达标,
+CVX,rejected,RSI2,1h,0.444,77.0,2026-07-25,网格优化后仍不达标,
+CVX,rejected,RSI2,4h,0.607,29.0,2026-07-25,网格优化后仍不达标,
+DUOL,rejected,Confluence,1d,0.64,11.0,2026-07-25,网格优化后仍不达标,
+DUOL,promoted,RSI2,1h,1.234,156.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标,
+DUOL,rejected,RSI2,4h,0.415,43.0,2026-07-25,网格优化后仍不达标,
+ETHU,rejected,Confluence,1d,0.58,36.0,2026-07-25,网格优化后仍不达标,
+FOF,rejected,Confluence,1d,0.14,30.0,2026-07-25,网格优化后仍不达标,
+FOF,promoted,RSI2,1h,0.879,104.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标,
+FOF,rejected,RSI2,4h,0.517,24.0,2026-07-25,网格优化后仍不达标,
+FWRG,rejected,Confluence,1d,-0.39,39.0,2026-07-25,网格优化后仍不达标,
+FWRG,rejected,Confluence,1h,0.2,102.0,2026-07-25,网格优化后仍不达标,
+FWRG,promoted,Confluence,4h,0.63,74.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标,
+FYC,rejected,RSI2,1d,0.391,15.0,2026-07-25,网格优化后仍不达标,
+FYC,rejected,RSI2,1h,0.197,157.0,2026-07-25,网格优化后仍不达标,
+FYC,rejected,RSI2,4h,1.213,23.0,2026-07-25,网格优化后仍不达标,
+GFS,rejected,RSI2,1d,0.766,19.0,2026-07-25,网格优化后仍不达标,
+GFS,promoted,Confluence,1h,0.69,82.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标,
+GFS,rejected,RSI2,4h,0.409,36.0,2026-07-25,网格优化后仍不达标,
+GL,rejected,Confluence,1d,0.41,45.0,2026-07-25,网格优化后仍不达标,
+GL,promoted,RSI2,1h,1.07,169.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标,
+GL,rejected,RSI2,4h,1.122,23.0,2026-07-25,网格优化后仍不达标,
+HBM,rejected,Confluence,1d,0.33,40.0,2026-07-25,网格优化后仍不达标,
+HBM,rejected,RSI2,1h,0.37,111.0,2026-07-25,网格优化后仍不达标,
+HBM,promoted,RSI2,4h,1.053,63.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标,
+IBBQ,rejected,RSI2,1d,0.749,17.0,2026-07-25,网格优化后仍不达标,
+IBBQ,rejected,RSI2,1h,0.593,46.0,2026-07-25,网格优化后仍不达标,
+IBBQ,rejected,RSI2,4h,0.831,16.0,2026-07-25,网格优化后仍不达标,
+KO,rejected,RSI2,1d,-0.0,16.0,2026-07-25,网格优化后仍不达标,
+KO,rejected,RSI2,1h,0.374,70.0,2026-07-25,网格优化后仍不达标,
+KO,promoted,Confluence,4h,0.78,41.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标,
+LLY,rejected,Confluence,1d,0.18,40.0,2026-07-25,网格优化后仍不达标,
+LLY,promoted,RSI2,1h,0.716,123.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标,
+LLY,promoted,Confluence,4h,0.64,63.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标,
+LULU,rejected,Confluence,1d,0.02,41.0,2026-07-25,网格优化后仍不达标,
+LULU,rejected,Confluence,1h,0.07,173.0,2026-07-25,网格优化后仍不达标,
+LULU,rejected,RSI2,4h,0.749,25.0,2026-07-25,网格优化后仍不达标,
+MO,rejected,RSI2,1d,0.543,18.0,2026-07-25,网格优化后仍不达标,
+MO,promoted,Confluence,1h,0.63,117.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标,
+MO,rejected,RSI2,4h,0.382,45.0,2026-07-25,网格优化后仍不达标,
+MSM,rejected,RSI2,1d,0.618,18.0,2026-07-25,网格优化后仍不达标,
+MSM,rejected,RSI2,1h,-0.029,46.0,2026-07-25,网格优化后仍不达标,
+MSM,rejected,RSI2,4h,0.66,29.0,2026-07-25,网格优化后仍不达标,
+MSTR,rejected,Confluence,1d,0.47,45.0,2026-07-25,网格优化后仍不达标,
+MSTR,promoted,RSI2,1h,0.909,163.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标,
+MSTR,rejected,RSI2,4h,0.658,27.0,2026-07-25,网格优化后仍不达标,
+NFLX,rejected,RSI2,1d,0.634,27.0,2026-07-25,网格优化后仍不达标,
+NFLX,promoted,RSI2,1h,0.821,77.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标,
+NFLX,rejected,RSI2,4h,0.754,21.0,2026-07-25,网格优化后仍不达标,
+NUKZ,rejected,RSI2,1d,1.112,18.0,2026-07-25,网格优化后仍不达标,
+NVO,rejected,Confluence,1d,0.4,44.0,2026-07-25,网格优化后仍不达标,
+NVO,rejected,RSI2,1h,0.597,92.0,2026-07-25,网格优化后仍不达标,
+NVO,rejected,Confluence,4h,0.04,64.0,2026-07-25,网格优化后仍不达标,
+PB,rejected,Confluence,1d,-0.09,32.0,2026-07-25,网格优化后仍不达标,
+PB,rejected,RSI2,1h,0.119,52.0,2026-07-25,网格优化后仍不达标,
+PB,promoted,RSI2,4h,0.689,33.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标,
+PINS,rejected,Confluence,1d,0.13,43.0,2026-07-25,网格优化后仍不达标,
+PINS,rejected,RSI2,1h,0.476,150.0,2026-07-25,网格优化后仍不达标,
+PINS,rejected,RSI2,4h,0.733,16.0,2026-07-25,网格优化后仍不达标,
+PTMC,rejected,Confluence,1d,-0.06,10.0,2026-07-25,网格优化后仍不达标,
+PTMC,rejected,RSI2,1h,-0.413,34.0,2026-07-25,网格优化后仍不达标,
+PTMC,rejected,RSI2,4h,0.511,15.0,2026-07-25,网格优化后仍不达标,
+QCOM,rejected,Confluence,1d,0.16,49.0,2026-07-25,网格优化后仍不达标,
+QCOM,rejected,RSI2,1h,0.23,196.0,2026-07-25,网格优化后仍不达标,
+QCOM,promoted,Confluence,4h,1.03,47.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标,
+RBC,rejected,RSI2,1d,0.68,19.0,2026-07-25,网格优化后仍不达标,
+RBC,rejected,RSI2,1h,0.563,124.0,2026-07-25,网格优化后仍不达标,
+RBC,promoted,RSI2,4h,0.766,47.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标,
+RGTI,rejected,RSI2,1d,0.65,17.0,2026-07-25,网格优化后仍不达标,
+RGTI,promoted,RSI2,1h,0.984,72.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标,
+RGTI,promoted,RSI2,4h,0.908,52.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标,
+RR,rejected,Confluence,1d,0.54,16.0,2026-07-25,网格优化后仍不达标,
+SAP,rejected,Confluence,1d,0.15,44.0,2026-07-25,网格优化后仍不达标,
+SAP,rejected,RSI2,1h,0.518,81.0,2026-07-25,网格优化后仍不达标,
+SAP,promoted,RSI2,4h,1.161,52.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标,
+SKM,rejected,Confluence,1d,0.12,31.0,2026-07-25,网格优化后仍不达标,
+SKM,promoted,RSI2,1h,0.688,71.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标,
+SKM,rejected,RSI2,4h,0.393,24.0,2026-07-25,网格优化后仍不达标,
+SLS,rejected,Confluence,1d,0.29,58.0,2026-07-25,网格优化后仍不达标,
+SLS,promoted,Confluence,1h,0.76,105.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标,
+SLS,rejected_high_risk_dd,RSI2,4h,0.825,79.0,2026-07-25,网格优化RSI2最大回撤-56.9%风险过高，改用其Confluence结果接入,
+SMCI,rejected,Confluence,1d,0.19,49.0,2026-07-25,网格优化后仍不达标,
+SMCI,promoted,Confluence,1h,0.6,294.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标,
+SMCI,rejected,RSI2,4h,0.95,26.0,2026-07-25,网格优化后仍不达标,
+SNAP,rejected,RSI2,1h,0.479,74.0,2026-07-25,网格优化后仍不达标,
+SNAP,rejected,Confluence,4h,0.47,55.0,2026-07-25,网格优化后仍不达标,
+SO,rejected,Confluence,1d,-0.16,42.0,2026-07-25,网格优化后仍不达标,
+SO,rejected,Confluence,1h,0.07,75.0,2026-07-25,网格优化后仍不达标,
+SO,rejected,RSI2,4h,0.439,27.0,2026-07-25,网格优化后仍不达标,
+SPXC,rejected,RSI2,1d,0.405,20.0,2026-07-25,网格优化后仍不达标,
+SPXC,promoted,RSI2,1h,1.058,99.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标,
+SPXC,rejected,RSI2,4h,0.477,90.0,2026-07-25,网格优化后仍不达标,
+SPYI,rejected,Confluence,1d,0.03,32.0,2026-07-25,网格优化后仍不达标,
+SPYI,rejected,RSI2,1h,0.186,19.0,2026-07-25,网格优化后仍不达标,
+SPYI,rejected,Confluence,4h,0.38,54.0,2026-07-25,网格优化后仍不达标,
+STLA,rejected,Confluence,1d,0.52,77.0,2026-07-25,网格优化后仍不达标,
+STLA,rejected,RSI2,1h,0.296,65.0,2026-07-25,网格优化后仍不达标,
+STLA,promoted,Confluence,4h,1.14,106.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标,
+TMC,promoted,Confluence,1d,0.62,31.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标,
+TMC,promoted,Confluence,1h,1.18,302.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标,
+TMC,rejected,RSI2,4h,0.456,41.0,2026-07-25,网格优化后仍不达标,
+UP,promoted,Confluence,1d,0.84,37.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标,
+UP,promoted,RSI2,1h,0.74,137.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标,
+UP,rejected,Confluence,4h,0.56,74.0,2026-07-25,网格优化后仍不达标,
+USO,rejected,Confluence,1d,0.6,20.0,2026-07-25,网格优化后仍不达标,
+USO,promoted,Confluence,1h,0.63,80.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标,
+USO,rejected,RSI2,4h,0.671,19.0,2026-07-25,网格优化后仍不达标,
+VC,rejected,Confluence,1d,0.72,20.0,2026-07-25,网格优化后仍不达标,
+VC,promoted,RSI2,1h,0.972,68.0,2026-07-25,网格优化(RSI2_GRID×Confluence网格)救回，默认参数曾不达标,
+VC,rejected,RSI2,4h,0.608,18.0,2026-07-25,网格优化后仍不达标,
+VEU,rejected,RSI2,1d,0.156,16.0,2026-07-25,网格优化后仍不达标,
+VEU,rejected,RSI2,1h,-0.178,88.0,2026-07-25,网格优化后仍不达标,
+VEU,rejected,RSI2,4h,0.253,32.0,2026-07-25,网格优化后仍不达标,
+VO,rejected,Confluence,1d,0.09,48.0,2026-07-25,网格优化后仍不达标,
+VO,rejected,RSI2,1h,-0.448,47.0,2026-07-25,网格优化后仍不达标,
+VO,rejected,RSI2,4h,0.66,28.0,2026-07-25,网格优化后仍不达标,
+WEN,rejected,Confluence,1d,0.47,38.0,2026-07-25,网格优化后仍不达标,
+WEN,rejected,RSI2,1h,0.071,59.0,2026-07-25,网格优化后仍不达标,
+WEN,rejected,Confluence,4h,0.08,23.0,2026-07-25,网格优化后仍不达标,
+WM,rejected,Confluence,1d,0.12,14.0,2026-07-25,网格优化后仍不达标,
+WM,rejected,RSI2,1h,0.303,116.0,2026-07-25,网格优化后仍不达标,
+WM,rejected,Confluence,4h,-0.12,25.0,2026-07-25,网格优化后仍不达标,
+XYZ,rejected,RSI2,1d,0.399,23.0,2026-07-25,网格优化后仍不达标,
+XYZ,rejected,Confluence,1h,0.29,69.0,2026-07-25,网格优化后仍不达标,
+XYZ,rejected,RSI2,4h,0.798,17.0,2026-07-25,网格优化后仍不达标,
+ZION,rejected,RSI2,1d,0.31,23.0,2026-07-25,网格优化后仍不达标,
+ZION,rejected,RSI2,1h,0.569,62.0,2026-07-25,网格优化后仍不达标,
+ZION,rejected,RSI2,4h,0.559,47.0,2026-07-25,网格优化后仍不达标,
+PANW,promoted,RSI2,1h,0.683,117.0,2026-07-26,用户要求加入，四策略回测；cost 10bps通过、wf训练0.37→测试0.84 已接入,
+PANW,rejected,MR,1d,0.444,15.0,2026-07-26,用户要求加入，四策略回测,
+PANW,rejected,MR,1h,0.265,18.0,2026-07-26,用户要求加入，四策略回测,
+PANW,rejected,Breakout,1d,0.244,28.0,2026-07-26,用户要求加入，四策略回测,
+PANW,rejected,Confluence,1h,0.24,156.0,2026-07-26,用户要求加入，四策略回测,
+PANW,rejected,RSI2,4h,0.111,42.0,2026-07-26,用户要求加入，四策略回测,
+PANW,rejected,Confluence,4h,-0.08,44.0,2026-07-26,用户要求加入，四策略回测,
+PANW,rejected,Confluence,1d,-0.21,62.0,2026-07-26,用户要求加入，四策略回测,
+AMAT,rejected,MR,1h,1.196,21.0,2026-07-26,补跑从未回测标的（四策略）,
+AMAT,rejected,RSI2,4h,0.439,48.0,2026-07-26,补跑从未回测标的（四策略）,
+AMAT,rejected,RSI2,1d,0.383,15.0,2026-07-26,补跑从未回测标的（四策略）,
+AMAT,rejected,Confluence,1d,0.25,47.0,2026-07-26,补跑从未回测标的（四策略）,
+AMAT,rejected,Breakout,1d,0.237,36.0,2026-07-26,补跑从未回测标的（四策略）,
+AMAT,rejected,Confluence,4h,-0.09,48.0,2026-07-26,补跑从未回测标的（四策略）,
+AMAT,rejected,RSI2,1h,-0.274,110.0,2026-07-26,补跑从未回测标的（四策略）,
+AMAT,rejected,Confluence,1h,-0.88,98.0,2026-07-26,补跑从未回测标的（四策略）,
+EYES,insufficient_data,Confluence,1h,,0.0,2026-07-26,2026-05-05上市的新ETF(Corgi Data & Surveillance)，全部历史仅55个交易日，无法回测,
+EYES,insufficient_data,Confluence,4h,,0.0,2026-07-26,2026-05-05上市的新ETF(Corgi Data & Surveillance)，全部历史仅55个交易日，无法回测,
+EYES,insufficient_data,Confluence,1d,,0.0,2026-07-26,2026-05-05上市的新ETF(Corgi Data & Surveillance)，全部历史仅55个交易日，无法回测,
+IREN,promoted,Confluence,1h,1.15,230.0,2026-07-26,补跑从未回测标的（四策略）；cost 30bps仍0.72、wf训练0.73→测试1.76，已从 pending_high_vol 升级接入,
+IREN,promoted,RSI2,1h,0.783,172.0,2026-07-26,补跑从未回测标的（四策略）,
+IREN,rejected,RSI2,1d,0.485,25.0,2026-07-26,补跑从未回测标的（四策略）,
+IREN,rejected,RSI2,4h,0.314,42.0,2026-07-26,补跑从未回测标的（四策略）,
+IREN,rejected,Breakout,1d,0.09,9.0,2026-07-26,补跑从未回测标的（四策略）,
+IREN,rejected,Confluence,1d,-0.25,41.0,2026-07-26,补跑从未回测标的（四策略）,
+IREN,rejected,Confluence,4h,-0.36,67.0,2026-07-26,补跑从未回测标的（四策略）,
+IREN,rejected,MR,1h,-0.765,22.0,2026-07-26,补跑从未回测标的（四策略）,
+KLAC,rejected,MR,1d,0.456,17.0,2026-07-26,补跑从未回测标的（四策略）,
+KLAC,rejected,RSI2,4h,0.35,52.0,2026-07-26,补跑从未回测标的（四策略）,
+KLAC,rejected,RSI2,1d,0.335,25.0,2026-07-26,补跑从未回测标的（四策略）,
+KLAC,rejected,MR,1h,0.086,19.0,2026-07-26,补跑从未回测标的（四策略）,
+KLAC,rejected,Confluence,1d,-0.04,45.0,2026-07-26,补跑从未回测标的（四策略）,
+KLAC,rejected,RSI2,1h,-0.21,140.0,2026-07-26,补跑从未回测标的（四策略）,
+KLAC,rejected,Breakout,1d,-0.407,44.0,2026-07-26,补跑从未回测标的（四策略）,
+KLAC,rejected,Confluence,1h,-0.78,105.0,2026-07-26,补跑从未回测标的（四策略）,
+KLAC,rejected,Confluence,4h,-0.9,45.0,2026-07-26,补跑从未回测标的（四策略）,
+SNAP,demoted,Confluence,1d,0.4,107.0,2026-07-27,QQQ数据修复后重验:10bps 0.40且样本外-0.09，降级（失去唯一路由，移出扫描池）,
+OUST,demoted,Confluence,1d,0.06,59.0,2026-07-27,QQQ数据修复后重验:10bps 0.06，降级（失去唯一路由，移出扫描池）,
+ONDS,demoted,Confluence,1d,0.41,64.0,2026-07-27,QQQ数据修复后重验:10bps 0.41，1d降级（保留1h路由）,
+SHOP,rejected,confluence,1h,0.37,95.0,2026-07-27,10bps降至-0.01，成本压力不达标,
+SHOP,rejected,confluence,4h,-1.26,26.0,2026-07-27,0成本即负Sharpe,
+SHOP,rejected,confluence,1d,-0.22,104.0,2026-07-27,0成本即负Sharpe，wf样本内外均负,
+SHOP,rejected,rsi2,1h,0.264,87.0,2026-07-27,10bps降至0.07，且maxDD-28.9%，wf样本外-3.07,
+SHOP,rejected,rsi2,4h,0.098,27.0,2026-07-27,maxDD-17%，10bps 0.009,
+SHOP,rejected,rsi2,1d,0.393,103.0,2026-07-27,maxDD-38.4%超过-50%阈值边缘但wf仅marginal(0.40)，风险偏高不接入,
+SHOP,insufficient_data,mr,1h,1.034,22.0,2026-07-27,10bps成本压力通过(0.933)但N=22<30门槛，样本不足，列入观察名单而非接入,
+SHOP,insufficient_data,mr,4h,,0.0,2026-07-27,信号数为0,
+SHOP,insufficient_data,mr,1d,,0.0,2026-07-27,信号数为0,
+SHOP,rejected_high_risk_dd,breakout,1d,-0.296,35.0,2026-07-27,maxDD-56.6%超过-50%风控阈值，且Sharpe为负,
+MAR,rejected,confluence,1h,-0.23,74.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.23 dd=-0.0% wf=fail,
+MAR,rejected,confluence,4h,-0.8,27.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.8 dd=-0.1% wf=insufficient,
+MAR,rejected,confluence,1d,-0.12,111.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.12 dd=-0.1% wf=marginal,
+MAR,promoted,rsi2,1h,0.691,62.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=0.691 dd=-7.6% wf=pass,
+MAR,rejected,rsi2,4h,-0.648,20.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.648 dd=-12.1% wf=insufficient,
+MAR,rejected,rsi2,1d,0.273,93.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=0.273 dd=-16.5% wf=marginal,
+MAR,rejected,mr,1h,-1.035,15.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-1.035 dd=-0.0% wf=insufficient,
+MAR,insufficient_data,mr,4h,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient,
+MAR,rejected,mr,1d,0.195,21.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=0.195 dd=-0.0% wf=insufficient,
+ON,rejected,confluence,1h,-1.08,79.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-1.08 dd=-0.0% wf=fail,
+ON,rejected,confluence,4h,-0.29,21.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.29 dd=-0.0% wf=insufficient,
+ON,rejected,confluence,1d,0.06,113.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=0.06 dd=-0.1% wf=fail,
+ON,rejected,rsi2,1h,-0.119,82.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.119 dd=-17.1% wf=marginal,
+ON,rejected,rsi2,4h,-0.487,21.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.487 dd=-25.3% wf=insufficient,
+ON,rejected,rsi2,1d,-0.069,83.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.069 dd=-46.1% wf=fail,
+ON,insufficient_data,mr,1h,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient,
+ON,insufficient_data,mr,4h,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient,
+ON,rejected,mr,1d,0.532,16.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=0.532 dd=-0.0% wf=insufficient,
+MCD,rejected,confluence,1h,-1.17,74.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-1.17 dd=-0.0% wf=fail,
+MCD,rejected,confluence,4h,-0.02,24.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.02 dd=-0.0% wf=insufficient,
+MCD,rejected,confluence,1d,0.01,110.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=0.01 dd=-0.1% wf=fail,
+MCD,rejected,rsi2,1h,-0.823,51.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.823 dd=-7.9% wf=insufficient,
+MCD,insufficient_data,rsi2,4h,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient,
+MCD,rejected,rsi2,1d,-0.165,56.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.165 dd=-14.2% wf=insufficient,
+MCD,insufficient_data,mr,1h,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient,
+MCD,insufficient_data,mr,4h,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient,
+MCD,rejected,mr,1d,0.084,19.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=0.084 dd=-0.1% wf=insufficient,
+ALAB,rejected,confluence,1h,-0.08,97.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.08 dd=-0.1% wf=marginal,
+ALAB,rejected,confluence,4h,0.29,37.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=0.29 dd=-0.1% wf=insufficient,
+ALAB,insufficient_data,confluence,1d,1.28,28.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=1.28 dd=-0.1% wf=insufficient,
+ALAB,promoted,rsi2,1h,0.835,92.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=0.835 dd=-29.2% wf=marginal,
+ALAB,rejected,rsi2,4h,0.123,23.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=0.123 dd=-33.5% wf=insufficient,
+ALAB,rejected,rsi2,1d,-0.612,22.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.612 dd=-39.5% wf=insufficient,
+ALAB,insufficient_data,mr,1h,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient,
+ALAB,insufficient_data,mr,4h,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient,
+ALAB,insufficient_data,mr,1d,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient,
+MRK,rejected,confluence,1h,-1.13,84.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-1.13 dd=-0.0% wf=fail,
+MRK,rejected,confluence,4h,-0.05,25.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.05 dd=-0.0% wf=insufficient,
+MRK,rejected,confluence,1d,-0.37,91.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.37 dd=-0.0% wf=marginal,
+MRK,rejected,rsi2,1h,-1.867,60.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-1.867 dd=-18.2% wf=fail,
+MRK,rejected,rsi2,4h,-0.863,20.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.863 dd=-16.8% wf=insufficient,
+MRK,rejected,rsi2,1d,0.049,51.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=0.049 dd=-19.5% wf=marginal,
+MRK,rejected,mr,1h,0.087,15.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=0.087 dd=-0.0% wf=insufficient,
+MRK,insufficient_data,mr,4h,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient,
+MRK,insufficient_data,mr,1d,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient,
+AXON,rejected,confluence,1h,0.55,89.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=0.55 dd=-0.1% wf=pass,
+AXON,insufficient_data,confluence,4h,0.64,32.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=0.64 dd=-0.2% wf=insufficient,
+AXON,rejected,confluence,1d,-0.21,125.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.21 dd=-0.3% wf=fail,
+AXON,rejected,rsi2,1h,0.394,65.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=0.394 dd=-18.2% wf=fail,
+AXON,insufficient_data,rsi2,4h,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient,
+AXON,rejected,rsi2,1d,-0.186,98.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.186 dd=-48.9% wf=fail,
+AXON,insufficient_data,mr,1h,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient,
+AXON,insufficient_data,mr,4h,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient,
+AXON,rejected,mr,1d,0.416,20.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=0.416 dd=-0.1% wf=insufficient,
+U,rejected,confluence,1h,-0.56,92.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.56 dd=-0.0% wf=marginal,
+U,rejected,confluence,4h,-0.64,18.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.64 dd=-0.0% wf=insufficient,
+U,rejected,confluence,1d,-0.1,57.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.1 dd=-0.1% wf=fail,
+U,rejected,rsi2,1h,0.522,80.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=0.522 dd=-20.2% wf=fail,
+U,rejected,rsi2,4h,-0.381,24.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.381 dd=-37.4% wf=insufficient,
+U,rejected,rsi2,1d,-0.426,38.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.426 dd=-61.5% wf=fail,
+U,insufficient_data,mr,1h,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient,
+U,insufficient_data,mr,4h,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient,
+U,insufficient_data,mr,1d,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient,
+ABNB,rejected,confluence,1h,-0.11,62.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.11 dd=-0.0% wf=fail,
+ABNB,rejected,confluence,4h,-0.58,15.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.58 dd=-0.0% wf=insufficient,
+ABNB,rejected,confluence,1d,-0.21,47.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.21 dd=-0.1% wf=fail,
+ABNB,rejected,rsi2,1h,-0.607,63.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.607 dd=-12.3% wf=fail,
+ABNB,rejected,rsi2,4h,-0.374,24.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.374 dd=-14.2% wf=insufficient,
+ABNB,rejected,rsi2,1d,-0.17,27.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.17 dd=-28.8% wf=insufficient,
+ABNB,insufficient_data,mr,1h,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient,
+ABNB,insufficient_data,mr,4h,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient,
+ABNB,insufficient_data,mr,1d,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient,
+UUUU,rejected,confluence,1h,0.22,106.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=0.22 dd=-0.0% wf=fail,
+UUUU,rejected,confluence,4h,-1.05,40.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-1.05 dd=-0.0% wf=insufficient,
+UUUU,rejected,confluence,1d,-0.13,111.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.13 dd=-0.0% wf=marginal,
+UUUU,rejected,rsi2,1h,-0.109,78.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.109 dd=-31.0% wf=fail,
+UUUU,rejected,rsi2,4h,0.553,19.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=0.553 dd=-34.7% wf=insufficient,
+UUUU,rejected,rsi2,1d,0.121,70.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=0.121 dd=-47.5% wf=fail,
+UUUU,insufficient_data,mr,1h,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient,
+UUUU,insufficient_data,mr,4h,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient,
+UUUU,insufficient_data,mr,1d,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient,
+TTD,promoted,confluence,1h,0.65,102.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=0.65 dd=-0.0% wf=pass,
+TTD,insufficient_data,confluence,4h,1.26,20.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=1.26 dd=-0.0% wf=insufficient,
+TTD,rejected,confluence,1d,-0.54,108.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.54 dd=-0.2% wf=marginal,
+TTD,rejected,rsi2,1h,-0.659,55.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.659 dd=-51.2% wf=insufficient,
+TTD,insufficient_data,rsi2,4h,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient,
+TTD,rejected,rsi2,1d,0.241,96.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=0.241 dd=-53.6% wf=fail,
+TTD,insufficient_data,mr,1h,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient,
+TTD,insufficient_data,mr,4h,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient,
+TTD,insufficient_data,mr,1d,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient,
+MP,rejected,confluence,1h,0.08,104.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=0.08 dd=-0.0% wf=fail,
+MP,rejected,confluence,4h,-0.04,38.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.04 dd=-0.0% wf=insufficient,
+MP,rejected,confluence,1d,0.17,72.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=0.17 dd=-0.1% wf=fail,
+MP,rejected,rsi2,1h,0.502,87.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=0.502 dd=-24.0% wf=fail,
+MP,rejected,rsi2,4h,0.136,22.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=0.136 dd=-31.2% wf=insufficient,
+MP,rejected,rsi2,1d,-0.594,24.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.594 dd=-55.6% wf=insufficient,
+MP,insufficient_data,mr,1h,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient,
+MP,insufficient_data,mr,4h,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient,
+MP,insufficient_data,mr,1d,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient,
+MAR,rejected,breakout,1d,-0.131,26.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.131 dd=-25.2% wf=insufficient,
+ON,rejected,breakout,1d,0.262,22.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=0.262 dd=-29.4% wf=insufficient,
+MCD,rejected,breakout,1d,-0.368,29.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.368 dd=-24.1% wf=insufficient,
+ALAB,insufficient_data,breakout,1d,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient,
+MRK,rejected,breakout,1d,-0.114,25.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.114 dd=-20.0% wf=insufficient,
+AXON,rejected,breakout,1d,0.392,24.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=0.392 dd=-24.2% wf=insufficient,
+U,insufficient_data,breakout,1d,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient,
+ABNB,insufficient_data,breakout,1d,,0.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=N/A dd=N/A wf=insufficient,
+UUUU,rejected,breakout,1d,0.075,13.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=0.075 dd=-45.9% wf=insufficient,
+TTD,rejected,breakout,1d,-0.169,28.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.169 dd=-36.8% wf=insufficient,
+MP,rejected,breakout,1d,-0.118,8.0,2026-08-02,用户批量加入18标的验证(AMET非有效代码已剔除): 10bps=-0.118 dd=-32.2% wf=insufficient,
+LITE,rejected,confluence,1h,0.37,91.0,2026-08-04,10bps=-0.49，wf marginal(test-0.28),-0.3
+LITE,rejected,confluence,4h,-0.14,33.0,2026-08-04,0成本即负,-0.1
+LITE,rejected,confluence,1d,-0.31,122.0,2026-08-04,0成本即负，wf marginal,-0.3
+LITE,rejected,rsi2,1h,0.819,95.0,2026-08-04,10bps=0.707通过成本关，但wf fail：训练1.158→测试0.214，远低于训练*0.5，衰减明显,-26.3
+LITE,rejected,rsi2,4h,0.553,29.0,2026-08-04,10bps=0.515不达标，N=29近门槛但DD-39.9%偏高,-39.9
+LITE,rejected,rsi2,1d,0.439,82.0,2026-08-04,10bps=0.402不达标，DD-47.4%接近-50%风控线,-47.4
+LITE,insufficient_data,mr,1h,-0.009,16.0,2026-08-04,N=16<30,-0.1
+LITE,insufficient_data,mr,4h,,0.0,2026-08-04,信号数0,
+LITE,insufficient_data,mr,1d,,0.0,2026-08-04,信号数0,
+LITE,rejected,breakout,1d,0.38,19.0,2026-08-04,N=19<30，DD-33.8%,-33.8
+COHR,rejected,confluence,1h,-1.64,92.0,2026-08-04,0成本即大幅负，wf fail,-0.2
+COHR,rejected,confluence,4h,-0.85,31.0,2026-08-04,0成本即负,-0.1
+COHR,rejected,confluence,1d,-0.14,135.0,2026-08-04,0成本即负，wf marginal,-0.1
+COHR,rejected,rsi2,1h,-0.178,91.0,2026-08-04,0成本即负，DD-45.2%,-45.2
+COHR,insufficient_data,rsi2,4h,1.057,28.0,2026-08-04,10bps=1.022通过成本关，但N=28<30门槛，样本不足，列入pending_high_vol观察,-16.9
+COHR,rejected,rsi2,1d,0.189,91.0,2026-08-04,10bps=0.148不达标，DD-52.5%超-50%风控线,-52.5
+COHR,insufficient_data,mr,1h,0.19,15.0,2026-08-04,N=15<30,-0.1
+COHR,insufficient_data,mr,4h,,0.0,2026-08-04,信号数0,
+COHR,insufficient_data,mr,1d,,0.0,2026-08-04,信号数0,
+COHR,rejected,breakout,1d,0.061,24.0,2026-08-04,N=24<30,-34.9
+VOYG,rejected,confluence,1h,-0.67,67.0,2026-08-04,0成本即负，2025-06-11上市历史短,-0.0
+VOYG,insufficient_data,confluence,4h,-0.97,14.0,2026-08-04,N=14<30,-0.0
+VOYG,insufficient_data,confluence,1d,0.09,17.0,2026-08-04,N=17<30，历史仅286个交易日,-0.0
+VOYG,rejected,rsi2,1h,0.385,37.0,2026-08-04,10bps=0.282不达标（wf虽pass但成本关不过）,-21.5
+VOYG,insufficient_data,rsi2,4h,,0.0,2026-08-04,信号数0,
+VOYG,insufficient_data,rsi2,1d,,0.0,2026-08-04,信号数0，历史仅286个交易日,
+VOYG,insufficient_data,mr,1h,,0.0,2026-08-04,信号数0,
+VOYG,insufficient_data,mr,4h,,0.0,2026-08-04,信号数0,
+VOYG,insufficient_data,mr,1d,,0.0,2026-08-04,信号数0，历史仅286个交易日,
+VOYG,insufficient_data,breakout,1d,,0.0,2026-08-04,信号数0，历史不足252个交易日,

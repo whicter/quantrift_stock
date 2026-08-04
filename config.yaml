@@ -52,7 +52,9 @@ symbols:
   # 过30笔门槛，但 walk-forward 训练/测试分段各仅19/10笔，太薄看不出稳健性
   # （非"marginal"而是"insufficient"，即两段都不足以下结论），暂不接入，
   # 待样本量增长后复检；1h 同策略 wf 测试段虽达1.51但10bps仅0.55不过成本关
-  pending_high_vol: [RKLB, NBIS, SHOP, AXON]
+  # COHR：2026-08-04 用户加入验证（同批 LITE/VOYG 均全策略fail，未列入观察）。
+  # RSI2 4h 10bps=1.022 通过成本关，但 N=28<30 门槛，样本不足，同 AXON 待复检
+  pending_high_vol: [RKLB, NBIS, SHOP, AXON, COHR]
 
   # 半导体 ETF：RSI2（不强制 RS vs QQQ）或 MR+ATR（待重新调参）
   sector_etf:  [SOXX, SMH]
