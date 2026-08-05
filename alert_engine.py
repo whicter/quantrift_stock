@@ -205,6 +205,9 @@ STRATEGY_MAP: dict[tuple[str, str], str] = {
     ("ALAB", "1h"): "rsi2",  # 10bps 0.835 N=92 训练0.998→测试0.568（wf marginal，样本量大予以接入，交衰减监控）
     ("TTD", "1h"): "confluence",  # 10bps 0.65 N=102 训练0.57→测试1.71（wf pass）
 
+    # 2026-08-05 用户单独要求加入
+    ("APP", "1h"): "confluence",  # 10bps 0.80 N=102 训练0.82→测试0.93（wf pass，测试段更优）
+
     # 2026-07-25 网格优化新增（60个"默认参数接近达标"标的跑RSI2_GRID×Confluence网格，42组合达标）
     ("AMC", "1h"): "confluence",  # Sharpe 1.06 N=154 WR=63.6% [网格优化]
     ("BA", "4h"): "confluence",  # Sharpe 0.86 N=85 WR=68.2% [网格优化]

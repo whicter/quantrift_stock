@@ -1188,3 +1188,13 @@ IONQ,insufficient_data,mr,1h,,0.0,2026-08-05,信号数0,
 IONQ,insufficient_data,mr,4h,,0.0,2026-08-05,信号数0,
 IONQ,insufficient_data,mr,1d,,0.0,2026-08-05,信号数0,
 IONQ,rejected,breakout,1d,0.023,10.0,2026-08-05,N=10<30，10bps=0.023,-39.0
+APP,promoted,confluence,1h,1.06,102.0,2026-08-05,10bps=0.80通过成本关，wf pass：训练0.82→测试0.93（测试段更优），接入实盘,-0.2
+APP,insufficient_data,confluence,4h,0.25,34.0,2026-08-05,10bps=0.16不达标,-0.2
+APP,rejected,confluence,1d,0.67,67.0,2026-08-05,10bps=0.63通过成本关，但wf fail：训练0.83→测试0.12，衰减明显,-0.2
+APP,rejected,rsi2,1h,0.422,95.0,2026-08-05,10bps=0.322不达标，DD-40.9%，wf fail,-40.9
+APP,insufficient_data,rsi2,4h,0.43,26.0,2026-08-05,N=26<30，10bps=0.374不达标,-24.1
+APP,rejected,rsi2,1d,0.275,46.0,2026-08-05,10bps=0.234不达标，wf fail,-29.7
+APP,insufficient_data,mr,1h,,0.0,2026-08-05,信号数0,
+APP,insufficient_data,mr,4h,,0.0,2026-08-05,信号数0,
+APP,insufficient_data,mr,1d,,0.0,2026-08-05,信号数0,
+APP,insufficient_data,breakout,1d,0.663,10.0,2026-08-05,10bps=0.663但N=10<30门槛，样本不足未接入（已有1h Confluence路由达标，无需此路由）,-25.2

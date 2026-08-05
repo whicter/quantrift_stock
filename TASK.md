@@ -277,6 +277,14 @@ Confluence 按周期：1h 做多 −0.74R / 做空 −0.75R；4h 做多 −1.64R
 - [x] 四策略×三周期全测（10个组合）：**全部 fail/insufficient，无一接近达标**——RSI2 1d 甚至出现 DD -72.3% 远超风控线；最高 10bps Sharpe 仅 0.28（Confluence 4h），且该组合 N=34 walk-forward 分段又不足
 - [x] 结论：**不接入实盘**，10条测试记录写入 `watchlist_history.csv`；无借口进 `pending_high_vol`（不像 COHR/AXON 那样有接近达标的组合）；加入 `watchlist.txt`（写入后用 `get_universe()` 验证）
 
+#### ⑰ APP（AppLovin）加入并接入实盘（2026-08-05，用户要求）
+
+- [x] yfinance 验真通过；四策略×三周期全测（10个组合）
+- [x] **Confluence 1h 清晰达标**：10bps Sharpe 0.80，N=102，maxDD仅-0.2%，walk-forward 训练0.82→测试0.93（测试段更优，非边缘case）——**接入实盘** `STRATEGY_MAP[("APP","1h")] = "confluence"`，`config.yaml watchlist_2026_07` 同步加入
+- [x] 其余组合：Confluence 1d 10bps过关但wf fail（训练0.83→测试0.12，衰减）reject；RSI2 全周期不达标；Breakout N=10样本不足（已有1h路由达标，无需此路由）
+- [x] 端到端验证：`STRATEGY_MAP.get(("APP","1h"))` 正确返回 `confluence`，`check_confluence_signal` 用真实拉取数据跑通无异常
+- [x] 10条测试记录写入 `watchlist_history.csv`，加入 `watchlist.txt` 并用 `get_universe()` 验证
+
 #### 已在流水线中、本节不重复动作
 
 - 4 个影子实验（TSLA 出场变体 / MRVL 宽出场 / RSI2+IBS / RKLB 突破）在等样本积累

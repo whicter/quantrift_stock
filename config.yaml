@@ -80,7 +80,7 @@ symbols:
   # CCJ/LLY/UP 各降级一个周期但保留其他合格路由。详见 watchlist_validation.csv
   # 2026-07-26 PANW（Palo Alto Networks）应用户要求加入：四策略回测仅 1h RSI2 达标
   # (Sharpe 0.683 N=117 DD-12.2%)；成本压力 10bps 通过、walk-forward 训练0.37→测试0.84（样本外更优）
-  watchlist_2026_07: [AAOI, AGI, AIRJ, AIS, ALAB, ALL, AMC, APLD, APO, BA, BABA, BAC, BB,
+  watchlist_2026_07: [AAOI, AGI, AIRJ, AIS, ALAB, ALL, AMC, APLD, APO, APP, BA, BABA, BAC, BB,
                        BBW, BE, CBUS, CCB, CCJ, CRCL, CRSP, CRWD, CRWV, DELL, DGRO, DJT,
                        FDVV, FOF, FOX, GE, GFS, GL, GOOG, HBM, HOOD, IBM, INTU, IREN,
                        JPM, KO, LLY, LMT, LTL, LUNR, LVHI, LWLG, MAR, MKSI, MO, MORN, MS,
