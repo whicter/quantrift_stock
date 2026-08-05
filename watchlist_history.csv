@@ -1178,3 +1178,13 @@ VOYG,insufficient_data,mr,1h,,0.0,2026-08-04,信号数0,
 VOYG,insufficient_data,mr,4h,,0.0,2026-08-04,信号数0,
 VOYG,insufficient_data,mr,1d,,0.0,2026-08-04,信号数0，历史仅286个交易日,
 VOYG,insufficient_data,breakout,1d,,0.0,2026-08-04,信号数0，历史不足252个交易日,
+IONQ,rejected,confluence,1h,0.01,91.0,2026-08-05,10bps转负(-0.13)，wf fail,-0.0
+IONQ,insufficient_data,confluence,4h,0.28,34.0,2026-08-05,10bps=0.21不达标，wf训练1.09→测试-0.50分段样本仅10笔,-0.0
+IONQ,rejected,confluence,1d,-0.1,62.0,2026-08-05,0成本即负，wf fail,-0.1
+IONQ,rejected,rsi2,1h,0.159,103.0,2026-08-05,10bps=0.037不达标，wf fail(训练0.30→测试-0.83),-37.5
+IONQ,insufficient_data,rsi2,4h,0.276,23.0,2026-08-05,N=23<30，10bps=0.253不达标,-30.3
+IONQ,rejected,rsi2,1d,-0.408,42.0,2026-08-05,DD-72.3%远超-50%风控线，0成本即负,-72.3
+IONQ,insufficient_data,mr,1h,,0.0,2026-08-05,信号数0,
+IONQ,insufficient_data,mr,4h,,0.0,2026-08-05,信号数0,
+IONQ,insufficient_data,mr,1d,,0.0,2026-08-05,信号数0,
+IONQ,rejected,breakout,1d,0.023,10.0,2026-08-05,N=10<30，10bps=0.023,-39.0

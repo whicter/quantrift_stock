@@ -271,6 +271,12 @@ Confluence 按周期：1h 做多 −0.74R / 做空 −0.75R；4h 做多 −1.64R
   | VOYG | RSI2 1h | 0.282（不过成本关） | 37 | wf 虽 pass 但成本关不过，reject；历史仅286个交易日，样本天花板有限 |
 - [x] 结论：**三个都不接入实盘**，30条测试记录写入 `watchlist_history.csv`；COHR RSI2 4h 加入 `config.yaml pending_high_vol`；三个标的均加入 `watchlist.txt`（**写入后立即用 `get_universe("watchlist")` 逐个验证**，吸取 ⑭ 的教训，未再犯合并成一行的错）
 
+#### ⑯ IONQ 加入验证（2026-08-05，用户要求）
+
+- [x] yfinance 验真通过（IonQ，2021年上市，1403个交易日）
+- [x] 四策略×三周期全测（10个组合）：**全部 fail/insufficient，无一接近达标**——RSI2 1d 甚至出现 DD -72.3% 远超风控线；最高 10bps Sharpe 仅 0.28（Confluence 4h），且该组合 N=34 walk-forward 分段又不足
+- [x] 结论：**不接入实盘**，10条测试记录写入 `watchlist_history.csv`；无借口进 `pending_high_vol`（不像 COHR/AXON 那样有接近达标的组合）；加入 `watchlist.txt`（写入后用 `get_universe()` 验证）
+
 #### 已在流水线中、本节不重复动作
 
 - 4 个影子实验（TSLA 出场变体 / MRVL 宽出场 / RSI2+IBS / RKLB 突破）在等样本积累
