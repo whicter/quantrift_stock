@@ -54,7 +54,13 @@ symbols:
   # 待样本量增长后复检；1h 同策略 wf 测试段虽达1.51但10bps仅0.55不过成本关
   # COHR：2026-08-04 用户加入验证（同批 LITE/VOYG 均全策略fail，未列入观察）。
   # RSI2 4h 10bps=1.022 通过成本关，但 N=28<30 门槛，样本不足，同 AXON 待复检
-  pending_high_vol: [RKLB, NBIS, SHOP, AXON, COHR]
+  # ALB/DASH/DKNG：2026-08-05 用户批量19标的验证（TEAM 达标已接入实盘，其余
+  # 14个fail，RDFN已确认退市）。这三个成本压力关都过了，但 60/40 walk-forward
+  # 切分后两段样本量太薄（train_n/test_n 多为0），既不能确认也不能证伪：
+  #   ALB  RSI2 4h  10bps=1.017  N=30（刚好压线）
+  #   DASH RSI2 1d  10bps=0.619  N=52，DD-26.3%
+  #   DKNG RSI2 1d  10bps=0.622  N=60，DD-30.1%
+  pending_high_vol: [RKLB, NBIS, SHOP, AXON, COHR, ALB, DASH, DKNG]
 
   # 半导体 ETF：RSI2（不强制 RS vs QQQ）或 MR+ATR（待重新调参）
   sector_etf:  [SOXX, SMH]
@@ -86,7 +92,7 @@ symbols:
                        JPM, KO, LLY, LMT, LTL, LUNR, LVHI, LWLG, MAR, MKSI, MO, MORN, MS,
                        MSOS, MSTR, NFLX, NTRS, OC, OKLO, ONDS, ORCL, OSCR, PANW, PB, PKW,
                        QCOM, RBC, RBLX, REMX, RGTI, SAP, SKM, SLS, SLV, SMCI, SOFI, SPCX,
-                       SPMO, SPXC, SPYM, TMC, TSM, TTD, UP, USAR, USO, VC, VOO, VTI, WBD,
+                       SPMO, SPXC, SPYM, TEAM, TMC, TSM, TTD, UP, USAR, USO, VC, VOO, VTI, WBD,
                        WDC, WMT]
   # SPCX（Space Exploration Technologies Corp，2026-06-12上市）：应用户明确要求接入实盘扫描，
   # 但 1d 仅28行数据，任何策略都无法跑出有意义的回测（RSI2/MR需200+天，Breakout需252+天）。

@@ -292,6 +292,18 @@ Confluence 按周期：1h 做多 −0.74R / 做空 −0.75R；4h 做多 −1.64R
 - [x] **结果：全部 fail/insufficient，无一组合接近达标**——与旧轮次的"rejected"结论一致，这次是完整覆盖后的确认而非推翻。PINS 最高 10bps Sharpe 仅0.48（RSI2 1d）；NOW 最高 0.19（Confluence 1d）但wf衰减
 - [x] 20条完整测试记录写入 `watchlist_history.csv`（补充早年的部分记录，不覆盖）
 
+#### ⑲ 19标的批量验证：TEAM接入实盘，3个进观察名单（2026-08-05，用户要求）
+
+- [x] yfinance 批量验真：**RDFN 确认已退市**（Redfin 被 Rocket Companies 收购），未入回测；WDC/CRWD/PANW 已在列且已路由，跳过；OXY/EBAY 已在列但只有7/25粗测，本次补齐完整验证
+- [x] 15个标的（ALB/FIG/EXPE/OXY/DASH/ETSY/EBAY/Z/ROOT/SBLK/DKNG/TEAM/RKT/TWLO/MARA）四策略×三周期全测，146条记录写入 `watchlist_history.csv`
+- [x] **TEAM Confluence 1h 清晰达标，接入实盘**：10bps Sharpe 0.89，N=114，DD仅-0.0%，wf 训练0.47→测试1.98（测试段更优）。路由到 `STRATEGY_MAP[("TEAM","1h")]`，加入 `config.yaml watchlist_2026_07`
+- [x] **3个边缘case列入 `pending_high_vol` 观察**（成本压力关都过了，但60/40 walk-forward切分后两段样本太薄，train_n/test_n多为0，无法确认也无法证伪）：
+  - ALB RSI2 4h：10bps=1.017，N=30（刚好压线）
+  - DASH RSI2 1d：10bps=0.619，N=52，DD-26.3%
+  - DKNG RSI2 1d：10bps=0.622，N=60，DD-30.1%
+- [x] 其余全部reject：FIG（上市仅1年历史天花板低）、EXPE、OXY（确认7/25旧结论）、ETSY、EBAY（确认7/25旧结论）、Z、ROOT、SBLK、RKT、TWLO、MARA——均无组合同时满足成本关+N≥30+wf非fail
+- [x] 端到端验证：TEAM路由正确解析，`check_confluence_signal`用真实数据跑通；全部15个新标的+RDFN已加入 `watchlist.txt` 并用 `get_universe()` 逐个验证（含确认RDFN被history过滤排除）
+
 #### 已在流水线中、本节不重复动作
 
 - 4 个影子实验（TSLA 出场变体 / MRVL 宽出场 / RSI2+IBS / RKLB 突破）在等样本积累

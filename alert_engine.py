@@ -208,6 +208,9 @@ STRATEGY_MAP: dict[tuple[str, str], str] = {
     # 2026-08-05 用户单独要求加入
     ("APP", "1h"): "confluence",  # 10bps 0.80 N=102 训练0.82→测试0.93（wf pass，测试段更优）
 
+    # 2026-08-05 用户批量加入19标的（RDFN已确认退市剔除）
+    ("TEAM", "1h"): "confluence",  # 10bps 0.89 N=114 训练0.47→测试1.98（wf pass，测试段更优）
+
     # 2026-07-25 网格优化新增（60个"默认参数接近达标"标的跑RSI2_GRID×Confluence网格，42组合达标）
     ("AMC", "1h"): "confluence",  # Sharpe 1.06 N=154 WR=63.6% [网格优化]
     ("BA", "4h"): "confluence",  # Sharpe 0.86 N=85 WR=68.2% [网格优化]
