@@ -1198,3 +1198,23 @@ APP,insufficient_data,mr,1h,,0.0,2026-08-05,信号数0,
 APP,insufficient_data,mr,4h,,0.0,2026-08-05,信号数0,
 APP,insufficient_data,mr,1d,,0.0,2026-08-05,信号数0,
 APP,insufficient_data,breakout,1d,0.663,10.0,2026-08-05,10bps=0.663但N=10<30门槛，样本不足未接入（已有1h Confluence路由达标，无需此路由）,-25.2
+PINS,rejected,confluence,1h,-0.72,81.0,2026-08-05,补全完整验证(旧轮次仅测部分组合)：0成本即负，wf fail,-0.0
+PINS,insufficient_data,confluence,4h,-0.76,26.0,2026-08-05,N=26<30，0成本即负,-0.0
+PINS,rejected,confluence,1d,0.33,79.0,2026-08-05,10bps=0.27不达标，wf fail(训练0.54→测试-0.29),-0.0
+PINS,rejected,rsi2,1h,-0.035,59.0,2026-08-05,0成本即负，wf fail,-21.7
+PINS,insufficient_data,rsi2,4h,-0.172,18.0,2026-08-05,N=18<30,-17.8
+PINS,rejected,rsi2,1d,0.509,49.0,2026-08-05,10bps=0.475不达标,-34.4
+PINS,insufficient_data,mr,1h,,0.0,2026-08-05,信号数0,
+PINS,insufficient_data,mr,4h,,0.0,2026-08-05,信号数0,
+PINS,insufficient_data,mr,1d,,0.0,2026-08-05,信号数0,
+PINS,insufficient_data,breakout,1d,-0.058,12.0,2026-08-05,N=12<30,-28.0
+NOW,rejected,confluence,1h,0.24,98.0,2026-08-05,补全完整验证(旧轮次仅测部分组合)：10bps转负(-0.22),-0.1
+NOW,rejected,confluence,4h,0.06,37.0,2026-08-05,10bps转负(-0.16),-0.0
+NOW,rejected,confluence,1d,0.28,111.0,2026-08-05,10bps转负(-0.19→实为0.19但wf fail)，wf训练0.61→测试-0.07,-0.1
+NOW,rejected,rsi2,1h,0.149,61.0,2026-08-05,10bps转负，wf marginal,-16.3
+NOW,insufficient_data,rsi2,4h,,0.0,2026-08-05,信号数0,
+NOW,rejected,rsi2,1d,0.092,98.0,2026-08-05,10bps=0.010不达标，wf marginal,-30.0
+NOW,insufficient_data,mr,1h,,0.0,2026-08-05,信号数0,
+NOW,insufficient_data,mr,4h,,0.0,2026-08-05,信号数0,
+NOW,insufficient_data,mr,1d,0.144,16.0,2026-08-05,N=16<30,-0.0
+NOW,insufficient_data,breakout,1d,-0.129,38.0,2026-08-05,0成本即负，wf分段不足,-29.5

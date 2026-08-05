@@ -285,6 +285,13 @@ Confluence 按周期：1h 做多 −0.74R / 做空 −0.75R；4h 做多 −1.64R
 - [x] 端到端验证：`STRATEGY_MAP.get(("APP","1h"))` 正确返回 `confluence`，`check_confluence_signal` 用真实拉取数据跑通无异常
 - [x] 10条测试记录写入 `watchlist_history.csv`，加入 `watchlist.txt` 并用 `get_universe()` 验证
 
+#### ⑱ PINS/NOW 补全完整验证，TTD 确认已在列（2026-08-05，用户要求）
+
+- [x] TTD 已在 `watchlist.txt` 且早于本节（8/2批次）接入实盘（Confluence 1h），无需动作
+- [x] PINS/NOW 此前（2026-07-25）只做过部分组合的默认参数粗测（无成本压力/walk-forward），本次补齐四策略×三周期完整验证（20个组合）
+- [x] **结果：全部 fail/insufficient，无一组合接近达标**——与旧轮次的"rejected"结论一致，这次是完整覆盖后的确认而非推翻。PINS 最高 10bps Sharpe 仅0.48（RSI2 1d）；NOW 最高 0.19（Confluence 1d）但wf衰减
+- [x] 20条完整测试记录写入 `watchlist_history.csv`（补充早年的部分记录，不覆盖）
+
 #### 已在流水线中、本节不重复动作
 
 - 4 个影子实验（TSLA 出场变体 / MRVL 宽出场 / RSI2+IBS / RKLB 突破）在等样本积累
