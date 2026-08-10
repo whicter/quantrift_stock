@@ -304,6 +304,16 @@ Confluence 按周期：1h 做多 −0.74R / 做空 −0.75R；4h 做多 −1.64R
 - [x] 其余全部reject：FIG（上市仅1年历史天花板低）、EXPE、OXY（确认7/25旧结论）、ETSY、EBAY（确认7/25旧结论）、Z、ROOT、SBLK、RKT、TWLO、MARA——均无组合同时满足成本关+N≥30+wf非fail
 - [x] 端到端验证：TEAM路由正确解析，`check_confluence_signal`用真实数据跑通；全部15个新标的+RDFN已加入 `watchlist.txt` 并用 `get_universe()` 逐个验证（含确认RDFN被history过滤排除）
 
+#### ⑳ 历史行情数据迁到外置盘，本地留符号链接（2026-08-09，用户要求）
+
+**背景**：`data/` 下 3166 个历史行情 CSV（原416M）经排查确认不是实时告警引擎的主数据源（那是yfinance），只在缺口填补/整体拉空兜底、以及夜间刷新/回测/选股等离线任务里才被读写，属于"不常读写、用于复盘回测"的数据。用户要求移到外置盘 `/Volumes/X9_Pro/data_seriliazation/quantrift_stock/`，并定期整理新产生的数据。
+
+- [x] **顺带清理**：`logs/pm2_err.log`(337M)+`logs/pm2_out.log`(5.6M) 确认是死文件——`ecosystem.config.js` 写的 `out_file`/`error_file` 从未真正生效（`pm2 restart` 不会重新绑定日志路径，需要 delete+re-add），真正生效的路径是 `~/.pm2/logs/stock-alert-{out,error}.log`。该文件最后修改时间6月30日，内容全是7月架构改造前的IB直连报错，已归档到外置盘 `archived_logs/`
+- [x] **新建 `consolidate_data.py`**：逐个 CSV 搬到外置盘对应路径，本地原地留同名符号链接；6个频繁读写的小文件（`.sent_signals.json`/`.paper_positions.json`/`.data_sources.json`/`screener_results.csv`/`russell2000_tickers.txt`）显式排除，留在本地。**未选择整个 `data/` 目录做符号链接**——那样会让这几个小文件也依赖外置盘挂载，且有把 git 跟踪的 `.data_sources.json`/`.paper_positions.json` 误判为目录结构变化的风险；逐文件符号链接零风险、零代码改动（所有硬编码/配置的 `"data/xxx.csv"` 路径透明生效）
+- [x] 执行迁移：3166个文件搬迁，本地 `data/` 从416M降至448K；验证：`git status` 显示2个跟踪文件为"修改"而非"删除"（符号链接方案未破坏git跟踪）；`pd.read_csv` 通过符号链接读取成功；`pm2 restart stock-alert` 后完整扫描 132/132 拉取成功，0信号（正常）
+- [x] **每周自动整理**：新增 pm2 任务 `stock-weekly-data-consolidate`（周日19:00 PT），复用同一脚本（幂等——已是符号链接的文件自动跳过），把一周内新加标的产生的新CSV自动搬走；外置盘未挂载时安全跳过不报错
+- [ ] **已知权衡（如实告知用户）**：外置盘不挂载时，`_fill_recent_gaps_from_local`/`_local_bars`（yfinance缺口填补/整体兜底）以及夜间IB刷新、每日选股、事件雷达、手动回测都会读不到本地历史数据；yfinance主链路和 `screener_results.csv`/`.sent_signals.json` 等实时状态不受影响
+
 #### 已在流水线中、本节不重复动作
 
 - 4 个影子实验（TSLA 出场变体 / MRVL 宽出场 / RSI2+IBS / RKLB 突破）在等样本积累

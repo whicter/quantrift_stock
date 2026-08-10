@@ -45,6 +45,14 @@
 - **df_1d_cache**：主循环中按 `(symbol, "1d")` 缓存 DataFrame，breakout 扫描复用，避免重复 fetch。
   - DataFrame bool 判断要用 `_cached if _cached is not None else fetch_bars(...)`，不能用 `or`（ValueError）。
 
+## 本地数据存储架构（2026-08-09 起）
+
+- **`data/` 下的历史行情CSV已迁到外置盘** `/Volumes/X9_Pro/data_seriliazation/quantrift_stock/data/`，本地 `data/*.csv` 均为指向外置盘的符号链接（逐文件链接，不是整个目录链接）。所有代码零改动，Python文件IO透明跟随符号链接。
+- **6个小文件仍在本地**（不符号链接，外置盘掉线不受影响）：`.sent_signals.json`（去重状态）、`.paper_positions.json`（纸面持仓）、`.data_sources.json`（IB数据源清单，均git跟踪）、`screener_results.csv`（每轮扫描读取的选股排名）、`russell2000_tickers.txt`（git跟踪）。
+- **`logs/pm2_err.log`/`pm2_out.log` 死文件已归档**到外置盘 `archived_logs/`（337M+5.6M，6月30日后未再写入，`ecosystem.config.js`的`out_file`早已失效，真正生效路径是 `~/.pm2/logs/stock-alert-*.log`）。
+- **`consolidate_data.py`**：幂等整理脚本，每周日19:00 PT自动跑（`stock-weekly-data-consolidate`），把新产生的历史CSV搬到外置盘并留本地符号链接；外置盘未挂载时安全跳过。
+- **权衡**：外置盘掉线不影响yfinance主链路和上述6个本地小文件，但会影响缺口填补/整体拉空兜底、夜间IB刷新、每日选股、事件雷达、手动回测（这些是历史CSV的真正重度消费者）。
+
 ## pm2 任务清单（quantrift_stock，均已 pm2 save）
 
 | 任务 | 时间 | 作用 |
@@ -56,6 +64,7 @@
 | `stock-watchlist-events-am` | 交易日 07:45 PT | 事件雷达·盘中（开盘75分钟后，量比按已过时段折算）→ TG |
 | `stock-weekly-review` | 周日 18:15 PT | 90天复盘+衰减监控 → TG |
 | `stock-monthly-reval` | 每月1日 06:00 PT | rejected 池复检，候选报告（不自动接入） |
+| `stock-weekly-data-consolidate` | 周日 19:00 PT | 新增历史CSV迁外置盘+本地留符号链接（幂等） |
 
 ## 策略速查
 

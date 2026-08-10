@@ -154,6 +154,22 @@ module.exports = {
       log_date_format: "YYYY-MM-DD HH:mm:ss",
     },
     {
+      // 每周日 19:00 PT：把本周新产生（新标的回测拉取、临时脚本写入）的
+      // 历史行情CSV迁到外置盘 X9_Pro，本地只留符号链接。已链接的文件
+      // 幂等跳过；外置盘未挂载时安全跳过本轮，不报错不中断。
+      name: "stock-weekly-data-consolidate",
+      script: "/bin/zsh",
+      args: "run_consolidate_data.sh",
+      cwd: "/Users/congrenhan/Documents/quantrift_stock",
+      interpreter: "none",
+      autorestart: false,
+      cron_restart: "0 19 * * 0",
+      out_file: "logs/consolidate_data_pm2_out.log",
+      error_file: "logs/consolidate_data_pm2_err.log",
+      merge_logs: true,
+      log_date_format: "YYYY-MM-DD HH:mm:ss",
+    },
+    {
       // 每月1日 06:00 PT：rejected 池复检（四策略回测+成本/walk-forward 全套验证），
       // 通过者仅推送候选报告，接入仍需人工确认。频率刻意不高于月度：
       // 反复重测同一批标的会抬高多重比较假阳性。
