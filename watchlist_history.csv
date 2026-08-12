@@ -1365,3 +1365,13 @@ RKT,insufficient_data,breakout,1d,,0.0,2026-08-05,用户批量加入19标的验�
 TWLO,insufficient_data,breakout,1d,0.219,21.0,2026-08-05,用户批量加入19标的验证(RDFN已确认退市剔除): N=21<30门槛,
 MARA,insufficient_data,breakout,1d,-0.04,9.0,2026-08-05,用户批量加入19标的验证(RDFN已确认退市剔除): N=9<30门槛,
 RDFN,non_us_or_invalid,,,,,2026-08-05,yfinance确认已退市(Redfin被Rocket Companies收购)，不加入回测，watchlist.txt仅留档由history过滤,
+CSCO,rejected,confluence,1h,0.44,82.0,2026-08-12,10bps转负(-0.11)，wf pass但全周期成本关不过,-0.0
+CSCO,rejected,confluence,4h,-1.32,37.0,2026-08-12,0成本即负,-0.0
+CSCO,rejected,confluence,1d,0.39,109.0,2026-08-12,10bps=0.28不达标,-0.0
+CSCO,rejected,rsi2,1h,0.482,77.0,2026-08-12,10bps=0.119不达标，wf fail,-11.7
+CSCO,insufficient_data,rsi2,4h,0.522,22.0,2026-08-12,N=22<30，10bps=0.391不达标,-10.2
+CSCO,rejected,rsi2,1d,0.4,74.0,2026-08-12,10bps=0.292不达标，wf pass但成本关不过,-19.9
+CSCO,insufficient_data,mr,1h,,0.0,2026-08-12,信号数0,
+CSCO,insufficient_data,mr,4h,,0.0,2026-08-12,信号数0,
+CSCO,insufficient_data,mr,1d,,0.0,2026-08-12,信号数0,
+CSCO,rejected,breakout,1d,0.14,33.0,2026-08-12,10bps=0.14不达标,-23.6

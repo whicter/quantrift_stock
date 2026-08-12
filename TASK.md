@@ -314,6 +314,11 @@ Confluence 按周期：1h 做多 −0.74R / 做空 −0.75R；4h 做多 −1.64R
 - [x] **每周自动整理**：新增 pm2 任务 `stock-weekly-data-consolidate`（周日19:00 PT），复用同一脚本（幂等——已是符号链接的文件自动跳过），把一周内新加标的产生的新CSV自动搬走；外置盘未挂载时安全跳过不报错
 - [ ] **已知权衡（如实告知用户）**：外置盘不挂载时，`_fill_recent_gaps_from_local`/`_local_bars`（yfinance缺口填补/整体兜底）以及夜间IB刷新、每日选股、事件雷达、手动回测都会读不到本地历史数据；yfinance主链路和 `screener_results.csv`/`.sent_signals.json` 等实时状态不受影响
 
+#### ㉑ CSCO 加入验证（2026-08-12，用户要求）
+
+- [x] yfinance 验真通过；四策略×三周期全测（10个组合）：**全部 fail/insufficient，无一通过成本压力关**——最高 10bps Sharpe 仅0.39（RSI2 4h，但N=22<30）
+- [x] 结论：**不接入实盘**，无借口进 `pending_high_vol`（不像COHR/ALAB那样有真正接近达标的组合）；10条测试记录写入 `watchlist_history.csv`；加入 `watchlist.txt` 并用 `get_universe()` 验证
+
 #### 已在流水线中、本节不重复动作
 
 - 4 个影子实验（TSLA 出场变体 / MRVL 宽出场 / RSI2+IBS / RKLB 突破）在等样本积累
