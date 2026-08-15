@@ -124,6 +124,7 @@ ssh -A mac-studio "cd /Users/congrenhan/Documents/quantrift_stock && git push"
 - **策略路由**：`STRATEGY_MAP` 按 `(symbol, tf)` 路由到 confluence / rsi2 / breakout / mr；**未显式列出的组合不发信号**（2026-07-26 起取消默认 confluence fall-through）
 - **52周突破**：`BREAKOUT_PARAMS` 独立配置（NVDA/MU/MSFT/PLTR/TSLA/AAPL + 2026-07-25 新增 DGRO/SPYM/VOO/VTI），仅日线
 - **MR 均值回归**（2026-07-25 首次接入实时扫描）：`check_mr_signal()` + `MR_PARAMS`，只做多，入场 z-score≤-0.9 + RSI<40 + ADX<25 + close>200SMA，出场纯 ATR 追踪+时间止损（无固定TP）。目前仅 `TSM`(1h)/`FDVV`(1h) 接入；`mr_backtest.py` 存在多年但此前从未接入实时告警，是这次才补的缺口
+- **RSI2-Trend 变体（2026-08-15）**：非独立策略，是 RSI2 + `{use_rs_filter:False, max_hold_bars:30}` 的参数覆盖，适配"长期趋势型"标的（200SMA上方≥65%、年化波动≤40%）。已接入 LLY/CSCO/ISRG/AVDV/VYM/DGRO/TSM/CRWD 的 1d。**8个标的共用同一套参数，不可逐标的调参**（泛化检验依赖于此）
 - **出场模式**：`use_staged_tp=True`，止损用 utTS，TP1/TP2 固定 ATR 倍数
 - **数据源（2026-07-27 起为混合架构）**：`fetch_bars()` 以 yfinance 为主（软限制，15分钟延时）；1d 近期缺 bar 用本地 IB 数据实时填补；yfinance 拉空时整段回退本地 IB 数据；本地 IB 数据由 `stock-nightly-ib-refresh`（每交易日 14:00 PT）自动 `--merge` 保鲜，最多落后一个交易日。引擎**不直连 IB**（历史教训：Error 162 crash-restart 循环）。单轮扫描拉取失败率 >20% 会发 Telegram 告警；财报日期按日缓存（省 ~90 请求/小时）。
 - **完整 bar 语义（2026-07-27 起）**：信号只在**完整 bar** 上产生——盘中不再有 1d 信号（当日 bar 16:00 ET 收盘后才纳入），1h/4h 丢弃进行中的 bar；且信号仅在 bar 收盘后的新鲜窗口内发出（1h=4h/4h=12h/1d=30h），数据缺口或重启不补发陈旧信号。与回测"完整 bar 收盘决策"语义对齐。

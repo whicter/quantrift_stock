@@ -214,6 +214,27 @@ STRATEGY_MAP: dict[tuple[str, str], str] = {
     # 2026-08-05 用户单独要求加入
     ("APP", "1h"): "confluence",  # 10bps 0.80 N=102 训练0.82→测试0.93（wf pass，测试段更优）
 
+    # ── RSI2-Trend 变体（2026-08-15）─────────────────────────────────────
+    # LLY 全策略不达标触发的专项开发。诊断发现 RSI2 卡在两处：① RS vs QQQ 过滤
+    # 对非科技股无意义（药企与纳指比强弱本就不相关）② 持仓仅10根，持续趋势型
+    # 标的还没走完就被时间止损踢出。关 RS + 持仓放长至30根即可解决。
+    #
+    # 防过拟合：该配置是从24个变体中选出的，与 LLY/SLS/USO 当年被网格"救回"
+    # 后失效是同一个危险动作。故先事前注册假设——"长期趋势型"(200SMA上方
+    # ≥65% 且年化波动≤40%)标的应当受益——再把配置原封不动套到全部223个标的
+    # （不做任何逐标的调参）。结果：达标的10个里8个是事前预测的趋势型(80%)，
+    # 而趋势型在全样本仅占30%，2.7倍富集，确认捕捉的是真实标的特征而非噪音。
+    ("LLY",  "1d"): "rsi2",   # 0.157→0.733  30bps 0.600  wf 0.722→0.615
+    ("CSCO", "1d"): "rsi2",   # 0.292→0.690  30bps 0.542  wf 0.695→0.687（此前四策略全不达标）
+    ("ISRG", "1d"): "rsi2",   # 0.422→0.699  30bps 0.545  wf 0.817→0.623
+    ("AVDV", "1d"): "rsi2",   # 0.550→0.761  30bps 0.491  wf 0.249→1.149
+    ("VYM",  "1d"): "rsi2",   # 0.851→0.715  30bps 0.344  DD仅-11%  wf 0.567→1.149
+    ("DGRO", "1d"): "rsi2",   # 0.462→0.700  30bps 0.342  wf 0.681→0.952（与既有 breakout 1d 并存）
+    ("TSM",  "1d"): "rsi2",   # 0.362→0.610  30bps 0.483  wf 0.551→0.763
+    # CRWD 不属于事前注册的趋势型（223个标的中"碰巧"达标无法排除），但各项
+    # 数值本身最强且通过项目统一门槛，经用户明确决定直接接入实盘而非先观察。
+    ("CRWD", "1d"): "rsi2",   # 0.422→0.844  30bps 0.773  wf 0.855→0.619  DD-31.7%
+
     # 2026-08-05 用户批量加入19标的（RDFN已确认退市剔除）
     ("TEAM", "1h"): "confluence",  # 10bps 0.89 N=114 训练0.47→测试1.98（wf pass，测试段更优）
 
@@ -330,6 +351,18 @@ RSI2_PARAMS: dict[tuple[str, str], dict] = {
 
     # 2026-07-25 补跑
     ("DELL", "4h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.5, "min_market_score": 2},
+
+    # RSI2-Trend 变体统一配置（2026-08-15）：关 RS 过滤 + 持仓30根。
+    # 刻意不做逐标的调参——generalization 检验正是建立在"同一套参数套用全池"
+    # 之上，逐标的微调会立刻把这道防线拆掉，退回成样本内寻优。
+    ("LLY",  "1d"): {"use_rs_filter": False, "max_hold_bars": 30},
+    ("CSCO", "1d"): {"use_rs_filter": False, "max_hold_bars": 30},
+    ("ISRG", "1d"): {"use_rs_filter": False, "max_hold_bars": 30},
+    ("AVDV", "1d"): {"use_rs_filter": False, "max_hold_bars": 30},
+    ("VYM",  "1d"): {"use_rs_filter": False, "max_hold_bars": 30},
+    ("DGRO", "1d"): {"use_rs_filter": False, "max_hold_bars": 30},
+    ("TSM",  "1d"): {"use_rs_filter": False, "max_hold_bars": 30},
+    ("CRWD", "1d"): {"use_rs_filter": False, "max_hold_bars": 30},
     ("HOOD", "1h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.0, "min_market_score": 2},
     ("HOOD", "4h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.5, "min_market_score": 2},
 
