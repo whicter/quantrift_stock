@@ -192,6 +192,23 @@ module.exports = {
       log_date_format: "YYYY-MM-DD HH:mm:ss",
     },
     {
+      // 每小时 :10（主扫描之后）：期权纸面模拟。
+      // 2026-08-15 加入——用户提出"信号触发时模拟买期权、到止盈出场看盈亏"。
+      // 只覆盖实测流动性足够的18个标的（价差<5%粗筛 + 入场时实时价差<8%闸门），
+      // 只对正股仍未出场的新信号开仓（避免时点错配）。绝不下单、不连 IB。
+      name: "stock-options-paper",
+      script: "/bin/zsh",
+      args: "run_options_paper.sh",
+      cwd: "/Users/congrenhan/Documents/quantrift_stock",
+      interpreter: "none",
+      autorestart: false,
+      cron_restart: "10 * * * *",
+      out_file: "logs/options_paper_pm2_out.log",
+      error_file: "logs/options_paper_pm2_err.log",
+      merge_logs: true,
+      log_date_format: "YYYY-MM-DD HH:mm:ss",
+    },
+    {
       // 每月1日 06:00 PT：rejected 池复检（四策略回测+成本/walk-forward 全套验证），
       // 通过者仅推送候选报告，接入仍需人工确认。频率刻意不高于月度：
       // 反复重测同一批标的会抬高多重比较假阳性。
