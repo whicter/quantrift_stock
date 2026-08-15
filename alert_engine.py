@@ -84,19 +84,24 @@ TIMEFRAMES = ["1h", "4h", "1d"]
 # 见 TASK.md ⑤：183 个默认路由组合仅 2 个达标，曾贡献一半的实盘信号）
 STRATEGY_MAP: dict[tuple[str, str], str] = {
     # ConfluenceStrategy 主力池
-    ("MU",   "1h"): "confluence",
-    ("MU",   "4h"): "confluence",
+    # 2026-08-15 升级：Confluence 10bps=-0.36(亏) → RSI2 10bps=1.441 N=95
+    # 训练0.84→测试1.74，默认参数无网格寻优，30bps 仍 1.157
+    ("MU",   "1h"): "rsi2",
+    # 降级(2026-08-15 红灯+重验证双挂): ("MU","4h"):"confluence" 10bps=-0.09 wf=fail
+    # 同批 RSI2 4h 10bps=1.210 过成本关但 wf 测试段0笔无法确认 → 进 pending_high_vol
     ("MRVL", "1h"): "confluence",
     ("MRVL", "4h"): "confluence",
-    ("NVDA", "4h"): "confluence",
+    # 降级(2026-08-15 红灯+重验证双挂): ("NVDA","4h"):"confluence" 10bps=-0.01 wf=fail
     ("SNDK", "1h"): "confluence",
-    ("STX",  "1h"): "confluence",
+    # 2026-08-15 升级：Confluence 10bps=0.54(不达标) → RSI2 10bps=1.622 N=90
+    # 训练1.70→测试1.81，默认参数无网格寻优，30bps 仍 1.332
+    ("STX",  "1h"): "rsi2",
     ("STX",  "4h"): "confluence",
-    ("STX",  "1d"): "confluence",
+    # 降级(2026-08-15 关空也救不回): ("STX","1d"):"confluence" 10bps=0.11 关空后0.12
     ("TSLA", "1d"): "confluence",
     # RSI2 v2 主力池
     ("NVDA", "1d"): "rsi2",
-    ("MRVL", "1d"): "rsi2",
+    # 降级(2026-08-15 连续8批次红灯+重验证双挂): ("MRVL","1d"):"rsi2" 10bps=0.203 wf=fail
     ("MU",   "1d"): "rsi2",
     ("MSFT", "1d"): "rsi2",
     ("MSFT", "4h"): "rsi2",
@@ -107,13 +112,13 @@ STRATEGY_MAP: dict[tuple[str, str], str] = {
     ("META", "1d"): "rsi2",
     ("SOXX", "1h"): "rsi2",
     ("SOXX", "4h"): "rsi2",
-    ("SOXX", "1d"): "rsi2",
+    # 降级(2026-08-15 红灯+重验证双挂): ("SOXX","1d"):"rsi2" 10bps=0.535 wf=fail
     ("SMH",  "4h"): "rsi2",
-    ("SMH",  "1d"): "rsi2",
+    # 降级(2026-08-15 红灯+重验证双挂): ("SMH","1d"):"rsi2" 10bps=0.57 wf=fail
     ("QQQ",  "1d"): "rsi2",
     ("SPY",  "4h"): "rsi2",
     ("SPY",  "1d"): "rsi2",
-    ("AAPL", "1d"): "rsi2",
+    # 降级(2026-08-15 红灯+重验证双挂): ("AAPL","1d"):"rsi2" 10bps=0.204 wf=fail
     # PLTR — RSI2 全周期（Confluence 全周期为负）
     ("PLTR", "1h"): "rsi2",
     ("PLTR", "4h"): "rsi2",
@@ -218,17 +223,19 @@ STRATEGY_MAP: dict[tuple[str, str], str] = {
     # 降级(2026-07-26 walk-forward): ("FWRG", "4h"): "confluence",  # Sharpe 0.63 N=74 WR=60.8% [网格优化]
     ("GFS", "1h"): "confluence",  # Sharpe 0.69 N=82 WR=57.3% [网格优化]
     ("KO", "4h"): "confluence",  # Sharpe 0.78 N=41 WR=75.6% [网格优化]
-    ("LLY", "4h"): "confluence",  # Sharpe 0.64 N=63 WR=61.9% [网格优化]
+    # 降级(2026-08-15 全策略不达标): ("LLY","4h"):"confluence" 10bps=0.59 wf=fail
+    # LLY 四策略×三周期12组合全部不达标，最佳 Breakout 1d 0.595 仍差一线；
+    # 当初 0.64 是网格优化救回的，属样本内寻优，样本外站不住
     ("MO", "1h"): "confluence",  # Sharpe 0.63 N=117 WR=68.4% [网格优化]
     ("QCOM", "4h"): "confluence",  # Sharpe 1.03 N=47 WR=72.3% [网格优化]
-    ("SLS", "1h"): "confluence",  # Sharpe 0.76 N=105 WR=58.1% [网格优化]
+    # 降级(2026-08-15 关空也救不回): ("SLS","1h"):"confluence" 10bps=-1.00 关空后-0.42
     ("SMCI", "1h"): "confluence",  # Sharpe 0.60 N=294 WR=55.4% [网格优化]
     # 降级(2026-07-27 QQQ数据修复后重验): ("SNAP", "1d"): "confluence",  # Sharpe 0.62 N=59 WR=78.0% [网格优化]
     # 降级(2026-07-26 walk-forward): ("STLA", "4h"): "confluence",  # Sharpe 1.14 N=106 WR=64.2% [网格优化]
     ("TMC", "1d"): "confluence",  # Sharpe 0.62 N=31 WR=67.7% [网格优化]
     ("TMC", "1h"): "confluence",  # Sharpe 1.18 N=302 WR=63.2% [网格优化]
     # 降级(2026-07-26 walk-forward): ("UP", "1d"): "confluence",  # Sharpe 0.84 N=37 WR=75.7% [网格优化]
-    ("USO", "1h"): "confluence",  # Sharpe 0.63 N=80 WR=57.5% [网格优化]
+    # 降级(2026-08-15 关空也救不回): ("USO","1h"):"confluence" 10bps=-0.42 关空后0.33
     ("AAOI", "4h"): "rsi2",  # Sharpe 0.672 N=70 WR=68.6% [网格优化]
     ("AIRJ", "1h"): "rsi2",  # Sharpe 0.614 N=56 WR=57.1% [网格优化，DD-35.6%需关注]
     ("ALL", "1h"): "rsi2",  # Sharpe 1.121 N=55 WR=69.1% [网格优化]

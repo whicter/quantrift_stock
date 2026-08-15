@@ -60,7 +60,9 @@ symbols:
   #   ALB  RSI2 4h  10bps=1.017  N=30（刚好压线）
   #   DASH RSI2 1d  10bps=0.619  N=52，DD-26.3%
   #   DKNG RSI2 1d  10bps=0.622  N=60，DD-30.1%
-  pending_high_vol: [RKLB, NBIS, SHOP, AXON, COHR, ALB, DASH, DKNG]
+  # MU 4h：2026-08-15 Confluence 降级后改测 RSI2，10bps=1.210 N=35 过成本关，
+  # 但 walk-forward 测试段 0 笔无法确认（同 AXON/COHR 情形），暂不接入
+  pending_high_vol: [RKLB, NBIS, SHOP, AXON, COHR, ALB, DASH, DKNG, MU]
 
   # 半导体 ETF：RSI2（不强制 RS vs QQQ）或 MR+ATR（待重新调参）
   sector_etf:  [SOXX, SMH]
@@ -319,10 +321,10 @@ symbol_params:
     1d:  {adx_threshold: 15.0, ut_key: 3.0, min_score: 4}   # Confluence 废（0.23）→ 用 RSI2 entry=5 trail=3× hold≤10 score≥3 Sharpe 0.94
   STX:
     1h:  {adx_threshold: 30.0, ut_key: 3.0, min_score: 4}
-    4h:  {adx_threshold: 25.0, ut_key: 1.5, min_score: 4}
+    4h:  {adx_threshold: 25.0, ut_key: 1.5, min_score: 4, allow_short: false}   # 2026-08-15 关空：both 0.60→long 0.66
     1d:  {adx_threshold: 20.0, ut_key: 1.5, min_score: 4}
   MRVL:
-    1h:  {adx_threshold: 15.0, ut_key: 1.0, min_score: 5, use_breakeven_after_tp1: true}  # Confluence Sharpe 0.94（RR 0.88，保本止损已加）
+    1h:  {adx_threshold: 15.0, ut_key: 1.0, min_score: 5, use_breakeven_after_tp1: true, allow_short: false}  # Confluence Sharpe 0.94（RR 0.88，保本止损已加）；2026-08-15 关空：both 0.70→long 0.97，测试段 1.16→1.65
     4h:  {adx_threshold: 30.0, ut_key: 3.0, min_score: 4}   # Confluence Sharpe 0.72（样本不足） → RSI2 4h 1.123⚠️（N=25 不可信）
     1d:  {adx_threshold: 20.0, ut_key: 3.0, min_score: 4}   # Confluence 0.37 → 换 RSI2 v2：entry=15, trail=2×, hold≤5, score≥2, Sharpe 0.748
   SOXX:
@@ -346,9 +348,14 @@ symbol_params:
     1h:  {adx_threshold: 20.0, ut_key: 2.0, min_score: 4}
     4h:  {adx_threshold: 20.0, ut_key: 2.5, min_score: 4}
     1d:  {adx_threshold: 20.0, ut_key: 2.5, min_score: 4}
+  # 2026-08-15 多空腿分离验证：这两个标的关掉做空后成本关和样本外一致更好
+  BB:
+    4h:  {allow_short: false}   # both 1.61→long 1.69，测试段 2.34→2.63
+  DELL:
+    1h:  {allow_short: false}   # both 0.57→long 0.72，测试段 1.01→1.30
   INTC:
     # Confluence 1h Sharpe 0.67（95笔），1d 0.56；4h 无效（0.11）
-    1h:  {adx_threshold: 25.0, ut_key: 1.5, min_score: 5}
+    1h:  {adx_threshold: 25.0, ut_key: 1.5, min_score: 5, allow_short: false}   # 2026-08-15 关空：both 1.00→long 1.01，测试段 1.75→1.96
     4h:  {adx_threshold: 25.0, ut_key: 2.0, min_score: 5}
     1d:  {adx_threshold: 20.0, ut_key: 3.0, min_score: 4}
 
