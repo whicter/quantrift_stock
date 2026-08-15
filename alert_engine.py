@@ -56,6 +56,7 @@ from mag7_rotation import run_rotation
 from meta_label import suggest as meta_label_suggest
 from paper_portfolio import open_position as paper_open_position, risk_warnings as paper_risk_warnings, update as paper_update
 from review_core import hold_description
+from sector_map import sector_of
 
 with open("config.yaml") as f:
     cfg = yaml.safe_load(f)
@@ -1212,6 +1213,62 @@ def _fetch_all_earnings(symbols: list[str], max_calendar_days: int = 7) -> dict[
     return result
 
 
+def _queue_alert(queued: list[dict], demoted: set[str], symbol: str, tf: str,
+                 strategy: str, direction: str, msg: str) -> None:
+    """把信号排入本轮推送队列；命中降级清单的只记录不推送。
+
+    降级组合的信号仍然照常写入 signal_log（`_log_signal` 在调用方独立执行），
+    只是不再打扰用户——这样才能持续观察它是否恢复，而不是彻底失明。
+    """
+    if f"{strategy}|{symbol.upper()}|{tf}" in demoted:
+        print(f"  ↓ {symbol} {tf} [{strategy}] 已降级，仅记录不推送")
+        return
+    queued.append({"sector": sector_of(symbol), "symbol": symbol, "tf": tf,
+                   "strategy": strategy, "direction": direction, "msg": msg})
+
+
+def _flush_sector_alerts(queued: list[dict]) -> None:
+    """把本轮扫描的信号按板块合并推送，每个板块一条 Telegram 消息。
+
+    用户 2026-08-15 要求"全部发出来，同板块的放在一条里发"：不做任何过滤，
+    只改投递方式。合并的价值不只是少几条消息——同板块同时出多条同向信号，
+    本质是同一个赌注下了多次，分开发时这种相关性集中度是看不见的。
+    """
+    if not queued:
+        return
+    grouped: dict[str, list[dict]] = {}
+    for item in queued:
+        grouped.setdefault(item["sector"], []).append(item)
+
+    # 板块内信号多的排前面：集中度高的更需要先看到
+    for sector, items in sorted(grouped.items(), key=lambda kv: (-len(kv[1]), kv[0])):
+        header = f"📦 {sector}（{len(items)} 条）"
+        if len(items) > 1:
+            longs = sum(1 for i in items if i["direction"] == "做多")
+            shorts = len(items) - longs
+            bias = " / ".join(filter(None, [f"做多{longs}" if longs else "",
+                                            f"做空{shorts}" if shorts else ""]))
+            header += f"  ⚠️ 同板块集中：{bias}"
+        tg_alert(header + "\n\n" + "\n\n".join(i["msg"] for i in items))
+
+
+def _load_demoted_routes() -> set[str]:
+    """读取被降级为影子的路由（`decay_action.py` 写入）。
+
+    降级由"连续多周红灯 + 最新数据重验证也未通过"双重确认后产生，写在数据文件
+    里而不是改 `STRATEGY_MAP` 源码——无人值守任务改代码不安全也不可审计。
+    命中的组合继续计算并记录为影子信号（便于观察是否恢复），但不推送 Telegram。
+    """
+    path = Path("logs/demoted_routes.json")
+    if not path.exists():
+        return set()
+    try:
+        return set(json.loads(path.read_text()).keys())
+    except Exception as exc:
+        print(f"  ⚠ demoted_routes.json 解析失败: {exc}")
+        return set()
+
+
 def _load_screener_ranks(top_n: int = 10) -> dict[str, int]:
     """
     读取最近一次选股结果，返回 {symbol: rank} for Top-N。
@@ -1462,6 +1519,11 @@ def run_scan(ib=None):
     else:
         print(f"  MAG7 轮动: 本周已发送，跳过")
 
+    # ── 降级路由：衰减监控+重验证双重确认后被降为影子的组合 ────────────────────
+    demoted_routes = _load_demoted_routes()
+    if demoted_routes:
+        print(f"  降级路由（仅记录不推送）: {', '.join(sorted(demoted_routes))}")
+
     # ── 选股排名：读取最近一次选股结果 Top10 ──────────────────────────────────
     screener_ranks = _load_screener_ranks(top_n=10)
     if screener_ranks:
@@ -1498,6 +1560,7 @@ def run_scan(ib=None):
         print(f"  SOXX MA50: 获取失败 ({e})")
 
     df_1d_cache: dict[str, pd.DataFrame] = {}  # 复用给 breakout 扫描，避免重复拉取
+    queued_alerts: list[dict] = []   # 本轮信号先入队，扫描结束后按板块合并推送
     fetch_attempts = 0   # 数据源健康度：yfinance 是非官方接口，Yahoo 收紧限流时
     fetch_failures = 0   # 表现为大面积拉空——不告警的话扫描会静默变瘦。
 
@@ -1587,7 +1650,8 @@ def run_scan(ib=None):
                             msg += "\n" + portfolio
                         print(f"\n  ⚡ 信号：{symbol} {tf} {sig['direction']} [Confluence]")
                         print(msg)
-                        tg_alert(msg)
+                        _queue_alert(queued_alerts, demoted_routes, symbol, tf,
+                                     "confluence", sig["direction"], msg)
                         row = _log_signal(symbol, tf, bar_date, sig, params=params,
                                           sector_aligned=not soxx_below_ma50 if symbol in SEMI_SYMBOLS else None,
                                           screener_rank=screener_ranks.get(symbol), market_regime=market_regime)
@@ -1629,7 +1693,8 @@ def run_scan(ib=None):
                             msg += "\n" + portfolio
                         print(f"\n  ⚡ 信号：{symbol} {tf} 做多 [RSI2 v2]")
                         print(msg)
-                        tg_alert(msg)
+                        _queue_alert(queued_alerts, demoted_routes, symbol, tf,
+                                     "rsi2", "做多", msg)
                         row = _log_signal(symbol, tf, bar_date, sig, params=p,
                                           sector_aligned=not soxx_below_ma50 if symbol in SEMI_SYMBOLS else None,
                                           screener_rank=screener_ranks.get(symbol), market_regime=market_regime)
@@ -1668,7 +1733,8 @@ def run_scan(ib=None):
                             msg += "\n" + portfolio
                         print(f"\n  ⚡ 信号：{symbol} {tf} 做多 [MR]")
                         print(msg)
-                        tg_alert(msg)
+                        _queue_alert(queued_alerts, demoted_routes, symbol, tf,
+                                     "mr", "做多", msg)
                         row = _log_signal(symbol, tf, bar_date, sig, params=p,
                                           sector_aligned=not soxx_below_ma50 if symbol in SEMI_SYMBOLS else None,
                                           screener_rank=screener_ranks.get(symbol), market_regime=market_regime)
@@ -1715,7 +1781,8 @@ def run_scan(ib=None):
                     msg += "\n" + portfolio
                 print(f"\n  🚀 突破信号：{symbol} 1d [Breakout52W]")
                 print(msg)
-                tg_alert(msg)
+                _queue_alert(queued_alerts, demoted_routes, symbol, "1d",
+                             "breakout", "做多", msg)
                 row = _log_signal(symbol, "1d", bar_date, sig, params=BREAKOUT_PARAMS.get(symbol, {}),
                                   sector_aligned=not soxx_below_ma50 if symbol in SEMI_SYMBOLS else None,
                                   screener_rank=screener_ranks.get(symbol), market_regime=market_regime)
@@ -1746,7 +1813,8 @@ def run_scan(ib=None):
     if fetch_attempts >= 20 and fetch_failures / fetch_attempts > 0.2:
         tg_alert(f"⚠️ 数据源异常：本轮扫描 {fetch_failures}/{fetch_attempts} 次拉取失败"
                  f"（>20%），yfinance 可能被限流，信号覆盖不完整")
-    print(f"\n扫描完成，发现 {found} 个信号（数据拉取 {fetch_attempts - fetch_failures}/{fetch_attempts}）")
+    _flush_sector_alerts(queued_alerts)
+    print(f"\n扫描完成，发现 {found} 个信号（数据拉取 {fetch_attempts - fetch_failures}/{fetch_attempts}），推送 {len(queued_alerts)} 条分 {len({a['sector'] for a in queued_alerts})} 个板块）")
     if found == 0:
         print("  (无信号)")
 

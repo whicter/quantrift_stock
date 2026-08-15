@@ -134,6 +134,14 @@ def compute_signals(df: pd.DataFrame, params: dict,
     result["rsi2"]    = _rsi2(close)
     result["atrVal"]  = _atr(high, low, close, 14)
 
+    # IBS（Internal Bar Strength）= (Close-Low)/(High-Low)，衡量收盘在当根 bar
+    # 区间中的位置。低 IBS = 收在最低点附近（恐慌式收盘），实盘影子策略
+    # RSI2_IBS_shadow 用 IBS<0.2 作为额外入场过滤（见 alert_engine._ibs）。
+    # 此处复刻同一定义供回测对比；width=0（极罕见的平价 bar）时取 1.0 以
+    # 保持与实盘一致——那种 bar 不该被当作恐慌收盘。
+    bar_width = (high - low).replace(0, np.nan)
+    result["ibs"] = ((close - low) / bar_width).fillna(1.0)
+
     # Pullback location filter：中期趋势完整 + 短期超卖位置
     result["pullback_ok"] = (
         (close > result["sma100"]) & (close < result["sma20"])
@@ -230,6 +238,8 @@ class RSI2Strategy(Strategy):
     use_vol_score:        bool  = False   # 成交量放量时 market_score +1
     use_vix_spike:        bool  = False   # VIX 急升回落时 market_score +1
     use_vix_structural:   bool  = False   # VIX < VIX_MA20 时 market_score +0.5
+    use_ibs_filter:       bool  = False   # 仅在 IBS < ibs_threshold（恐慌式收盘）时入场
+    ibs_threshold:        float = 0.2     # 与 alert_engine 影子策略同阈值
     n_contracts:         int   = 0       # 0=全仓，支持 position.close(0.5)
     contract_size:       int   = 1
 
@@ -312,6 +322,10 @@ class RSI2Strategy(Strategy):
         if self.use_rs_filter and not bool(self.data.rs_positive[-1]):
             return
 
+        # IBS：只在收盘落在当根 bar 低位（恐慌式收盘）时入场
+        if self.use_ibs_filter and float(self.data.ibs[-1]) >= self.ibs_threshold:
+            return
+
         self._trail_stop  = close - self.atr_sl_mult * atr
         self._bars_held   = 0
         self._half_closed = False
@@ -344,6 +358,8 @@ def set_params(p: dict):
     _S.use_vol_score        = bool(p.get("use_vol_score", False))
     _S.use_vix_spike        = bool(p.get("use_vix_spike", False))
     _S.use_vix_structural   = bool(p.get("use_vix_structural", False))
+    _S.use_ibs_filter       = bool(p.get("use_ibs_filter", False))
+    _S.ibs_threshold        = float(p.get("ibs_threshold", 0.2))
     _S.n_contracts         = int(p.get("n_contracts", 0))
     _S.contract_size       = int(p.get("contract_size", 1))
 

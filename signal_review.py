@@ -216,6 +216,29 @@ def _expected_r(expectations: dict, strategy: str, symbol: str, tf: str) -> tupl
     return 0.0, "placeholder"
 
 
+def _append_with_schema_check(df: pd.DataFrame, path: Path) -> None:
+    """追加前校验列结构；不一致则归档旧文件重建。
+
+    2026-08-15 发现：`review_history.csv` 的表头停留在旧的 8 字段 schema（无 tf、
+    无 baseline_r/baseline_kind），而后续 544 行是 11 字段——因为原来用
+    `header=not path.exists()` 盲目追加，schema 演进时表头从未更新，导致
+    `pd.read_csv` 直接解析失败，整个文件对下游不可用。与 screener_results.csv
+    是同一类事故（见 LEARNING.md），此处用同样的写入方检查修复。
+    """
+    if path.exists():
+        with open(path) as fh:
+            existing_header = fh.readline().strip().split(",")
+        if existing_header != list(df.columns):
+            archive = path.with_suffix(f".schema-{datetime.now():%Y%m%d}.bak")
+            path.rename(archive)
+            df.to_csv(path, index=False)
+            print(f"⚠️ review_history.csv 列结构不同，已归档为 {archive.name} 并重建")
+            return
+        df.to_csv(path, mode="a", index=False, header=False)
+    else:
+        df.to_csv(path, index=False)
+
+
 def _monitor(rdf: pd.DataFrame) -> None:
     """Write rolling live performance history and flag statistical degradation."""
     decided = rdf[pd.to_numeric(rdf["r_mult"], errors="coerce").notna()].copy()
@@ -248,7 +271,7 @@ def _monitor(rdf: pd.DataFrame) -> None:
                      "baseline_kind": baseline_kind, "z_vs_baseline": round(z, 3), "status": level})
     hist = pd.DataFrame(rows)
     path.parent.mkdir(exist_ok=True)
-    hist.to_csv(path, mode="a", index=False, header=not path.exists())
+    _append_with_schema_check(hist, path)
     graded = [r for r in rows if r["status"] != "样本不足"]
     pending = [r for r in rows if r["status"] == "样本不足"]
     meta = expectations.get("_meta", {})

@@ -170,6 +170,28 @@ module.exports = {
       log_date_format: "YYYY-MM-DD HH:mm:ss",
     },
     {
+      // 执行账本：常驻长轮询，接收「接 NVDA 176.5」这类指令记录真实成交。
+      // 2026-08-15 加入——此前系统只知道自己发了什么信号，完全不知道用户实际
+      // 接了哪些、什么价成交，所有 R 值都是理论值。这是从"信号系统"走向
+      // "能判断是否盈利"的关键缺口。绝不下单、不连 IB。
+      // 注意：同一个 bot token 全局只能有一个 getUpdates 消费者。已核对本项目
+      // token(8864211814) 与期货项目 ib-bot-tg-control(8882740685) 不同，不冲突。
+      name: "stock-exec-ledger",
+      script: "/bin/zsh",
+      args: "run_execution_ledger.sh",
+      cwd: "/Users/congrenhan/Documents/quantrift_stock",
+      interpreter: "none",
+      autorestart: true,
+      env: {
+        TG_TOKEN: envVars.TG_TOKEN || "",
+        TG_CHAT_ID: envVars.TG_CHAT_ID || "",
+      },
+      out_file: "logs/exec_ledger_pm2_out.log",
+      error_file: "logs/exec_ledger_pm2_err.log",
+      merge_logs: true,
+      log_date_format: "YYYY-MM-DD HH:mm:ss",
+    },
+    {
       // 每月1日 06:00 PT：rejected 池复检（四策略回测+成本/walk-forward 全套验证），
       // 通过者仅推送候选报告，接入仍需人工确认。频率刻意不高于月度：
       // 反复重测同一批标的会抬高多重比较假阳性。
