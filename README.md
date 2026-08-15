@@ -6,12 +6,21 @@ Stock signal monitor with multi-strategy architecture.
 
 ## Symbols
 
-| Group | Tickers | Strategy |
+108 symbols across 130 explicit `(symbol, timeframe)` routes as of 2026-08-15.
+Combinations not listed in `STRATEGY_MAP` emit nothing — there is no default
+fall-through (removed 2026-07-26; see TASK.md section 5).
+
+| Route family | Count | Notes |
 |---|---|---|
-| High-beta momentum | NVDA, TSLA, SNDK, MU, STX, MRVL | ConfluenceStrategy |
-| Large-cap slow-trend | MSFT, GOOGL, META, AAPL, AMZN | RSI2 + QQQ filter + RS filter |
-| Broad ETFs | SOXX, SMH, QQQ, SPY | RSI2 (self-trend, no QQQ RS filter for SOXX/SMH) |
-| Watchlist batch (2026-07-25) | 34 symbols in `config.yaml` `watchlist_2026_07` | Confluence/RSI2/Breakout/MR — whichever cleared Sharpe≥0.6, N≥30 on default params; see TASK.md section M |
+| RSI2 v2 | 88 | Includes the 8 RSI2-Trend routes below |
+| ConfluenceStrategy | 39 | Only strategy that shorts; 5 combos have `allow_short:false` |
+| MR + ATR Trail | 3 | TSM/FDVV/MKSI 1h |
+| Breakout 52W | 10 | `BREAKOUT_PARAMS`, daily only, runs alongside the above |
+
+Every route is admitted through the same gate: Sharpe ≥ 0.6 at 10bps commission,
+N ≥ 30 trades, and a 60/40 walk-forward whose test segment does not collapse.
+Outcomes for every symbol ever tested — passing and failing — are in
+`watchlist_history.csv`.
 
 ## Strategies
 
@@ -25,7 +34,21 @@ Stock signal monitor with multi-strategy architecture.
 - Exit: RSI2 > 80 OR ATR trailing stop OR time stop
 - Best results: MSFT 4h (Sharpe 1.13), SOXX 1h (Sharpe 1.14)
 
-### 3. MR + ATR Trail（均值回归）
+### 3. RSI2-Trend（长期趋势型变体，2026-08-15）
+- Not a separate strategy: the RSI2 engine with `use_rs_filter=False` and
+  `max_hold_bars=30`, applied via `RSI2_PARAMS`
+- Motivation: RSI2's relative-strength gate is meaningless for non-tech names
+  (a pharma company need not outperform the Nasdaq to be worth buying), and a
+  10-bar time stop ejects slow trends before they develop
+- Routed on 1d for LLY, CSCO, ISRG, AVDV, VYM, DGRO, TSM, CRWD
+- All eight share byte-identical parameters deliberately. The evidence for this
+  variant is a pre-registered generalization test — the config was frozen, a
+  target class was defined in advance (above 200SMA ≥65%, annualized vol ≤40%),
+  and it was applied unchanged to all 223 evaluable symbols; 8 of the 10 that
+  cleared the bar belong to that class against a 30% base rate. Per-symbol
+  tuning would dissolve that argument into eight separate in-sample fits.
+
+### 4. MR + ATR Trail（均值回归）
 - Entry: z-score ≤ −0.9 (near BB lower band) AND RSI < 40 AND ADX < 25 AND close > 200 SMA
 - Exit: ATR trailing stop（不在中轨止盈，让趋势跑起来）
 - Originally researched for broad ETFs (SOXX/SMH/QQQ/SPY) but paused for insufficient sample size across the board (see LEARNING.md); those four still run on RSI2 in production
@@ -63,16 +86,26 @@ rsync -av mac-studio:/Users/congrenhan/Documents/quantrift_stock/data/ /Users/co
 ## Architecture
 
 ```
-yfinance (15-minute delayed OHLCV)
-  └── alert_engine.py
-        ├── fetch bars for each symbol × timeframe
-        ├── compute_signals() / RSI2 signals
-        ├── check entry conditions (per strategy)
-        └── send Telegram alert (NO orders placed)
-
-IB Gateway :4001
-  └── fetch_ib_data.py (clientId=2, offline history refresh only)
+yfinance (primary, 15-min delayed)      IB Gateway :4001 (clientId=2)
+        │                                       │
+        │  gaps / empty responses               │  fetch_ib_data.py --merge
+        └──────────► data/*.csv ◄───────────────┘  (nightly 14:00 PT)
+                        │
+                   alert_engine.py   ── signals only on COMPLETE, FRESH bars
+                        ├── route via STRATEGY_MAP (no default fall-through)
+                        ├── skip routes listed in logs/demoted_routes.json
+                        ├── queue signals, flush grouped BY SECTOR
+                        └── Telegram alert (NEVER places orders)
+                                    │
+                   execution_ledger.py ◄── your replies ("接 NVDA 176.5")
+                        └── logs/execution_log.csv = realized fills vs signals
 ```
+
+The engine never dials IB directly: its hourly scan needs ~300 historical
+requests against a 60-per-10-minute Gateway quota shared with the futures
+bots, which produced an Error 162 crash-restart loop in early July. IB feeds
+the local store on a nightly schedule instead, and that store backfills
+yfinance gaps and covers outright fetch failures.
 
 ## Files
 
@@ -97,6 +130,12 @@ IB Gateway :4001
 | `review_core.py` | 与实盘状态机对齐的逐 bar 复盘引擎 |
 | `paper_portfolio.py` | 虚拟持仓、暴露警示与净值账本（无下单） |
 | `signal_review.py` | 信号复盘、质量校准、衰减监控与 Meta-label 训练 |
+| `decay_action.py` | 红灯连续N周 → 自动重验证 → 双挂才降级（写 `logs/demoted_routes.json`，不改代码） |
+| `execution_ledger.py` | Telegram 长轮询记录真实成交，绝不下单 |
+| `sector_map.py` | 标的→板块映射（带缓存），供信号按板块合并推送 |
+| `consolidate_data.py` | 历史行情CSV迁外置盘，本地留符号链接（幂等，每周自动） |
+| `confluence_direction_test.py` / `rsi2_ibs_test.py` | 多空腿分离 / IBS过滤器 对照验证（研究脚本） |
+| `harmonic_signals.py` / `harmonic_strategy.py` / `harmonic_backtest.py` | 谐波形态原型（研究用，样本不足未接入） |
 | `CLAUDE.md` | Claude Code instructions |
 | `TASK.md` | Pending tasks |
 | `LEARNING.md` | Backtest observations and strategy findings |

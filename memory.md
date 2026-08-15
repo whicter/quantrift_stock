@@ -57,7 +57,7 @@
 
 | 任务 | 时间 | 作用 |
 |---|---|---|
-| `stock-alert` | 常驻，每小时扫描 | 主告警引擎（103+标的） |
+| `stock-alert` | 常驻，每小时扫描 | 主告警引擎（108标的/130条路由；信号按板块合并推送） |
 | `stock-nightly-ib-refresh` | 交易日 14:00 PT | IB 全池 `--merge` 保鲜本地数据 |
 | `stock-daily-screener` | 交易日 13:20 PT | watchlist 全池因子选股 Top15 → TG |
 | `stock-watchlist-events` | 交易日 13:35 PT | 事件雷达·收盘（52W突破/放量新高/异动）→ TG |
@@ -65,6 +65,7 @@
 | `stock-weekly-review` | 周日 18:15 PT | 90天复盘+衰减监控 → TG |
 | `stock-monthly-reval` | 每月1日 06:00 PT | rejected 池复检，候选报告（不自动接入） |
 | `stock-weekly-data-consolidate` | 周日 19:00 PT | 新增历史CSV迁外置盘+本地留符号链接（幂等） |
+| `stock-exec-ledger` | **常驻长轮询** | 执行账本：接收「接 NVDA 176.5」等指令记录真实成交（绝不下单） |
 
 ## RSI2-Trend 变体（2026-08-15 新增，无独立代码）
 

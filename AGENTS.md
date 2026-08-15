@@ -113,6 +113,29 @@ ssh -A mac-studio "cd /Users/congrenhan/Documents/quantrift_stock && git push"
 - **ETF 扫描器数据已回补**：`fetch_etf_data.py` 在 Gateway 恢复后重跑，47 个 ETF + SPY/QQQ + VIX 共 50 次请求全部成功；此前停留在 2026-06-17/18 的文件均已刷新至 2026-07-23（VIX 至 07-24）。ETF 扫描结果现可视为最新。
 - **历史事实保留**：`fetch_ib_data.py` 对合约解析和历史请求仍保留 45 秒超时（当时用于诊断 HMDS 断连，现继续作为常规保护）；2026-07-18 曾用 `fetch_data.py --merge` 做 yfinance 备用回补覆盖 72 个文件，该记录仅作历史参考，当前数据源已是 IB。
 
+## 后台任务（pm2，均已 pm2 save）
+
+| 任务 | 时间 | 作用 |
+|---|---|---|
+| `stock-alert` | 常驻，每小时 | 主告警引擎（108标的/130条路由） |
+| `stock-exec-ledger` | 常驻长轮询 | 执行账本，接收「接 NVDA 176.5」记录真实成交（**绝不下单**） |
+| `stock-nightly-ib-refresh` | 交易日 14:00 PT | IB 全池 `--merge` 保鲜本地数据 |
+| `stock-daily-screener` | 交易日 13:20 PT | 因子选股 Top15 → TG |
+| `stock-watchlist-events-am` | 交易日 07:45 PT | 事件雷达·盘中 → TG |
+| `stock-watchlist-events` | 交易日 13:35 PT | 事件雷达·收盘 → TG |
+| `stock-weekly-review` | 周日 18:15 PT | 90天复盘+衰减监控 → TG |
+| `stock-weekly-data-consolidate` | 周日 19:00 PT | 历史CSV迁外置盘留符号链接 |
+| `stock-monthly-reval` | 每月1日 06:00 PT | rejected 池复检 |
+
+## 信号投递与降级（2026-08-15 起）
+
+- **按板块合并推送**：本轮信号先入队，扫描结束按板块合并，每板块一条消息；
+  同板块多条时附「⚠️ 同板块集中：做多N/做空M」——相关性集中度分开发时看不见。
+  **不做任何过滤，全部信号照发**。
+- **降级路由**：`logs/demoted_routes.json` 里的组合仍计算并记入 signal_log，
+  但不推送。由 `decay_action.py`（连续红灯 → 自动重验证 → 双挂才降级）写入，
+  **是数据不是代码**——无人值守任务不改 `STRATEGY_MAP` 源码。
+
 ## 告警格式
 
 ```
