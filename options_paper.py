@@ -18,9 +18,11 @@ options_paper.py — 期权纸面模拟（绝不下单）
    只有 7.6% 非空，且快照时点与我们的扫描不对齐；yfinance 在信号时刻能直接给出
    真实 bid/ask/OI/IV（实测 NVDA 价差 1.4%、AAPL 3.7%）。数据库更适合做历史分析。
 
-成交假设（刻意保守，避免自欺）：
-  买入按 **ask** 成交，卖出按 **bid** 成交。同时记录 mid 价便于对比"理想成交"与
-  "实际可成交"的差距——这个差距正是期权相对正股的主要额外成本。
+成交假设：
+  **主口径按中间价（mid）成交**——用户要求不因价差宽而过滤，按 mid 下单。
+  同时**仍记录保守口径**（买 ask / 卖 bid）作为对照列：两者之差就是价差成本，
+  也是"限价单能否在 mid 成交"这一假设的敞口。宽价差标的上两个数会差很多，
+  分析时以哪个为准由使用者判断，账本两个都留。
 
 合约选择规则（固定，不做逐标的优化）：
   - 做多 → call；做空 → put
@@ -52,21 +54,23 @@ SIGNAL_LOG = Path("logs/signal_log.csv")
 LEDGER = Path("logs/options_paper_log.csv")
 STATE = Path("data/.options_positions.json")
 
-# 粗筛白名单：options_liquidity.py 2026-08-15 实测价差 <5% 的标的。
-# 刻意保守：宁可覆盖少，也不要在价差大的标的上产生看似盈利的假结果。
-# 入场实时价差闸门。白名单是基于 options-lab 数据库快照算的，但实测发现同一标的
-# 的实时价差可能与快照差很多（CRWD 快照 <5%，实时周度到期却是 16%）。故白名单只
-# 作粗筛，真正的把关是下单那一刻的实时价差。
-MAX_ENTRY_SPREAD_PCT = 8.0
+# 白名单：`options_liquidity.py` 实测 ATM 未平仓量 ≥500 的标的（2026-08-15）。
+# 约束是"有没有真实的双边市场"，不是价差大小——用户明确要求按中间价成交、
+# 不因价差宽而过滤，故价差不再作为准入条件，只作为记录字段供事后分析。
+WHITELIST = {
+    "AAOI", "AAPL", "AGI", "AIRJ", "ALAB", "ALL", "AMC", "APLD", "APO", "APP",
+    "BA", "BABA", "BAC", "BB", "BE", "CCJ", "CRCL", "CRSP", "CRWD", "CRWV",
+    "DELL", "DJT", "GE", "GFS", "GOOG", "GOOGL", "HBM", "HOOD", "IBM", "INTC",
+    "INTU", "IREN", "JPM", "KO", "LMT", "LUNR", "LWLG", "META", "MO", "MRVL",
+    "MS", "MSFT", "MSOS", "MSTR", "MU", "NFLX", "NVDA", "OKLO", "ONDS", "ORCL",
+    "OSCR", "PANW", "PLTR", "QCOM", "QQQ", "RBLX", "RGTI", "SAP", "SKM", "SLV",
+    "SMCI", "SNDK", "SOFI", "SOXX", "SPY", "STX", "TEAM", "TMC", "TSLA", "TSM",
+    "TTD", "USAR", "WBD", "WDC", "WMT",
+}
 
 # 只接这个时间窗内发出的信号（分钟）。主扫描在整点触发、数分钟内完成，本任务
 # 在 :10 运行，30 分钟窗口刚好覆盖当轮扫描且不会捞到上一小时的陈旧信号。
 FRESH_MINUTES = 30
-
-WHITELIST = {
-    "AAPL", "BABA", "CRWD", "DELL", "GOOGL", "IBM", "INTC", "MRVL", "MS",
-    "MSFT", "MU", "NFLX", "NVDA", "PLTR", "QCOM", "SLV", "SNDK", "TSLA",
-}
 
 FIELDS = [
     "opened_at", "closed_at", "symbol", "tf", "strategy", "direction", "signal_id",
@@ -141,9 +145,6 @@ def pick_contract(symbol: str, direction: str, hold_days: float) -> dict | None:
             return None      # 无有效双边报价，如实跳过而不是编一个价
         mid = (bid + ask) / 2
         spread_pct = (ask - bid) / mid * 100
-        if spread_pct > MAX_ENTRY_SPREAD_PCT:
-            print(f"  ⊘ {symbol} {exp} 实时价差 {spread_pct:.1f}% > {MAX_ENTRY_SPREAD_PCT}%，跳过")
-            return None
         return {
             "contract": str(row.get("contractSymbol", "")),
             "expiry": exp, "strike": float(row["strike"]),
@@ -228,7 +229,7 @@ def open_new(state: dict) -> int:
         }
         print(f"  ＋ {r['symbol']} {r['tf']} {r['direction']} → "
               f"{c['right']} {c['strike']} @{c['expiry']} (DTE{c['dte']}) "
-              f"买入ask ${c['ask']:.2f} 价差{(c['ask']-c['bid'])/c['mid']*100:.1f}%")
+              f"按mid ${c['mid']:.2f} 买入（ask ${c['ask']:.2f}，价差{c['spread_pct']}%）")
         opened += 1
     return opened
 
@@ -251,8 +252,9 @@ def close_finished(state: dict) -> int:
         if not q:
             continue
         entry_ask, entry_mid = pos["opt_ask"], pos["opt_mid"]
-        ret = (q["bid"] - entry_ask) / entry_ask * 100 if entry_ask else None
+        # 主口径 mid→mid；对照口径 ask→bid（把价差成本吃满）
         ret_mid = (q["mid"] - entry_mid) / entry_mid * 100 if entry_mid else None
+        ret = (q["bid"] - entry_ask) / entry_ask * 100 if entry_ask else None
         _append({
             "opened_at": pos["opened_at"], "closed_at": datetime.now().isoformat(timespec="seconds"),
             "symbol": pos["symbol"], "tf": pos["tf"], "strategy": pos["strategy"],
@@ -270,7 +272,7 @@ def close_finished(state: dict) -> int:
             "exit_reason": res.get("outcome"),
         })
         print(f"  － {pos['symbol']} {pos['tf']} 平仓：正股 {res.get('r_mult'):+.2f}R "
-              f"／期权 {ret:+.1f}%（{res.get('outcome')}）")
+              f"／期权(mid) {ret_mid:+.1f}%　保守口径 {ret:+.1f}%（{res.get('outcome')}）")
         del state[sid]
         closed += 1
     return closed
@@ -281,22 +283,25 @@ def summary() -> None:
         print("期权纸面账本为空")
         return
     d = pd.read_csv(LEDGER)
-    d = d[pd.to_numeric(d["opt_return_pct"], errors="coerce").notna()]
+    d = d[pd.to_numeric(d["opt_return_mid_pct"], errors="coerce").notna()]
     if d.empty:
         print("暂无已平仓记录")
         return
-    d["opt_return_pct"] = pd.to_numeric(d["opt_return_pct"])
+    d["opt_return_mid_pct"] = pd.to_numeric(d["opt_return_mid_pct"])
+    d["opt_return_pct"] = pd.to_numeric(d["opt_return_pct"], errors="coerce")
     d["stock_r"] = pd.to_numeric(d["stock_r"], errors="coerce")
     print(f"\n=== 期权纸面结果（{len(d)} 笔已平仓）===")
-    print(f"  期权胜率 {(d.opt_return_pct>0).mean()*100:.0f}%  平均 {d.opt_return_pct.mean():+.1f}%  "
-          f"中位 {d.opt_return_pct.median():+.1f}%")
+    print(f"  期权(mid口径) 胜率 {(d.opt_return_mid_pct>0).mean()*100:.0f}%  "
+          f"平均 {d.opt_return_mid_pct.mean():+.1f}%  中位 {d.opt_return_mid_pct.median():+.1f}%")
+    print(f"  保守口径(吃满价差) 胜率 {(d.opt_return_pct>0).mean()*100:.0f}%  "
+          f"平均 {d.opt_return_pct.mean():+.1f}%   ← 两者之差即价差成本")
     print(f"  同期正股 平均 {d.stock_r.mean():+.2f}R  胜率 {(d.stock_r>0).mean()*100:.0f}%")
     both = d.dropna(subset=["stock_r"])
     if len(both) >= 5:
-        agree = ((both.stock_r > 0) == (both.opt_return_pct > 0)).mean() * 100
+        agree = ((both.stock_r > 0) == (both.opt_return_mid_pct > 0)).mean() * 100
         print(f"  方向一致率 {agree:.0f}%（正股赚时期权也赚的比例）")
     print("\n按策略:")
-    print(d.groupby("strategy")["opt_return_pct"].agg(
+    print(d.groupby("strategy")["opt_return_mid_pct"].agg(
         笔数="count", 胜率=lambda s: f"{(s>0).mean()*100:.0f}%", 平均=lambda s: f"{s.mean():+.1f}%").to_string())
 
 
