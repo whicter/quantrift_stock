@@ -26,7 +26,7 @@ options_paper.py — 期权纸面模拟（绝不下单）
 
 合约选择规则（固定，不做逐标的优化）：
   - 做多 → call；做空 → put
-  - 到期：目标 DTE = max(30, 该路由持仓上限交易日 × 3.5)，**优先取月度到期
+  - 到期：目标 DTE = clamp(持仓上限交易日 × 3.5, 30, 60)，**优先取月度到期
     （每月第三个周五）**。实测 CRWD 同一时点周度到期价差 16.0%/OI 99，月度
     8.4%/OI 233——月度流动性接近两倍，周度期权对模拟和实盘都不可用。
   - 行权价：最接近现价的 ATM（流动性最好、delta 最高）
@@ -57,20 +57,36 @@ STATE = Path("data/.options_positions.json")
 # 白名单：`options_liquidity.py` 实测 ATM 未平仓量 ≥500 的标的（2026-08-15）。
 # 约束是"有没有真实的双边市场"，不是价差大小——用户明确要求按中间价成交、
 # 不因价差宽而过滤，故价差不再作为准入条件，只作为记录字段供事后分析。
+#
+# SMH / CSCO 是**手工补入**：筛选脚本读的是 options-lab 数据库，而该库恰好没有
+# 收这两个标的（连同 FOF 共 3 个未覆盖），于是被误判为"无到期覆盖"。yfinance
+# 实测两者流动性其实很好——SMH 34DTE 价差7.2%/OI4650/量489，CSCO 34DTE
+# 价差4.9%/OI2870/量2012，都优于名单里不少标的。这是数据采集缺口，不是市场事实。
+# 封顶 60DTE 后对此前"无到期覆盖"的一批做了 yfinance 实测复核，准入线定为
+# **目标到期处 OI≥50 且有有效双边报价**（用户要求不按价差过滤，价差只记录不拦截）：
+#   补入：LLY(OI77) ISRG(64) NTRS(61) MAR(217) SPYM(291) VOO(95) VTI(550)
+#   仍排除（几乎无市场）：AVDV(OI0) VYM(6) FDVV(11) MKSI(32) SPMO(38) DGRO(46)
+# 注意 LLY/ISRG/NTRS 等价差 8-37% 不等，mid 成交假设在这些标的上偏乐观，
+# 账本同时记保守口径（买ask/卖bid）供对照，分析时可按 spread 列自行筛。
 WHITELIST = {
     "AAOI", "AAPL", "AGI", "AIRJ", "ALAB", "ALL", "AMC", "APLD", "APO", "APP",
-    "BA", "BABA", "BAC", "BB", "BE", "CCJ", "CRCL", "CRSP", "CRWD", "CRWV",
+    "BA", "BABA", "BAC", "BB", "BE", "CCJ", "CRCL", "CRSP", "CRWD", "CRWV", "CSCO",
     "DELL", "DJT", "GE", "GFS", "GOOG", "GOOGL", "HBM", "HOOD", "IBM", "INTC",
-    "INTU", "IREN", "JPM", "KO", "LMT", "LUNR", "LWLG", "META", "MO", "MRVL",
+    "INTU", "IREN", "ISRG", "JPM", "KO", "LLY", "LMT", "LUNR", "LWLG", "MAR",
+    "META", "MO", "MRVL", "NTRS",
     "MS", "MSFT", "MSOS", "MSTR", "MU", "NFLX", "NVDA", "OKLO", "ONDS", "ORCL",
     "OSCR", "PANW", "PLTR", "QCOM", "QQQ", "RBLX", "RGTI", "SAP", "SKM", "SLV",
-    "SMCI", "SNDK", "SOFI", "SOXX", "SPY", "STX", "TEAM", "TMC", "TSLA", "TSM",
-    "TTD", "USAR", "WBD", "WDC", "WMT",
+    "SMCI", "SMH", "SNDK", "SOFI", "SOXX", "SPY", "SPYM", "STX", "TEAM", "TMC",
+    "TSLA", "TSM", "TTD", "USAR", "VOO", "VTI", "WBD", "WDC", "WMT",
 }
 
 # 只接这个时间窗内发出的信号（分钟）。主扫描在整点触发、数分钟内完成，本任务
 # 在 :10 运行，30 分钟窗口刚好覆盖当轮扫描且不会捞到上一小时的陈旧信号。
 FRESH_MINUTES = 30
+
+# 目标到期上限（天）。见 pick_contract 里的说明：超过约 60DTE 后，我们标的池里
+# 多数合约的未平仓量断崖式下跌，宁可承担多一些 theta 也不要开在无人交易的合约上。
+MAX_TARGET_DTE = 60
 
 FIELDS = [
     "opened_at", "closed_at", "symbol", "tf", "strategy", "direction", "signal_id",
@@ -113,7 +129,10 @@ def _append(row: dict) -> None:
 
 def pick_contract(symbol: str, direction: str, hold_days: float) -> dict | None:
     """按固定规则选一张 ATM 合约并取实时报价。"""
-    target_dte = max(30, round(hold_days * 3.5))
+    # 3.5 倍持仓是为了让出场时点仍在 30DTE 的 theta 陡坡之外，但**必须封顶**：
+    # 机械外推会把长持仓路由推到没人交易的远月——LLY 持仓30天×3.5=105DTE 处
+    # OI 只有 39，而它 34DTE 处 OI 有 602。远月省下的 theta 远不抵流动性损失。
+    target_dte = min(max(30, round(hold_days * 3.5)), MAX_TARGET_DTE)
     try:
         t = yf.Ticker(symbol)
         expiries = t.options
