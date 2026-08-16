@@ -48,7 +48,27 @@ Outcomes for every symbol ever tested — passing and failing — are in
   cleared the bar belong to that class against a 30% base rate. Per-symbol
   tuning would dissolve that argument into eight separate in-sample fits.
 
-### 4. MR + ATR Trail（均值回归）
+### 4. Options paper simulation (2026-08-15, no orders)
+
+Not a signal strategy -- a measurement layer. When a signal fires,
+`options_paper.py` buys an ATM option at the midpoint and closes it when the
+underlying strategy exits, so option P&L can be compared against the stock's
+theoretical R.
+
+- Quotes come from yfinance's live chain. The options-lab Postgres has 320k
+  contract snapshots but only 7.6% carry bid/ask and its cadence doesn't line
+  up with our scans, so it's used for liquidity and IV history instead.
+- Expiry targets `clamp(hold_days x 3.5, 30, 60)` and prefers monthlies. The
+  cap matters: LLY's 30-day hold extrapolates to 105 DTE where open interest is
+  39, against 602 at 34 DTE. Back-month theta savings don't cover that.
+- 84 symbols qualify, admitted on whether a two-sided market exists (OI >= 50),
+  not on spread width. Both mid-to-mid and ask-to-bid fills are recorded; their
+  difference is the spread cost.
+- Long-hold strategies and options are structurally mismatched -- the longer the
+  hold, the further out the expiry, and the thinner the market. The RSI2-Trend
+  routes (LLY aside) trade the underlying only.
+
+### 5. MR + ATR Trail（均值回归）
 - Entry: z-score ≤ −0.9 (near BB lower band) AND RSI < 40 AND ADX < 25 AND close > 200 SMA
 - Exit: ATR trailing stop（不在中轨止盈，让趋势跑起来）
 - Originally researched for broad ETFs (SOXX/SMH/QQQ/SPY) but paused for insufficient sample size across the board (see LEARNING.md); those four still run on RSI2 in production
@@ -62,6 +82,7 @@ Outcomes for every symbol ever tested — passing and failing — are in
 
 ```bash
 pip install backtesting pandas yfinance pyyaml requests
+pip install psycopg2-binary        # options_liquidity.py reads the options-lab PG
 
 # Audit local coverage, then merge an IB refresh (Mac Studio only)
 /opt/homebrew/bin/python3.11 data_audit.py --write
@@ -99,6 +120,11 @@ yfinance (primary, 15-min delayed)      IB Gateway :4001 (clientId=2)
                                     │
                    execution_ledger.py ◄── your replies ("接 NVDA 176.5")
                         └── logs/execution_log.csv = realized fills vs signals
+
+                   options_paper.py  (:10, after each scan)
+                        ├── yfinance live chain → ATM, monthly expiry
+                        ├── DTE = clamp(hold_days x 3.5, 30, 60)
+                        └── logs/options_paper_log.csv = option vs stock P&L
 ```
 
 The engine never dials IB directly: its hourly scan needs ~300 historical
@@ -133,6 +159,8 @@ yfinance gaps and covers outright fetch failures.
 | `decay_action.py` | 红灯连续N周 → 自动重验证 → 双挂才降级（写 `logs/demoted_routes.json`，不改代码） |
 | `execution_ledger.py` | Telegram 长轮询记录真实成交，绝不下单 |
 | `sector_map.py` | 标的→板块映射（带缓存），供信号按板块合并推送 |
+| `options_paper.py` | 期权纸面模拟：信号当下按 mid 买 ATM，正股出场时平仓（**不下单**） |
+| `options_liquidity.py` | 按各路由持仓上限匹配 DTE，筛出期权流动性够的标的 |
 | `consolidate_data.py` | 历史行情CSV迁外置盘，本地留符号链接（幂等，每周自动） |
 | `confluence_direction_test.py` / `rsi2_ibs_test.py` | 多空腿分离 / IBS过滤器 对照验证（研究脚本） |
 | `harmonic_signals.py` / `harmonic_strategy.py` / `harmonic_backtest.py` | 谐波形态原型（研究用，样本不足未接入） |

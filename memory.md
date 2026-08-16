@@ -66,6 +66,7 @@
 | `stock-monthly-reval` | 每月1日 06:00 PT | rejected 池复检，候选报告（不自动接入） |
 | `stock-weekly-data-consolidate` | 周日 19:00 PT | 新增历史CSV迁外置盘+本地留符号链接（幂等） |
 | `stock-exec-ledger` | **常驻长轮询** | 执行账本：接收「接 NVDA 176.5」等指令记录真实成交（绝不下单） |
+| `stock-options-paper` | 每小时 :10 | 期权纸面模拟：对当轮新信号按 mid 开仓，正股出场时平仓（**绝不下单**） |
 
 ## RSI2-Trend 变体（2026-08-15 新增，无独立代码）
 
@@ -73,6 +74,22 @@
 - **适用**：长期趋势型标的（200SMA上方≥65%、年化波动≤40%）。关 RS 是因为非科技股与 QQQ 比强弱无意义；持仓30根是因为持续趋势需要时间展开。
 - **已接入 1d**：LLY(0.733) / CSCO(0.690) / ISRG(0.699) / AVDV(0.761) / VYM(0.715) / DGRO(0.700) / TSM(0.610) / CRWD(0.844)
 - **8 个标的共用完全相同的参数，严禁逐标的调参**——泛化检验（80%达标者属事前预测类别 vs 全样本30%）正是建立在这一点上，微调即失效。
+
+## 期权纸面模拟（2026-08-15 新增，绝不下单）
+
+- **`options_paper.py`**：信号发出后 10 分钟内按 **mid 价**买 ATM 期权（做多→call/做空→put），
+  正股策略出场时按当时 mid 平仓，写 `logs/options_paper_log.csv`。
+- **报价源 = yfinance 实时期权链**，不是 options-lab 数据库（后者 bid/ask 仅 7.6% 非空、
+  快照时点与扫描不对齐；但它有 32 万行历史快照，做流动性/IV 历史分析只能靠它）。
+- **白名单 84 个标的**：准入条件是"有真实双边市场"（目标到期处 OI≥50 且有有效买价），
+  **不按价差过滤**（用户明确要求）。账本同时记 mid 口径与保守口径（买ask/卖bid），
+  两者之差即价差成本。
+- **DTE = clamp(持仓上限交易日 × 3.5, 30, 60)**，优先月度到期（第三个周五）。
+  封顶 60 是硬性教训：LLY 持仓30天若按3.5倍外推到105DTE，OI 只剩39，而34DTE处有602。
+- **只接 30 分钟内发出的信号**（`FRESH_MINUTES`）——期权必须在信号当下按当时报价买入，
+  用几天后的报价对应几天前的信号毫无意义。
+- **长持仓策略与期权天然不搭**：持仓越久越需要远月，而远月越没流动性。
+  AVDV/VYM/FDVV/DGRO 等红利宽基 ETF 各到期都几乎无市场，只做正股。
 
 ## 策略速查
 
@@ -88,6 +105,11 @@
 | `screener.py` | 多指数周频因子选股（NDX100/SP500等） |
 | `mag7_rotation.py` | MAG7 周频相对强弱轮动 |
 | `signal_review.py` | 信号复盘（读 logs/signal_log.csv） |
+| `options_paper.py` | 期权纸面模拟（yfinance 实时链，绝不下单） |
+| `options_liquidity.py` | 期权流动性筛选（读 options-lab PG，只读） |
+| `decay_action.py` | 红灯→自动重验证→双挂才降级 |
+| `execution_ledger.py` | Telegram 记录真实成交（绝不下单） |
+| `sector_map.py` | 标的→板块映射，供信号合并推送 |
 | `mr_backtest.py`/`mr_signals.py`/`mr_strategy.py` | MR均值回归回测；2026-07-25 起 `alert_engine.py` 的 `check_mr_signal()` 也直接实现同一入场规则用于实时扫描 |
 
 ## BREAKOUT_PARAMS（当前接入实盘的标的）

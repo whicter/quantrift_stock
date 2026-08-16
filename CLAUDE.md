@@ -151,6 +151,19 @@ ssh -A mac-studio "cd /Users/congrenhan/Documents/quantrift_stock && git push"
 | `stock-weekly-review` | 周日 18:15 PT | 90天复盘+衰减监控 → TG |
 | `stock-weekly-data-consolidate` | 周日 19:00 PT | 历史CSV迁外置盘留符号链接 |
 | `stock-monthly-reval` | 每月1日 06:00 PT | rejected 池复检 |
+| `stock-options-paper` | 每小时 :10 | 期权纸面模拟：对当轮新信号按 mid 开仓，正股出场时平仓（**绝不下单**） |
+
+## 期权纸面模拟（2026-08-15 起，绝不下单）
+
+`options_paper.py` 在每轮扫描后 10 分钟运行：对**当轮新发出**的信号（白名单 84 个
+标的），按 **mid 价**买入 ATM 期权并记账，正股策略出场时按 mid 平仓。
+
+- 报价取 **yfinance 实时期权链**（options-lab 数据库 bid/ask 仅 7.6% 非空，
+  只用于流动性/IV 的历史分析）
+- DTE = `clamp(持仓上限交易日 × 3.5, 30, 60)`，优先月度到期
+- 准入看"有无真实双边市场"（OI≥50），**不按价差过滤**；账本同记保守口径
+  （买ask/卖bid）供对照
+- 需要 `psycopg2-binary`（`options_liquidity.py` 读期权库时用）
 
 ## 信号投递与降级（2026-08-15 起）
 
