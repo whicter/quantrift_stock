@@ -46,9 +46,12 @@ warnings.filterwarnings("ignore")
 
 import pandas as pd
 import yfinance as yf
+from dotenv import load_dotenv
 
 import review_core
 from review_core import evaluate, hold_bars
+
+load_dotenv()
 
 SIGNAL_LOG = Path("logs/signal_log.csv")
 LEDGER = Path("logs/options_paper_log.csv")
@@ -95,6 +98,22 @@ FIELDS = [
     "opt_entry_ask", "opt_entry_mid", "opt_exit_bid", "opt_exit_mid",
     "opt_return_pct", "opt_return_mid_pct", "iv_entry", "oi_entry", "exit_reason",
 ]
+
+
+def tg_alert(msg: str) -> None:
+    """推送到 Telegram；未配置或失败都静默跳过，绝不影响账本写入。"""
+    import os
+    token, chat = os.getenv("TG_TOKEN", ""), os.getenv("TG_CHAT_ID", "")
+    if not token or not chat:
+        return
+    try:
+        import urllib.parse
+        import urllib.request
+        data = urllib.parse.urlencode({"chat_id": chat, "text": msg}).encode()
+        urllib.request.urlopen(f"https://api.telegram.org/bot{token}/sendMessage",
+                               data=data, timeout=15)
+    except Exception:
+        pass
 
 
 def _load_state() -> dict:
@@ -223,6 +242,7 @@ def open_new(state: dict) -> int:
     cutoff = pd.Timestamp.now() - pd.Timedelta(minutes=FRESH_MINUTES)
     sig = sig[pd.to_datetime(sig["timestamp"]) >= cutoff]
     opened = 0
+    msgs: list[str] = []
     for _, r in sig.iterrows():
         sid = str(r.get("signal_id", ""))
         if not sid or sid in state:
@@ -246,10 +266,18 @@ def open_new(state: dict) -> int:
             "signal_row": {k: (None if pd.isna(v) else v) for k, v in r.items()},
             **{f"opt_{k}": v for k, v in c.items()},
         }
-        print(f"  ＋ {r['symbol']} {r['tf']} {r['direction']} → "
-              f"{c['right']} {c['strike']} @{c['expiry']} (DTE{c['dte']}) "
-              f"按mid ${c['mid']:.2f} 买入（ask ${c['ask']:.2f}，价差{c['spread_pct']}%）")
+        line = (f"{c['right']} {c['strike']:g} @{c['expiry']} (DTE{c['dte']})\n"
+                f"  {r['symbol']} {r['tf']} {r['direction']} [{r['strategy']}]\n"
+                f"  买入 mid ${c['mid']:.2f}　(bid ${c['bid']:.2f} / ask ${c['ask']:.2f}，"
+                f"价差 {c['spread_pct']}%)\n"
+                f"  IV {c['iv']*100:.0f}%　OI {c['oi']:,}")
+        print(f"  ＋ {r['symbol']} {r['tf']} {r['direction']} → {c['right']} {c['strike']:g} "
+              f"@{c['expiry']} (DTE{c['dte']}) 按mid ${c['mid']:.2f} 价差{c['spread_pct']}%")
+        msgs.append(line)
         opened += 1
+    if msgs:
+        tg_alert(f"🎲 期权纸面开仓 {len(msgs)} 笔（模拟，未下单）\n\n"
+                 + "\n\n".join(msgs))
     return opened
 
 
@@ -257,6 +285,7 @@ def close_finished(state: dict) -> int:
     """正股信号已出场的，按当前期权报价平掉纸面仓。"""
     import rsi2_backtest as r2
     closed = 0
+    msgs: list[str] = []
     for sid in list(state):
         pos = state[sid]
         row = pd.Series(pos["signal_row"])
@@ -292,8 +321,14 @@ def close_finished(state: dict) -> int:
         })
         print(f"  － {pos['symbol']} {pos['tf']} 平仓：正股 {res.get('r_mult'):+.2f}R "
               f"／期权(mid) {ret_mid:+.1f}%　保守口径 {ret:+.1f}%（{res.get('outcome')}）")
+        msgs.append(f"{pos['symbol']} {pos['tf']} {pos['opt_right']}{pos['opt_strike']:g}\n"
+                    f"  正股 {res.get('r_mult'):+.2f}R　期权 {ret_mid:+.1f}% "
+                    f"(保守 {ret:+.1f}%)\n"
+                    f"  ${entry_mid:.2f} → ${q['mid']:.2f}　{res.get('outcome')}")
         del state[sid]
         closed += 1
+    if msgs:
+        tg_alert(f"🎲 期权纸面平仓 {len(msgs)} 笔（模拟）\n\n" + "\n\n".join(msgs))
     return closed
 
 

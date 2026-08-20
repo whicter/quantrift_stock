@@ -203,6 +203,10 @@ module.exports = {
       interpreter: "none",
       autorestart: false,
       cron_restart: "10 * * * *",
+      env: {
+        TG_TOKEN: envVars.TG_TOKEN || "",
+        TG_CHAT_ID: envVars.TG_CHAT_ID || "",
+      },
       out_file: "logs/options_paper_pm2_out.log",
       error_file: "logs/options_paper_pm2_err.log",
       merge_logs: true,
