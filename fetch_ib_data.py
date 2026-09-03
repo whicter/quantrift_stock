@@ -182,6 +182,32 @@ def fetch_symbol(ib: IB, symbol: str, tfs: list[str], merge: bool = False):
         print(f" ✅ {len(saved)} 行  →  {out_path}")
 
 
+def _alert_failure(failed: list[str], total: int) -> None:
+    """拉取失败率过高时推 Telegram。只读环境变量，失败静默，绝不影响数据流程。"""
+    import os
+    import urllib.parse
+    import urllib.request
+    try:
+        from dotenv import load_dotenv
+        load_dotenv()
+    except Exception:
+        pass
+    token, chat = os.getenv("TG_TOKEN"), os.getenv("TG_CHAT_ID")
+    if not token or not chat:
+        return
+    msg = (f"⚠️ IB 数据保鲜异常：{len(failed)}/{total} 个标的未更新\n"
+           f"（常见原因：Gateway 中途掉线，日志里成片的「Not connected」）\n"
+           f"受影响：{', '.join(failed[:20])}{' ...' if len(failed) > 20 else ''}\n"
+           f"本地数据是引擎补缺兜底与复盘的价格来源，陈旧会同时污染信号和复盘。")
+    try:
+        urllib.request.urlopen(
+            f"https://api.telegram.org/bot{token}/sendMessage",
+            data=urllib.parse.urlencode({"chat_id": chat, "text": msg}).encode(),
+            timeout=15)
+    except Exception:
+        pass
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--port",     type=int, default=4001)
@@ -221,15 +247,34 @@ def main():
     print("✅ 已连接\n")
     print(f"下载 {len(symbols)} 个标的 × {tfs}（每次请求间隔 {PACING_SLEEP}s）")
 
+    # 断连自查。2026-09-03 发现：IB 连接会在批量拉取中途掉线，之后每个标的都
+    # 打印「请求失败：Not connected」但脚本照常跑完、照常退出 0，pm2 也认为
+    # 成功——结果 108 个已路由标的里有 24 个的本地日线停在 8/21，整整 13 天
+    # 没人发现。本地数据是 alert_engine 的补缺与兜底数据源，也是 review_core
+    # 复盘的唯一价格来源，陈旧了会同时污染信号和复盘。静默失败必须变成告警。
+    failed: list[str] = []
     try:
         for sym in symbols:
+            before = {tf: (DATA_DIR / f"{sym}_{tf}.csv").stat().st_mtime
+                      if (DATA_DIR / f"{sym}_{tf}.csv").exists() else 0 for tf in tfs}
             fetch_symbol(ib, sym, tfs, merge=args.merge)
+            after = {tf: (DATA_DIR / f"{sym}_{tf}.csv").stat().st_mtime
+                     if (DATA_DIR / f"{sym}_{tf}.csv").exists() else 0 for tf in tfs}
+            if all(after[tf] <= before[tf] for tf in tfs):
+                failed.append(sym)
     except KeyboardInterrupt:
         print("\n⛔ 用户中断")
     finally:
         ib.disconnect()
         print("\n已断开 IB 连接")
         print(f"数据保存在 {DATA_DIR}/")
+        if symbols:
+            rate = len(failed) / len(symbols)
+            print(f"\n本轮 {len(symbols) - len(failed)}/{len(symbols)} 个标的已更新"
+                  + (f"，失败 {len(failed)}：{', '.join(failed[:15])}"
+                     f"{' ...' if len(failed) > 15 else ''}" if failed else ""))
+            if rate > 0.1:
+                _alert_failure(failed, len(symbols))
 
 
 if __name__ == "__main__":

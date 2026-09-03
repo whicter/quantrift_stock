@@ -1,271 +1,271 @@
 {
   "AAOI|1d": {
-    "bars": 2682,
-    "fetched_at": "2026-09-02T14:09:39.982842-07:00",
+    "bars": 2683,
+    "fetched_at": "2026-09-03T14:09:39.748912-07:00",
     "path": "data/AAOI_1d.csv",
     "source": "ib"
   },
   "AAOI|1h": {
-    "bars": 8257,
-    "fetched_at": "2026-09-02T14:09:47.583251-07:00",
+    "bars": 8264,
+    "fetched_at": "2026-09-03T14:09:47.157114-07:00",
     "path": "data/AAOI_1h.csv",
     "source": "ib"
   },
   "AAOI|4h": {
-    "bars": 2008,
-    "fetched_at": "2026-09-02T14:09:47.592284-07:00",
+    "bars": 2010,
+    "fetched_at": "2026-09-03T14:09:47.167288-07:00",
     "path": "data/AAOI_4h.csv",
     "source": "ib"
   },
   "AAPL|1d": {
-    "bars": 2565,
-    "fetched_at": "2026-09-02T14:03:25.328331-07:00",
+    "bars": 2566,
+    "fetched_at": "2026-09-03T14:03:24.970850-07:00",
     "path": "data/AAPL_1d.csv",
     "source": "ib"
   },
   "AAPL|1h": {
-    "bars": 8400,
-    "fetched_at": "2026-09-02T14:03:32.932904-07:00",
+    "bars": 8407,
+    "fetched_at": "2026-09-03T14:03:32.556257-07:00",
     "path": "data/AAPL_1h.csv",
     "source": "ib"
   },
   "AAPL|4h": {
-    "bars": 1523,
-    "fetched_at": "2026-09-02T14:03:32.943286-07:00",
+    "bars": 1525,
+    "fetched_at": "2026-09-03T14:03:32.566819-07:00",
     "path": "data/AAPL_4h.csv",
     "source": "ib"
   },
   "AGI|1d": {
-    "bars": 2682,
-    "fetched_at": "2026-09-02T14:09:55.045686-07:00",
+    "bars": 2683,
+    "fetched_at": "2026-09-03T14:09:54.226254-07:00",
     "path": "data/AGI_1d.csv",
     "source": "ib"
   },
   "AGI|1h": {
-    "bars": 8257,
-    "fetched_at": "2026-09-02T14:10:02.753323-07:00",
+    "bars": 8264,
+    "fetched_at": "2026-09-03T14:10:01.866257-07:00",
     "path": "data/AGI_1h.csv",
     "source": "ib"
   },
   "AGI|4h": {
-    "bars": 2008,
-    "fetched_at": "2026-09-02T14:10:02.762950-07:00",
+    "bars": 2010,
+    "fetched_at": "2026-09-03T14:10:01.877464-07:00",
     "path": "data/AGI_4h.csv",
     "source": "ib"
   },
   "AIRJ|1d": {
-    "bars": 1151,
-    "fetched_at": "2026-09-02T14:10:10.002111-07:00",
+    "bars": 1152,
+    "fetched_at": "2026-09-03T14:10:09.503540-07:00",
     "path": "data/AIRJ_1d.csv",
     "source": "ib"
   },
   "AIRJ|1h": {
-    "bars": 7140,
-    "fetched_at": "2026-09-02T14:10:18.057526-07:00",
+    "bars": 7147,
+    "fetched_at": "2026-09-03T14:10:18.006176-07:00",
     "path": "data/AIRJ_1h.csv",
     "source": "ib"
   },
   "AIRJ|4h": {
-    "bars": 1730,
-    "fetched_at": "2026-09-02T14:10:18.066530-07:00",
+    "bars": 1732,
+    "fetched_at": "2026-09-03T14:10:18.016193-07:00",
     "path": "data/AIRJ_4h.csv",
     "source": "ib"
   },
   "AIS|1d": {
-    "bars": 438,
-    "fetched_at": "2026-09-02T14:10:25.111465-07:00",
+    "bars": 439,
+    "fetched_at": "2026-09-03T14:10:24.722734-07:00",
     "path": "data/AIS_1d.csv",
     "source": "ib"
   },
   "AIS|1h": {
-    "bars": 5231,
-    "fetched_at": "2026-09-02T14:10:32.285196-07:00",
+    "bars": 5238,
+    "fetched_at": "2026-09-03T14:10:31.948934-07:00",
     "path": "data/AIS_1h.csv",
     "source": "ib"
   },
   "AIS|4h": {
-    "bars": 1274,
-    "fetched_at": "2026-09-02T14:10:32.295365-07:00",
+    "bars": 1276,
+    "fetched_at": "2026-09-03T14:10:31.957343-07:00",
     "path": "data/AIS_4h.csv",
     "source": "ib"
   },
   "ALAB|1d": {
-    "bars": 616,
-    "fetched_at": "2026-09-02T14:10:39.361320-07:00",
+    "bars": 617,
+    "fetched_at": "2026-09-03T14:10:38.667930-07:00",
     "path": "data/ALAB_1d.csv",
     "source": "ib"
   },
   "ALAB|1h": {
-    "bars": 6627,
-    "fetched_at": "2026-09-02T14:10:46.763754-07:00",
+    "bars": 6634,
+    "fetched_at": "2026-09-03T14:10:46.172465-07:00",
     "path": "data/ALAB_1h.csv",
     "source": "ib"
   },
   "ALAB|4h": {
-    "bars": 1542,
-    "fetched_at": "2026-09-02T14:10:46.772829-07:00",
+    "bars": 1544,
+    "fetched_at": "2026-09-03T14:10:46.181883-07:00",
     "path": "data/ALAB_4h.csv",
     "source": "ib"
   },
   "ALB|1d": {
-    "bars": 2532,
-    "fetched_at": "2026-09-02T14:06:49.029447-07:00",
+    "bars": 2533,
+    "fetched_at": "2026-09-03T14:06:49.044009-07:00",
     "path": "data/ALB_1d.csv",
     "source": "ib"
   },
   "ALB|1h": {
-    "bars": 6612,
-    "fetched_at": "2026-09-02T14:07:17.891501-07:00",
+    "bars": 6619,
+    "fetched_at": "2026-09-03T14:07:17.917760-07:00",
     "path": "data/ALB_1h.csv",
     "source": "ib"
   },
   "ALB|4h": {
-    "bars": 1537,
-    "fetched_at": "2026-09-02T14:07:17.899351-07:00",
+    "bars": 1539,
+    "fetched_at": "2026-09-03T14:07:17.928029-07:00",
     "path": "data/ALB_4h.csv",
     "source": "ib"
   },
   "ALL|1d": {
-    "bars": 2682,
-    "fetched_at": "2026-09-02T14:10:54.224095-07:00",
+    "bars": 2683,
+    "fetched_at": "2026-09-03T14:10:53.285149-07:00",
     "path": "data/ALL_1d.csv",
     "source": "ib"
   },
   "ALL|1h": {
-    "bars": 8257,
-    "fetched_at": "2026-09-02T14:11:17.693090-07:00",
+    "bars": 8264,
+    "fetched_at": "2026-09-03T14:11:17.786932-07:00",
     "path": "data/ALL_1h.csv",
     "source": "ib"
   },
   "ALL|4h": {
-    "bars": 2008,
-    "fetched_at": "2026-09-02T14:11:17.702633-07:00",
+    "bars": 2010,
+    "fetched_at": "2026-09-03T14:11:17.798270-07:00",
     "path": "data/ALL_4h.csv",
     "source": "ib"
   },
   "AMAT|1d": {
-    "bars": 2556,
-    "fetched_at": "2026-09-02T14:04:09.978815-07:00",
+    "bars": 2557,
+    "fetched_at": "2026-09-03T14:04:08.685300-07:00",
     "path": "data/AMAT_1d.csv",
     "source": "ib"
   },
   "AMAT|1h": {
-    "bars": 8352,
-    "fetched_at": "2026-09-02T14:04:18.181865-07:00",
+    "bars": 8359,
+    "fetched_at": "2026-09-03T14:04:18.233535-07:00",
     "path": "data/AMAT_1h.csv",
     "source": "ib"
   },
   "AMAT|4h": {
-    "bars": 1523,
-    "fetched_at": "2026-09-02T14:04:18.189404-07:00",
+    "bars": 1525,
+    "fetched_at": "2026-09-03T14:04:18.242631-07:00",
     "path": "data/AMAT_4h.csv",
     "source": "ib"
   },
   "AMC|1d": {
-    "bars": 2682,
-    "fetched_at": "2026-09-02T14:11:25.114731-07:00",
+    "bars": 2683,
+    "fetched_at": "2026-09-03T14:11:24.853984-07:00",
     "path": "data/AMC_1d.csv",
     "source": "ib"
   },
   "AMC|1h": {
-    "bars": 8257,
-    "fetched_at": "2026-09-02T14:11:32.666886-07:00",
+    "bars": 8264,
+    "fetched_at": "2026-09-03T14:11:32.413495-07:00",
     "path": "data/AMC_1h.csv",
     "source": "ib"
   },
   "AMC|4h": {
-    "bars": 2008,
-    "fetched_at": "2026-09-02T14:11:32.676167-07:00",
+    "bars": 2010,
+    "fetched_at": "2026-09-03T14:11:32.424521-07:00",
     "path": "data/AMC_4h.csv",
     "source": "ib"
   },
   "AMD|1d": {
-    "bars": 2556,
-    "fetched_at": "2026-09-02T14:03:55.113298-07:00",
+    "bars": 2557,
+    "fetched_at": "2026-09-03T14:03:54.173213-07:00",
     "path": "data/AMD_1d.csv",
     "source": "ib"
   },
   "AMD|1h": {
-    "bars": 8352,
-    "fetched_at": "2026-09-02T14:04:02.614433-07:00",
+    "bars": 8359,
+    "fetched_at": "2026-09-03T14:04:01.681494-07:00",
     "path": "data/AMD_1h.csv",
     "source": "ib"
   },
   "AMD|4h": {
-    "bars": 1523,
-    "fetched_at": "2026-09-02T14:04:02.622172-07:00",
+    "bars": 1525,
+    "fetched_at": "2026-09-03T14:04:01.691280-07:00",
     "path": "data/AMD_4h.csv",
     "source": "ib"
   },
   "AMZN|1d": {
-    "bars": 2565,
-    "fetched_at": "2026-09-02T14:04:40.276702-07:00",
+    "bars": 2566,
+    "fetched_at": "2026-09-03T14:04:39.663833-07:00",
     "path": "data/AMZN_1d.csv",
     "source": "ib"
   },
   "AMZN|1h": {
-    "bars": 8400,
-    "fetched_at": "2026-09-02T14:04:47.746960-07:00",
+    "bars": 8407,
+    "fetched_at": "2026-09-03T14:04:47.173444-07:00",
     "path": "data/AMZN_1h.csv",
     "source": "ib"
   },
   "AMZN|4h": {
-    "bars": 1523,
-    "fetched_at": "2026-09-02T14:04:47.755239-07:00",
+    "bars": 1525,
+    "fetched_at": "2026-09-03T14:04:47.181857-07:00",
     "path": "data/AMZN_4h.csv",
     "source": "ib"
   },
   "APLD|1d": {
-    "bars": 2537,
-    "fetched_at": "2026-09-02T14:11:39.766849-07:00",
+    "bars": 2538,
+    "fetched_at": "2026-09-03T14:11:39.516487-07:00",
     "path": "data/APLD_1d.csv",
     "source": "ib"
   },
   "APLD|1h": {
-    "bars": 8257,
-    "fetched_at": "2026-09-02T14:11:47.299547-07:00",
+    "bars": 8264,
+    "fetched_at": "2026-09-03T14:11:46.980656-07:00",
     "path": "data/APLD_1h.csv",
     "source": "ib"
   },
   "APLD|4h": {
-    "bars": 2008,
-    "fetched_at": "2026-09-02T14:11:47.309998-07:00",
+    "bars": 2010,
+    "fetched_at": "2026-09-03T14:11:46.991932-07:00",
     "path": "data/APLD_4h.csv",
     "source": "ib"
   },
   "APO|1d": {
-    "bars": 2682,
-    "fetched_at": "2026-09-02T14:11:54.865938-07:00",
+    "bars": 2683,
+    "fetched_at": "2026-09-03T14:11:54.040292-07:00",
     "path": "data/APO_1d.csv",
     "source": "ib"
   },
   "APO|1h": {
-    "bars": 8241,
-    "fetched_at": "2026-09-02T14:12:18.067918-07:00",
+    "bars": 8248,
+    "fetched_at": "2026-09-03T14:12:18.115176-07:00",
     "path": "data/APO_1h.csv",
     "source": "ib"
   },
   "APO|4h": {
-    "bars": 2007,
-    "fetched_at": "2026-09-02T14:12:18.079968-07:00",
+    "bars": 2009,
+    "fetched_at": "2026-09-03T14:12:18.127554-07:00",
     "path": "data/APO_4h.csv",
     "source": "ib"
   },
   "APP|1d": {
-    "bars": 1353,
-    "fetched_at": "2026-09-02T14:12:25.218622-07:00",
+    "bars": 1354,
+    "fetched_at": "2026-09-03T14:12:24.940120-07:00",
     "path": "data/APP_1d.csv",
     "source": "ib"
   },
   "APP|1h": {
-    "bars": 6612,
-    "fetched_at": "2026-09-02T14:12:32.585608-07:00",
+    "bars": 6619,
+    "fetched_at": "2026-09-03T14:12:32.325387-07:00",
     "path": "data/APP_1h.csv",
     "source": "ib"
   },
   "APP|4h": {
-    "bars": 1537,
-    "fetched_at": "2026-09-02T14:12:32.593936-07:00",
+    "bars": 1539,
+    "fetched_at": "2026-09-03T14:12:32.334769-07:00",
     "path": "data/APP_4h.csv",
     "source": "ib"
   },
@@ -288,272 +288,272 @@
     "source": "ib"
   },
   "AXON|1d": {
-    "bars": 2537,
-    "fetched_at": "2026-09-02T14:06:17.690840-07:00",
+    "bars": 2538,
+    "fetched_at": "2026-09-03T14:06:17.715352-07:00",
     "path": "data/AXON_1d.csv",
     "source": "ib"
   },
   "AXON|1h": {
-    "bars": 6627,
-    "fetched_at": "2026-09-02T14:06:25.049027-07:00",
+    "bars": 6634,
+    "fetched_at": "2026-09-03T14:06:25.156600-07:00",
     "path": "data/AXON_1h.csv",
     "source": "ib"
   },
   "AXON|4h": {
-    "bars": 1542,
-    "fetched_at": "2026-09-02T14:06:25.057704-07:00",
+    "bars": 1544,
+    "fetched_at": "2026-09-03T14:06:25.165447-07:00",
     "path": "data/AXON_4h.csv",
     "source": "ib"
   },
   "BABA|1d": {
-    "bars": 2682,
-    "fetched_at": "2026-09-02T14:12:55.061055-07:00",
+    "bars": 2683,
+    "fetched_at": "2026-09-03T14:12:54.103437-07:00",
     "path": "data/BABA_1d.csv",
     "source": "ib"
   },
   "BABA|1h": {
-    "bars": 8257,
-    "fetched_at": "2026-09-02T14:13:17.610708-07:00",
+    "bars": 8264,
+    "fetched_at": "2026-09-03T14:13:17.659620-07:00",
     "path": "data/BABA_1h.csv",
     "source": "ib"
   },
   "BABA|4h": {
-    "bars": 2008,
-    "fetched_at": "2026-09-02T14:13:17.620437-07:00",
+    "bars": 2010,
+    "fetched_at": "2026-09-03T14:13:17.670707-07:00",
     "path": "data/BABA_4h.csv",
     "source": "ib"
   },
   "BAC|1d": {
-    "bars": 2682,
-    "fetched_at": "2026-09-02T14:13:25.018192-07:00",
+    "bars": 2683,
+    "fetched_at": "2026-09-03T14:13:24.902110-07:00",
     "path": "data/BAC_1d.csv",
     "source": "ib"
   },
   "BAC|1h": {
-    "bars": 8257,
-    "fetched_at": "2026-09-02T14:13:32.698746-07:00",
+    "bars": 8264,
+    "fetched_at": "2026-09-03T14:13:32.589086-07:00",
     "path": "data/BAC_1h.csv",
     "source": "ib"
   },
   "BAC|4h": {
-    "bars": 2008,
-    "fetched_at": "2026-09-02T14:13:32.708759-07:00",
+    "bars": 2010,
+    "fetched_at": "2026-09-03T14:13:32.600273-07:00",
     "path": "data/BAC_4h.csv",
     "source": "ib"
   },
   "BA|1d": {
-    "bars": 2682,
-    "fetched_at": "2026-09-02T14:12:40.039353-07:00",
+    "bars": 2683,
+    "fetched_at": "2026-09-03T14:12:39.426124-07:00",
     "path": "data/BA_1d.csv",
     "source": "ib"
   },
   "BA|1h": {
-    "bars": 8257,
-    "fetched_at": "2026-09-02T14:12:47.646975-07:00",
+    "bars": 8264,
+    "fetched_at": "2026-09-03T14:12:47.068235-07:00",
     "path": "data/BA_1h.csv",
     "source": "ib"
   },
   "BA|4h": {
-    "bars": 2008,
-    "fetched_at": "2026-09-02T14:12:47.656258-07:00",
+    "bars": 2010,
+    "fetched_at": "2026-09-03T14:12:47.079900-07:00",
     "path": "data/BA_4h.csv",
     "source": "ib"
   },
   "BBW|1d": {
-    "bars": 2682,
-    "fetched_at": "2026-09-02T14:13:55.167610-07:00",
+    "bars": 2683,
+    "fetched_at": "2026-09-03T14:13:54.339617-07:00",
     "path": "data/BBW_1d.csv",
     "source": "ib"
   },
   "BBW|1h": {
-    "bars": 8257,
-    "fetched_at": "2026-09-02T14:14:02.690437-07:00",
+    "bars": 8264,
+    "fetched_at": "2026-09-03T14:14:01.751456-07:00",
     "path": "data/BBW_1h.csv",
     "source": "ib"
   },
   "BBW|4h": {
-    "bars": 2008,
-    "fetched_at": "2026-09-02T14:14:02.701108-07:00",
+    "bars": 2010,
+    "fetched_at": "2026-09-03T14:14:01.763924-07:00",
     "path": "data/BBW_4h.csv",
     "source": "ib"
   },
   "BB|1d": {
-    "bars": 2682,
-    "fetched_at": "2026-09-02T14:13:40.303819-07:00",
+    "bars": 2683,
+    "fetched_at": "2026-09-03T14:13:39.826577-07:00",
     "path": "data/BB_1d.csv",
     "source": "ib"
   },
   "BB|1h": {
-    "bars": 8257,
-    "fetched_at": "2026-09-02T14:13:47.786355-07:00",
+    "bars": 8264,
+    "fetched_at": "2026-09-03T14:13:47.305888-07:00",
     "path": "data/BB_1h.csv",
     "source": "ib"
   },
   "BB|4h": {
-    "bars": 2008,
-    "fetched_at": "2026-09-02T14:13:47.798531-07:00",
+    "bars": 2010,
+    "fetched_at": "2026-09-03T14:13:47.316317-07:00",
     "path": "data/BB_4h.csv",
     "source": "ib"
   },
   "BE|1d": {
-    "bars": 2038,
-    "fetched_at": "2026-09-02T14:14:10.100482-07:00",
+    "bars": 2039,
+    "fetched_at": "2026-09-03T14:14:08.801998-07:00",
     "path": "data/BE_1d.csv",
     "source": "ib"
   },
   "BE|1h": {
-    "bars": 8254,
-    "fetched_at": "2026-09-02T14:14:18.134245-07:00",
+    "bars": 8261,
+    "fetched_at": "2026-09-03T14:14:18.318844-07:00",
     "path": "data/BE_1h.csv",
     "source": "ib"
   },
   "BE|4h": {
-    "bars": 2008,
-    "fetched_at": "2026-09-02T14:14:18.145846-07:00",
+    "bars": 2010,
+    "fetched_at": "2026-09-03T14:14:18.329943-07:00",
     "path": "data/BE_4h.csv",
     "source": "ib"
   },
   "CBUS|1d": {
-    "bars": 2293,
-    "fetched_at": "2026-09-02T14:14:25.548096-07:00",
+    "bars": 2294,
+    "fetched_at": "2026-09-03T14:14:25.384572-07:00",
     "path": "data/CBUS_1d.csv",
     "source": "ib"
   },
   "CBUS|1h": {
-    "bars": 8233,
-    "fetched_at": "2026-09-02T14:14:35.614260-07:00",
+    "bars": 8240,
+    "fetched_at": "2026-09-03T14:14:35.661570-07:00",
     "path": "data/CBUS_1h.csv",
     "source": "ib"
   },
   "CBUS|4h": {
-    "bars": 2008,
-    "fetched_at": "2026-09-02T14:14:35.626080-07:00",
+    "bars": 2010,
+    "fetched_at": "2026-09-03T14:14:35.672458-07:00",
     "path": "data/CBUS_4h.csv",
     "source": "ib"
   },
   "CCB|1d": {
-    "bars": 2043,
-    "fetched_at": "2026-09-02T14:14:42.843239-07:00",
+    "bars": 2044,
+    "fetched_at": "2026-09-03T14:14:42.539589-07:00",
     "path": "data/CCB_1d.csv",
     "source": "ib"
   },
   "CCB|1h": {
-    "bars": 8221,
-    "fetched_at": "2026-09-02T14:14:59.606668-07:00",
+    "bars": 8228,
+    "fetched_at": "2026-09-03T14:14:59.667933-07:00",
     "path": "data/CCB_1h.csv",
     "source": "ib"
   },
   "CCB|4h": {
-    "bars": 2008,
-    "fetched_at": "2026-09-02T14:14:59.616244-07:00",
+    "bars": 2010,
+    "fetched_at": "2026-09-03T14:14:59.679771-07:00",
     "path": "data/CCB_4h.csv",
     "source": "ib"
   },
   "CCJ|1d": {
-    "bars": 2682,
-    "fetched_at": "2026-09-02T14:15:06.661937-07:00",
+    "bars": 2683,
+    "fetched_at": "2026-09-03T14:15:06.695638-07:00",
     "path": "data/CCJ_1d.csv",
     "source": "ib"
   },
   "CCJ|1h": {
-    "bars": 8257,
-    "fetched_at": "2026-09-02T14:15:18.177532-07:00",
+    "bars": 8264,
+    "fetched_at": "2026-09-03T14:15:18.280446-07:00",
     "path": "data/CCJ_1h.csv",
     "source": "ib"
   },
   "CCJ|4h": {
-    "bars": 2008,
-    "fetched_at": "2026-09-02T14:15:18.187849-07:00",
+    "bars": 2010,
+    "fetched_at": "2026-09-03T14:15:18.291385-07:00",
     "path": "data/CCJ_4h.csv",
     "source": "ib"
   },
   "COHR|1d": {
-    "bars": 2534,
-    "fetched_at": "2026-09-02T14:06:32.472683-07:00",
+    "bars": 2535,
+    "fetched_at": "2026-09-03T14:06:32.293404-07:00",
     "path": "data/COHR_1d.csv",
     "source": "ib"
   },
   "COHR|1h": {
-    "bars": 6619,
-    "fetched_at": "2026-09-02T14:06:41.618181-07:00",
+    "bars": 6626,
+    "fetched_at": "2026-09-03T14:06:41.703042-07:00",
     "path": "data/COHR_1h.csv",
     "source": "ib"
   },
   "COHR|4h": {
-    "bars": 1539,
-    "fetched_at": "2026-09-02T14:06:41.627374-07:00",
+    "bars": 1541,
+    "fetched_at": "2026-09-03T14:06:41.711623-07:00",
     "path": "data/COHR_4h.csv",
     "source": "ib"
   },
   "CRCL|1d": {
-    "bars": 313,
-    "fetched_at": "2026-09-02T14:15:25.218101-07:00",
+    "bars": 314,
+    "fetched_at": "2026-09-03T14:15:24.964036-07:00",
     "path": "data/CRCL_1d.csv",
     "source": "ib"
   },
   "CRCL|1h": {
-    "bars": 3876,
-    "fetched_at": "2026-09-02T14:15:32.519378-07:00",
+    "bars": 3883,
+    "fetched_at": "2026-09-03T14:15:32.124799-07:00",
     "path": "data/CRCL_1h.csv",
     "source": "ib"
   },
   "CRCL|4h": {
-    "bars": 907,
-    "fetched_at": "2026-09-02T14:15:32.526518-07:00",
+    "bars": 909,
+    "fetched_at": "2026-09-03T14:15:32.131480-07:00",
     "path": "data/CRCL_4h.csv",
     "source": "ib"
   },
   "CRSP|1d": {
-    "bars": 2481,
-    "fetched_at": "2026-09-02T14:15:39.797741-07:00",
+    "bars": 2482,
+    "fetched_at": "2026-09-03T14:15:39.175319-07:00",
     "path": "data/CRSP_1d.csv",
     "source": "ib"
   },
   "CRSP|1h": {
-    "bars": 8250,
-    "fetched_at": "2026-09-02T14:15:47.278564-07:00",
+    "bars": 8257,
+    "fetched_at": "2026-09-03T14:15:46.571741-07:00",
     "path": "data/CRSP_1h.csv",
     "source": "ib"
   },
   "CRSP|4h": {
-    "bars": 2006,
-    "fetched_at": "2026-09-02T14:15:47.288772-07:00",
+    "bars": 2008,
+    "fetched_at": "2026-09-03T14:15:46.583037-07:00",
     "path": "data/CRSP_4h.csv",
     "source": "ib"
   },
   "CRWD|1d": {
-    "bars": 1817,
-    "fetched_at": "2026-09-02T14:15:54.531903-07:00",
+    "bars": 1818,
+    "fetched_at": "2026-09-03T14:15:53.507445-07:00",
     "path": "data/CRWD_1d.csv",
     "source": "ib"
   },
   "CRWD|1h": {
-    "bars": 8257,
-    "fetched_at": "2026-09-02T14:16:02.127060-07:00",
+    "bars": 8264,
+    "fetched_at": "2026-09-03T14:16:00.898416-07:00",
     "path": "data/CRWD_1h.csv",
     "source": "ib"
   },
   "CRWD|4h": {
-    "bars": 2008,
-    "fetched_at": "2026-09-02T14:16:02.136988-07:00",
+    "bars": 2010,
+    "fetched_at": "2026-09-03T14:16:00.908927-07:00",
     "path": "data/CRWD_4h.csv",
     "source": "ib"
   },
   "CRWV|1d": {
-    "bars": 360,
-    "fetched_at": "2026-09-02T14:16:11.730943-07:00",
+    "bars": 361,
+    "fetched_at": "2026-09-03T14:16:11.410587-07:00",
     "path": "data/CRWV_1d.csv",
     "source": "ib"
   },
   "CRWV|1h": {
-    "bars": 4485,
-    "fetched_at": "2026-09-02T14:16:18.885962-07:00",
+    "bars": 4492,
+    "fetched_at": "2026-09-03T14:16:18.581173-07:00",
     "path": "data/CRWV_1h.csv",
     "source": "ib"
   },
   "CRWV|4h": {
-    "bars": 1048,
-    "fetched_at": "2026-09-02T14:16:18.894940-07:00",
+    "bars": 1050,
+    "fetched_at": "2026-09-03T14:16:18.588719-07:00",
     "path": "data/CRWV_4h.csv",
     "source": "ib"
   },
@@ -576,344 +576,344 @@
     "source": "ib"
   },
   "DASH|1d": {
-    "bars": 1439,
-    "fetched_at": "2026-09-02T14:07:25.201298-07:00",
+    "bars": 1440,
+    "fetched_at": "2026-09-03T14:07:24.900653-07:00",
     "path": "data/DASH_1d.csv",
     "source": "ib"
   },
   "DASH|1h": {
-    "bars": 6612,
-    "fetched_at": "2026-09-02T14:07:32.574420-07:00",
+    "bars": 6619,
+    "fetched_at": "2026-09-03T14:07:32.257109-07:00",
     "path": "data/DASH_1h.csv",
     "source": "ib"
   },
   "DASH|4h": {
-    "bars": 1537,
-    "fetched_at": "2026-09-02T14:07:32.584714-07:00",
+    "bars": 1539,
+    "fetched_at": "2026-09-03T14:07:32.266142-07:00",
     "path": "data/DASH_4h.csv",
     "source": "ib"
   },
   "DELL|1d": {
-    "bars": 1934,
-    "fetched_at": "2026-09-02T14:16:26.560922-07:00",
+    "bars": 1935,
+    "fetched_at": "2026-09-03T14:16:25.965812-07:00",
     "path": "data/DELL_1d.csv",
     "source": "ib"
   },
   "DELL|1h": {
-    "bars": 8351,
-    "fetched_at": "2026-09-02T14:16:34.111381-07:00",
+    "bars": 8358,
+    "fetched_at": "2026-09-03T14:16:33.536380-07:00",
     "path": "data/DELL_1h.csv",
     "source": "ib"
   },
   "DELL|4h": {
-    "bars": 1523,
-    "fetched_at": "2026-09-02T14:16:34.119923-07:00",
+    "bars": 1525,
+    "fetched_at": "2026-09-03T14:16:33.546947-07:00",
     "path": "data/DELL_4h.csv",
     "source": "ib"
   },
   "DGRO|1d": {
-    "bars": 2682,
-    "fetched_at": "2026-09-02T14:16:41.567257-07:00",
+    "bars": 2683,
+    "fetched_at": "2026-09-03T14:16:40.661012-07:00",
     "path": "data/DGRO_1d.csv",
     "source": "ib"
   },
   "DGRO|1h": {
-    "bars": 8257,
-    "fetched_at": "2026-09-02T14:16:49.604372-07:00",
+    "bars": 8264,
+    "fetched_at": "2026-09-03T14:16:48.325898-07:00",
     "path": "data/DGRO_1h.csv",
     "source": "ib"
   },
   "DGRO|4h": {
-    "bars": 2008,
-    "fetched_at": "2026-09-02T14:16:49.613706-07:00",
+    "bars": 2010,
+    "fetched_at": "2026-09-03T14:16:48.336033-07:00",
     "path": "data/DGRO_4h.csv",
     "source": "ib"
   },
   "DJT|1d": {
-    "bars": 1236,
-    "fetched_at": "2026-09-02T14:16:56.466475-07:00",
+    "bars": 1237,
+    "fetched_at": "2026-09-03T14:16:55.220767-07:00",
     "path": "data/DJT_1d.csv",
     "source": "ib"
   },
   "DJT|1h": {
-    "bars": 7239,
-    "fetched_at": "2026-09-02T14:17:18.912817-07:00",
+    "bars": 7246,
+    "fetched_at": "2026-09-03T14:17:18.613890-07:00",
     "path": "data/DJT_1h.csv",
     "source": "ib"
   },
   "DJT|4h": {
-    "bars": 1717,
-    "fetched_at": "2026-09-02T14:17:18.920886-07:00",
+    "bars": 1719,
+    "fetched_at": "2026-09-03T14:17:18.623620-07:00",
     "path": "data/DJT_4h.csv",
     "source": "ib"
   },
   "DKNG|1d": {
-    "bars": 1801,
-    "fetched_at": "2026-09-02T14:07:39.991032-07:00",
+    "bars": 1802,
+    "fetched_at": "2026-09-03T14:07:39.329274-07:00",
     "path": "data/DKNG_1d.csv",
     "source": "ib"
   },
   "DKNG|1h": {
-    "bars": 6612,
-    "fetched_at": "2026-09-02T14:07:47.348216-07:00",
+    "bars": 6619,
+    "fetched_at": "2026-09-03T14:07:46.749150-07:00",
     "path": "data/DKNG_1h.csv",
     "source": "ib"
   },
   "DKNG|4h": {
-    "bars": 1537,
-    "fetched_at": "2026-09-02T14:07:47.355892-07:00",
+    "bars": 1539,
+    "fetched_at": "2026-09-03T14:07:46.758621-07:00",
     "path": "data/DKNG_4h.csv",
     "source": "ib"
   },
   "FDVV|1d": {
-    "bars": 2505,
-    "fetched_at": "2026-09-02T14:17:26.317968-07:00",
+    "bars": 2506,
+    "fetched_at": "2026-09-03T14:17:25.733784-07:00",
     "path": "data/FDVV_1d.csv",
     "source": "ib"
   },
   "FDVV|1h": {
-    "bars": 8257,
-    "fetched_at": "2026-09-02T14:17:34.021146-07:00",
+    "bars": 8264,
+    "fetched_at": "2026-09-03T14:17:33.341135-07:00",
     "path": "data/FDVV_1h.csv",
     "source": "ib"
   },
   "FDVV|4h": {
-    "bars": 2008,
-    "fetched_at": "2026-09-02T14:17:34.031184-07:00",
+    "bars": 2010,
+    "fetched_at": "2026-09-03T14:17:33.351113-07:00",
     "path": "data/FDVV_4h.csv",
     "source": "ib"
   },
   "FOF|1d": {
-    "bars": 2682,
-    "fetched_at": "2026-09-02T14:17:41.881402-07:00",
+    "bars": 2683,
+    "fetched_at": "2026-09-03T14:17:40.773082-07:00",
     "path": "data/FOF_1d.csv",
     "source": "ib"
   },
   "FOF|1h": {
-    "bars": 8247,
-    "fetched_at": "2026-09-02T14:17:49.637960-07:00",
+    "bars": 8254,
+    "fetched_at": "2026-09-03T14:17:48.689975-07:00",
     "path": "data/FOF_1h.csv",
     "source": "ib"
   },
   "FOF|4h": {
-    "bars": 2009,
-    "fetched_at": "2026-09-02T14:17:49.650435-07:00",
+    "bars": 2011,
+    "fetched_at": "2026-09-03T14:17:48.700879-07:00",
     "path": "data/FOF_4h.csv",
     "source": "ib"
   },
   "FOX|1d": {
-    "bars": 1880,
-    "fetched_at": "2026-09-02T14:17:56.955611-07:00",
+    "bars": 1881,
+    "fetched_at": "2026-09-03T14:17:55.651396-07:00",
     "path": "data/FOX_1d.csv",
     "source": "ib"
   },
   "FOX|1h": {
-    "bars": 8257,
-    "fetched_at": "2026-09-02T14:18:18.621459-07:00",
+    "bars": 8264,
+    "fetched_at": "2026-09-03T14:18:18.302358-07:00",
     "path": "data/FOX_1h.csv",
     "source": "ib"
   },
   "FOX|4h": {
-    "bars": 2008,
-    "fetched_at": "2026-09-02T14:18:18.637303-07:00",
+    "bars": 2010,
+    "fetched_at": "2026-09-03T14:18:18.321010-07:00",
     "path": "data/FOX_4h.csv",
     "source": "ib"
   },
   "GE|1d": {
-    "bars": 2682,
-    "fetched_at": "2026-09-02T14:18:26.045358-07:00",
+    "bars": 2683,
+    "fetched_at": "2026-09-03T14:18:25.436829-07:00",
     "path": "data/GE_1d.csv",
     "source": "ib"
   },
   "GE|1h": {
-    "bars": 8257,
-    "fetched_at": "2026-09-02T14:18:33.689912-07:00",
+    "bars": 8264,
+    "fetched_at": "2026-09-03T14:18:33.084562-07:00",
     "path": "data/GE_1h.csv",
     "source": "ib"
   },
   "GE|4h": {
-    "bars": 2008,
-    "fetched_at": "2026-09-02T14:18:33.702521-07:00",
+    "bars": 2010,
+    "fetched_at": "2026-09-03T14:18:33.095770-07:00",
     "path": "data/GE_4h.csv",
     "source": "ib"
   },
   "GFS|1d": {
-    "bars": 1216,
-    "fetched_at": "2026-09-02T14:18:40.841720-07:00",
+    "bars": 1217,
+    "fetched_at": "2026-09-03T14:18:39.881090-07:00",
     "path": "data/GFS_1d.csv",
     "source": "ib"
   },
   "GFS|1h": {
-    "bars": 8257,
-    "fetched_at": "2026-09-02T14:18:48.206739-07:00",
+    "bars": 8264,
+    "fetched_at": "2026-09-03T14:18:47.267309-07:00",
     "path": "data/GFS_1h.csv",
     "source": "ib"
   },
   "GFS|4h": {
-    "bars": 2008,
-    "fetched_at": "2026-09-02T14:18:48.218297-07:00",
+    "bars": 2010,
+    "fetched_at": "2026-09-03T14:18:47.278166-07:00",
     "path": "data/GFS_4h.csv",
     "source": "ib"
   },
   "GL|1d": {
-    "bars": 2682,
-    "fetched_at": "2026-09-02T14:18:55.856656-07:00",
+    "bars": 2683,
+    "fetched_at": "2026-09-03T14:18:54.359197-07:00",
     "path": "data/GL_1d.csv",
     "source": "ib"
   },
   "GL|1h": {
-    "bars": 8257,
-    "fetched_at": "2026-09-02T14:19:18.691249-07:00",
+    "bars": 8264,
+    "fetched_at": "2026-09-03T14:19:18.376771-07:00",
     "path": "data/GL_1h.csv",
     "source": "ib"
   },
   "GL|4h": {
-    "bars": 2008,
-    "fetched_at": "2026-09-02T14:19:18.701435-07:00",
+    "bars": 2010,
+    "fetched_at": "2026-09-03T14:19:18.387844-07:00",
     "path": "data/GL_4h.csv",
     "source": "ib"
   },
   "GOOGL|1d": {
-    "bars": 2565,
-    "fetched_at": "2026-09-02T14:02:25.143664-07:00",
+    "bars": 2566,
+    "fetched_at": "2026-09-03T14:02:24.971071-07:00",
     "path": "data/GOOGL_1d.csv",
     "source": "ib"
   },
   "GOOGL|1h": {
-    "bars": 8400,
-    "fetched_at": "2026-09-02T14:02:32.713675-07:00",
+    "bars": 8407,
+    "fetched_at": "2026-09-03T14:02:32.533624-07:00",
     "path": "data/GOOGL_1h.csv",
     "source": "ib"
   },
   "GOOGL|4h": {
-    "bars": 1523,
-    "fetched_at": "2026-09-02T14:02:32.722281-07:00",
+    "bars": 1525,
+    "fetched_at": "2026-09-03T14:02:32.543342-07:00",
     "path": "data/GOOGL_4h.csv",
     "source": "ib"
   },
   "GOOG|1d": {
-    "bars": 2682,
-    "fetched_at": "2026-09-02T14:19:25.995690-07:00",
+    "bars": 2683,
+    "fetched_at": "2026-09-03T14:19:25.338583-07:00",
     "path": "data/GOOG_1d.csv",
     "source": "ib"
   },
   "GOOG|1h": {
-    "bars": 8257,
-    "fetched_at": "2026-09-02T14:19:33.760898-07:00",
+    "bars": 8264,
+    "fetched_at": "2026-09-03T14:19:32.824011-07:00",
     "path": "data/GOOG_1h.csv",
     "source": "ib"
   },
   "GOOG|4h": {
-    "bars": 2008,
-    "fetched_at": "2026-09-02T14:19:33.770006-07:00",
+    "bars": 2010,
+    "fetched_at": "2026-09-03T14:19:32.836268-07:00",
     "path": "data/GOOG_4h.csv",
     "source": "ib"
   },
   "HBM|1d": {
-    "bars": 2682,
-    "fetched_at": "2026-09-02T14:19:41.137289-07:00",
+    "bars": 2683,
+    "fetched_at": "2026-09-03T14:19:39.883456-07:00",
     "path": "data/HBM_1d.csv",
     "source": "ib"
   },
   "HBM|1h": {
-    "bars": 8257,
-    "fetched_at": "2026-09-02T14:19:48.718116-07:00",
+    "bars": 8264,
+    "fetched_at": "2026-09-03T14:19:47.465884-07:00",
     "path": "data/HBM_1h.csv",
     "source": "ib"
   },
   "HBM|4h": {
-    "bars": 2008,
-    "fetched_at": "2026-09-02T14:19:48.734705-07:00",
+    "bars": 2010,
+    "fetched_at": "2026-09-03T14:19:47.477085-07:00",
     "path": "data/HBM_4h.csv",
     "source": "ib"
   },
   "HOOD|1d": {
-    "bars": 1280,
-    "fetched_at": "2026-09-02T14:19:55.978046-07:00",
+    "bars": 1281,
+    "fetched_at": "2026-09-03T14:19:54.381002-07:00",
     "path": "data/HOOD_1d.csv",
     "source": "ib"
   },
   "HOOD|1h": {
-    "bars": 8257,
-    "fetched_at": "2026-09-02T14:20:03.465573-07:00",
+    "bars": 8264,
+    "fetched_at": "2026-09-03T14:20:01.893147-07:00",
     "path": "data/HOOD_1h.csv",
     "source": "ib"
   },
   "HOOD|4h": {
-    "bars": 2008,
-    "fetched_at": "2026-09-02T14:20:03.475628-07:00",
+    "bars": 2010,
+    "fetched_at": "2026-09-03T14:20:01.905043-07:00",
     "path": "data/HOOD_4h.csv",
     "source": "ib"
   },
   "IBM|1d": {
-    "bars": 2682,
-    "fetched_at": "2026-09-02T14:20:10.867269-07:00",
+    "bars": 2683,
+    "fetched_at": "2026-09-03T14:20:09.798409-07:00",
     "path": "data/IBM_1d.csv",
     "source": "ib"
   },
   "IBM|1h": {
-    "bars": 8257,
-    "fetched_at": "2026-09-02T14:20:19.243670-07:00",
+    "bars": 8264,
+    "fetched_at": "2026-09-03T14:20:18.953180-07:00",
     "path": "data/IBM_1h.csv",
     "source": "ib"
   },
   "IBM|4h": {
-    "bars": 2008,
-    "fetched_at": "2026-09-02T14:20:19.253839-07:00",
+    "bars": 2010,
+    "fetched_at": "2026-09-03T14:20:18.964418-07:00",
     "path": "data/IBM_4h.csv",
     "source": "ib"
   },
   "INTC|1d": {
-    "bars": 2556,
-    "fetched_at": "2026-09-02T14:03:40.275708-07:00",
+    "bars": 2557,
+    "fetched_at": "2026-09-03T14:03:39.549961-07:00",
     "path": "data/INTC_1d.csv",
     "source": "ib"
   },
   "INTC|1h": {
-    "bars": 8352,
-    "fetched_at": "2026-09-02T14:03:47.867259-07:00",
+    "bars": 8359,
+    "fetched_at": "2026-09-03T14:03:47.229234-07:00",
     "path": "data/INTC_1h.csv",
     "source": "ib"
   },
   "INTC|4h": {
-    "bars": 1523,
-    "fetched_at": "2026-09-02T14:03:47.875659-07:00",
+    "bars": 1525,
+    "fetched_at": "2026-09-03T14:03:47.239564-07:00",
     "path": "data/INTC_4h.csv",
     "source": "ib"
   },
   "INTU|1d": {
-    "bars": 2682,
-    "fetched_at": "2026-09-02T14:20:26.565799-07:00",
+    "bars": 2683,
+    "fetched_at": "2026-09-03T14:20:25.957065-07:00",
     "path": "data/INTU_1d.csv",
     "source": "ib"
   },
   "INTU|1h": {
-    "bars": 8257,
-    "fetched_at": "2026-09-02T14:20:33.973598-07:00",
+    "bars": 8264,
+    "fetched_at": "2026-09-03T14:20:33.518430-07:00",
     "path": "data/INTU_1h.csv",
     "source": "ib"
   },
   "INTU|4h": {
-    "bars": 2008,
-    "fetched_at": "2026-09-02T14:20:33.983357-07:00",
+    "bars": 2010,
+    "fetched_at": "2026-09-03T14:20:33.529712-07:00",
     "path": "data/INTU_4h.csv",
     "source": "ib"
   },
   "IREN|1d": {
-    "bars": 1202,
-    "fetched_at": "2026-09-02T14:20:41.122396-07:00",
+    "bars": 1203,
+    "fetched_at": "2026-09-03T14:20:40.314322-07:00",
     "path": "data/IREN_1d.csv",
     "source": "ib"
   },
   "IREN|1h": {
-    "bars": 8265,
-    "fetched_at": "2026-09-02T14:20:52.019124-07:00",
+    "bars": 8272,
+    "fetched_at": "2026-09-03T14:20:47.780781-07:00",
     "path": "data/IREN_1h.csv",
     "source": "ib"
   },
   "IREN|4h": {
-    "bars": 1582,
-    "fetched_at": "2026-09-02T14:20:52.027700-07:00",
+    "bars": 1584,
+    "fetched_at": "2026-09-03T14:20:47.790027-07:00",
     "path": "data/IREN_4h.csv",
     "source": "ib"
   },
@@ -936,692 +936,692 @@
     "source": "ib"
   },
   "JPM|1d": {
-    "bars": 2682,
-    "fetched_at": "2026-09-02T14:20:59.424674-07:00",
+    "bars": 2683,
+    "fetched_at": "2026-09-03T14:20:54.882426-07:00",
     "path": "data/JPM_1d.csv",
     "source": "ib"
   },
   "JPM|1h": {
-    "bars": 8257,
-    "fetched_at": "2026-09-02T14:21:18.677752-07:00",
+    "bars": 8264,
+    "fetched_at": "2026-09-03T14:21:18.422310-07:00",
     "path": "data/JPM_1h.csv",
     "source": "ib"
   },
   "JPM|4h": {
-    "bars": 2008,
-    "fetched_at": "2026-09-02T14:21:18.687063-07:00",
+    "bars": 2010,
+    "fetched_at": "2026-09-03T14:21:18.433454-07:00",
     "path": "data/JPM_4h.csv",
     "source": "ib"
   },
   "KLAC|1d": {
-    "bars": 2556,
-    "fetched_at": "2026-09-02T14:04:25.505785-07:00",
+    "bars": 2557,
+    "fetched_at": "2026-09-03T14:04:25.212397-07:00",
     "path": "data/KLAC_1d.csv",
     "source": "ib"
   },
   "KLAC|1h": {
-    "bars": 8352,
-    "fetched_at": "2026-09-02T14:04:32.954151-07:00",
+    "bars": 8359,
+    "fetched_at": "2026-09-03T14:04:32.717573-07:00",
     "path": "data/KLAC_1h.csv",
     "source": "ib"
   },
   "KLAC|4h": {
-    "bars": 1523,
-    "fetched_at": "2026-09-02T14:04:32.962116-07:00",
+    "bars": 1525,
+    "fetched_at": "2026-09-03T14:04:32.727053-07:00",
     "path": "data/KLAC_4h.csv",
     "source": "ib"
   },
   "KO|1d": {
-    "bars": 2682,
-    "fetched_at": "2026-09-02T14:21:26.130873-07:00",
+    "bars": 2683,
+    "fetched_at": "2026-09-03T14:21:25.556437-07:00",
     "path": "data/KO_1d.csv",
     "source": "ib"
   },
   "KO|1h": {
-    "bars": 8257,
-    "fetched_at": "2026-09-02T14:21:33.838058-07:00",
+    "bars": 8264,
+    "fetched_at": "2026-09-03T14:21:33.210983-07:00",
     "path": "data/KO_1h.csv",
     "source": "ib"
   },
   "KO|4h": {
-    "bars": 2008,
-    "fetched_at": "2026-09-02T14:21:33.846866-07:00",
+    "bars": 2010,
+    "fetched_at": "2026-09-03T14:21:33.220852-07:00",
     "path": "data/KO_4h.csv",
     "source": "ib"
   },
   "LLY|1d": {
-    "bars": 2527,
-    "fetched_at": "2026-09-02T14:21:40.954971-07:00",
+    "bars": 2528,
+    "fetched_at": "2026-09-03T14:21:40.330026-07:00",
     "path": "data/LLY_1d.csv",
     "source": "ib"
   },
   "LLY|1h": {
-    "bars": 6557,
-    "fetched_at": "2026-09-02T14:21:49.434319-07:00",
+    "bars": 6564,
+    "fetched_at": "2026-09-03T14:21:47.884804-07:00",
     "path": "data/LLY_1h.csv",
     "source": "ib"
   },
   "LLY|4h": {
-    "bars": 1522,
-    "fetched_at": "2026-09-02T14:21:49.442608-07:00",
+    "bars": 1524,
+    "fetched_at": "2026-09-03T14:21:47.894895-07:00",
     "path": "data/LLY_4h.csv",
     "source": "ib"
   },
   "LMT|1d": {
-    "bars": 2682,
-    "fetched_at": "2026-09-02T14:21:56.844144-07:00",
+    "bars": 2683,
+    "fetched_at": "2026-09-03T14:21:55.015107-07:00",
     "path": "data/LMT_1d.csv",
     "source": "ib"
   },
   "LMT|1h": {
-    "bars": 8257,
-    "fetched_at": "2026-09-02T14:22:04.363593-07:00",
+    "bars": 8264,
+    "fetched_at": "2026-09-03T14:22:02.642401-07:00",
     "path": "data/LMT_1h.csv",
     "source": "ib"
   },
   "LMT|4h": {
-    "bars": 2008,
-    "fetched_at": "2026-09-02T14:22:04.375449-07:00",
+    "bars": 2010,
+    "fetched_at": "2026-09-03T14:22:02.659673-07:00",
     "path": "data/LMT_4h.csv",
     "source": "ib"
   },
   "LTL|1d": {
-    "bars": 2682,
-    "fetched_at": "2026-09-02T14:22:11.755680-07:00",
+    "bars": 2683,
+    "fetched_at": "2026-09-03T14:22:09.695881-07:00",
     "path": "data/LTL_1d.csv",
     "source": "ib"
   },
   "LTL|1h": {
-    "bars": 5220,
-    "fetched_at": "2026-09-02T14:22:19.272257-07:00",
+    "bars": 5227,
+    "fetched_at": "2026-09-03T14:22:18.689936-07:00",
     "path": "data/LTL_1h.csv",
     "source": "ib"
   },
   "LTL|4h": {
-    "bars": 1637,
-    "fetched_at": "2026-09-02T14:22:19.280911-07:00",
+    "bars": 1639,
+    "fetched_at": "2026-09-03T14:22:18.699759-07:00",
     "path": "data/LTL_4h.csv",
     "source": "ib"
   },
   "LUNR|1d": {
-    "bars": 1202,
-    "fetched_at": "2026-09-02T14:22:26.517269-07:00",
+    "bars": 1203,
+    "fetched_at": "2026-09-03T14:22:25.599503-07:00",
     "path": "data/LUNR_1d.csv",
     "source": "ib"
   },
   "LUNR|1h": {
-    "bars": 8257,
-    "fetched_at": "2026-09-02T14:22:33.933817-07:00",
+    "bars": 8264,
+    "fetched_at": "2026-09-03T14:22:33.032986-07:00",
     "path": "data/LUNR_1h.csv",
     "source": "ib"
   },
   "LUNR|4h": {
-    "bars": 2008,
-    "fetched_at": "2026-09-02T14:22:33.945529-07:00",
+    "bars": 2010,
+    "fetched_at": "2026-09-03T14:22:33.045520-07:00",
     "path": "data/LUNR_4h.csv",
     "source": "ib"
   },
   "LVHI|1d": {
-    "bars": 2539,
-    "fetched_at": "2026-09-02T14:22:41.597836-07:00",
+    "bars": 2540,
+    "fetched_at": "2026-09-03T14:22:40.167483-07:00",
     "path": "data/LVHI_1d.csv",
     "source": "ib"
   },
   "LVHI|1h": {
-    "bars": 8258,
-    "fetched_at": "2026-09-02T14:22:49.310539-07:00",
+    "bars": 8265,
+    "fetched_at": "2026-09-03T14:22:47.955060-07:00",
     "path": "data/LVHI_1h.csv",
     "source": "ib"
   },
   "LVHI|4h": {
-    "bars": 2009,
-    "fetched_at": "2026-09-02T14:22:49.320447-07:00",
+    "bars": 2011,
+    "fetched_at": "2026-09-03T14:22:47.967206-07:00",
     "path": "data/LVHI_4h.csv",
     "source": "ib"
   },
   "LWLG|1d": {
-    "bars": 2682,
-    "fetched_at": "2026-09-02T14:23:00.597529-07:00",
+    "bars": 2683,
+    "fetched_at": "2026-09-03T14:22:54.930502-07:00",
     "path": "data/LWLG_1d.csv",
     "source": "ib"
   },
   "LWLG|1h": {
-    "bars": 8257,
-    "fetched_at": "2026-09-02T14:23:18.918423-07:00",
+    "bars": 8264,
+    "fetched_at": "2026-09-03T14:23:18.410063-07:00",
     "path": "data/LWLG_1h.csv",
     "source": "ib"
   },
   "LWLG|4h": {
-    "bars": 2008,
-    "fetched_at": "2026-09-02T14:23:18.928792-07:00",
+    "bars": 2010,
+    "fetched_at": "2026-09-03T14:23:18.420798-07:00",
     "path": "data/LWLG_4h.csv",
     "source": "ib"
   },
   "MAR|1d": {
-    "bars": 2537,
-    "fetched_at": "2026-09-02T14:23:26.299263-07:00",
+    "bars": 2538,
+    "fetched_at": "2026-09-03T14:23:25.412679-07:00",
     "path": "data/MAR_1d.csv",
     "source": "ib"
   },
   "MAR|1h": {
-    "bars": 6627,
-    "fetched_at": "2026-09-02T14:23:33.829883-07:00",
+    "bars": 6634,
+    "fetched_at": "2026-09-03T14:23:33.161119-07:00",
     "path": "data/MAR_1h.csv",
     "source": "ib"
   },
   "MAR|4h": {
-    "bars": 1542,
-    "fetched_at": "2026-09-02T14:23:33.837563-07:00",
+    "bars": 1544,
+    "fetched_at": "2026-09-03T14:23:33.170881-07:00",
     "path": "data/MAR_4h.csv",
     "source": "ib"
   },
   "META|1d": {
-    "bars": 2564,
-    "fetched_at": "2026-09-02T14:02:40.188945-07:00",
+    "bars": 2565,
+    "fetched_at": "2026-09-03T14:02:39.626405-07:00",
     "path": "data/META_1d.csv",
     "source": "ib"
   },
   "META|1h": {
-    "bars": 8400,
-    "fetched_at": "2026-09-02T14:02:47.728374-07:00",
+    "bars": 8407,
+    "fetched_at": "2026-09-03T14:02:47.221721-07:00",
     "path": "data/META_1h.csv",
     "source": "ib"
   },
   "META|4h": {
-    "bars": 1523,
-    "fetched_at": "2026-09-02T14:02:47.736067-07:00",
+    "bars": 1525,
+    "fetched_at": "2026-09-03T14:02:47.230057-07:00",
     "path": "data/META_4h.csv",
     "source": "ib"
   },
   "MKSI|1d": {
-    "bars": 2682,
-    "fetched_at": "2026-09-02T14:23:41.184386-07:00",
+    "bars": 2683,
+    "fetched_at": "2026-09-03T14:23:40.173904-07:00",
     "path": "data/MKSI_1d.csv",
     "source": "ib"
   },
   "MKSI|1h": {
-    "bars": 8257,
-    "fetched_at": "2026-09-02T14:23:48.630613-07:00",
+    "bars": 8264,
+    "fetched_at": "2026-09-03T14:23:47.719605-07:00",
     "path": "data/MKSI_1h.csv",
     "source": "ib"
   },
   "MKSI|4h": {
-    "bars": 2008,
-    "fetched_at": "2026-09-02T14:23:48.641216-07:00",
+    "bars": 2010,
+    "fetched_at": "2026-09-03T14:23:47.731287-07:00",
     "path": "data/MKSI_4h.csv",
     "source": "ib"
   },
   "MORN|1d": {
-    "bars": 2682,
-    "fetched_at": "2026-09-02T14:24:26.082335-07:00",
+    "bars": 2683,
+    "fetched_at": "2026-09-03T14:24:13.373020-07:00",
     "path": "data/MORN_1d.csv",
     "source": "ib"
   },
   "MORN|1h": {
-    "bars": 8255,
-    "fetched_at": "2026-09-02T14:24:33.482767-07:00",
+    "bars": 8262,
+    "fetched_at": "2026-09-03T14:24:20.809503-07:00",
     "path": "data/MORN_1h.csv",
     "source": "ib"
   },
   "MORN|4h": {
-    "bars": 2008,
-    "fetched_at": "2026-09-02T14:24:33.491610-07:00",
+    "bars": 2010,
+    "fetched_at": "2026-09-03T14:24:20.820590-07:00",
     "path": "data/MORN_4h.csv",
     "source": "ib"
   },
   "MO|1d": {
-    "bars": 2682,
-    "fetched_at": "2026-09-02T14:23:56.102657-07:00",
+    "bars": 2683,
+    "fetched_at": "2026-09-03T14:23:54.907994-07:00",
     "path": "data/MO_1d.csv",
     "source": "ib"
   },
   "MO|1h": {
-    "bars": 8257,
-    "fetched_at": "2026-09-02T14:24:18.749580-07:00",
+    "bars": 8264,
+    "fetched_at": "2026-09-03T14:24:06.390834-07:00",
     "path": "data/MO_1h.csv",
     "source": "ib"
   },
   "MO|4h": {
-    "bars": 2008,
-    "fetched_at": "2026-09-02T14:24:18.760306-07:00",
+    "bars": 2010,
+    "fetched_at": "2026-09-03T14:24:06.401798-07:00",
     "path": "data/MO_4h.csv",
     "source": "ib"
   },
   "MRVL|1d": {
-    "bars": 2527,
-    "fetched_at": "2026-09-02T14:00:40.946496-07:00",
+    "bars": 2528,
+    "fetched_at": "2026-09-03T14:00:40.783287-07:00",
     "path": "data/MRVL_1d.csv",
     "source": "ib"
   },
   "MRVL|1h": {
-    "bars": 8400,
-    "fetched_at": "2026-09-02T14:00:53.561994-07:00",
+    "bars": 8407,
+    "fetched_at": "2026-09-03T14:00:53.705559-07:00",
     "path": "data/MRVL_1h.csv",
     "source": "ib"
   },
   "MRVL|4h": {
-    "bars": 1523,
-    "fetched_at": "2026-09-02T14:00:53.572102-07:00",
+    "bars": 1525,
+    "fetched_at": "2026-09-03T14:00:53.713896-07:00",
     "path": "data/MRVL_4h.csv",
     "source": "ib"
   },
   "MSFT|1d": {
-    "bars": 2565,
-    "fetched_at": "2026-09-02T14:01:54.815714-07:00",
+    "bars": 2566,
+    "fetched_at": "2026-09-03T14:01:54.154755-07:00",
     "path": "data/MSFT_1d.csv",
     "source": "ib"
   },
   "MSFT|1h": {
-    "bars": 8400,
-    "fetched_at": "2026-09-02T14:02:17.806755-07:00",
+    "bars": 8407,
+    "fetched_at": "2026-09-03T14:02:17.817556-07:00",
     "path": "data/MSFT_1h.csv",
     "source": "ib"
   },
   "MSFT|4h": {
-    "bars": 1523,
-    "fetched_at": "2026-09-02T14:02:17.814634-07:00",
+    "bars": 1525,
+    "fetched_at": "2026-09-03T14:02:17.826182-07:00",
     "path": "data/MSFT_4h.csv",
     "source": "ib"
   },
   "MSOS|1d": {
-    "bars": 1507,
-    "fetched_at": "2026-09-02T14:24:55.770896-07:00",
+    "bars": 1508,
+    "fetched_at": "2026-09-03T14:24:42.500977-07:00",
     "path": "data/MSOS_1d.csv",
     "source": "ib"
   },
   "MSOS|1h": {
-    "bars": 8257,
-    "fetched_at": "2026-09-02T14:25:03.397861-07:00",
+    "bars": 8264,
+    "fetched_at": "2026-09-03T14:24:50.066943-07:00",
     "path": "data/MSOS_1h.csv",
     "source": "ib"
   },
   "MSOS|4h": {
-    "bars": 2008,
-    "fetched_at": "2026-09-02T14:25:03.408971-07:00",
+    "bars": 2010,
+    "fetched_at": "2026-09-03T14:24:50.078171-07:00",
     "path": "data/MSOS_4h.csv",
     "source": "ib"
   },
   "MSTR|1d": {
-    "bars": 2682,
-    "fetched_at": "2026-09-02T14:25:10.692749-07:00",
+    "bars": 2683,
+    "fetched_at": "2026-09-03T14:24:57.003302-07:00",
     "path": "data/MSTR_1d.csv",
     "source": "ib"
   },
   "MSTR|1h": {
-    "bars": 8257,
-    "fetched_at": "2026-09-02T14:25:18.973664-07:00",
+    "bars": 8264,
+    "fetched_at": "2026-09-03T14:25:20.404404-07:00",
     "path": "data/MSTR_1h.csv",
     "source": "ib"
   },
   "MSTR|4h": {
-    "bars": 2008,
-    "fetched_at": "2026-09-02T14:25:18.985185-07:00",
+    "bars": 2010,
+    "fetched_at": "2026-09-03T14:25:20.417213-07:00",
     "path": "data/MSTR_4h.csv",
     "source": "ib"
   },
   "MS|1d": {
-    "bars": 2682,
-    "fetched_at": "2026-09-02T14:24:40.993372-07:00",
+    "bars": 2683,
+    "fetched_at": "2026-09-03T14:24:27.947890-07:00",
     "path": "data/MS_1d.csv",
     "source": "ib"
   },
   "MS|1h": {
-    "bars": 8257,
-    "fetched_at": "2026-09-02T14:24:48.547826-07:00",
+    "bars": 8264,
+    "fetched_at": "2026-09-03T14:24:35.617319-07:00",
     "path": "data/MS_1h.csv",
     "source": "ib"
   },
   "MS|4h": {
-    "bars": 2008,
-    "fetched_at": "2026-09-02T14:24:48.557925-07:00",
+    "bars": 2010,
+    "fetched_at": "2026-09-03T14:24:35.628273-07:00",
     "path": "data/MS_4h.csv",
     "source": "ib"
   },
   "MU|1d": {
-    "bars": 2527,
-    "fetched_at": "2026-09-02T14:07:54.280433-07:00",
+    "bars": 2528,
+    "fetched_at": "2026-09-03T14:07:53.713056-07:00",
     "path": "data/MU_1d.csv",
     "source": "ib"
   },
   "MU|1h": {
-    "bars": 6557,
-    "fetched_at": "2026-09-02T14:08:17.663999-07:00",
+    "bars": 6564,
+    "fetched_at": "2026-09-03T14:08:17.873096-07:00",
     "path": "data/MU_1h.csv",
     "source": "ib"
   },
   "MU|4h": {
-    "bars": 1522,
-    "fetched_at": "2026-09-02T14:08:17.671387-07:00",
+    "bars": 1524,
+    "fetched_at": "2026-09-03T14:08:17.881543-07:00",
     "path": "data/MU_4h.csv",
     "source": "ib"
   },
   "NBIS|1d": {
-    "bars": 2541,
-    "fetched_at": "2026-09-02T14:05:25.448744-07:00",
+    "bars": 2542,
+    "fetched_at": "2026-09-03T14:05:25.108530-07:00",
     "path": "data/NBIS_1d.csv",
     "source": "ib"
   },
   "NBIS|1h": {
-    "bars": 5843,
-    "fetched_at": "2026-09-02T14:05:32.883122-07:00",
+    "bars": 5850,
+    "fetched_at": "2026-09-03T14:05:32.573767-07:00",
     "path": "data/NBIS_1h.csv",
     "source": "ib"
   },
   "NBIS|4h": {
-    "bars": 996,
-    "fetched_at": "2026-09-02T14:05:32.890055-07:00",
+    "bars": 998,
+    "fetched_at": "2026-09-03T14:05:32.582381-07:00",
     "path": "data/NBIS_4h.csv",
     "source": "ib"
   },
   "NFLX|1d": {
-    "bars": 2682,
-    "fetched_at": "2026-09-02T14:25:26.258905-07:00",
+    "bars": 2683,
+    "fetched_at": "2026-09-03T14:25:31.348416-07:00",
     "path": "data/NFLX_1d.csv",
     "source": "ib"
   },
   "NFLX|1h": {
-    "bars": 8257,
-    "fetched_at": "2026-09-02T14:25:33.805198-07:00",
+    "bars": 8264,
+    "fetched_at": "2026-09-03T14:25:38.890272-07:00",
     "path": "data/NFLX_1h.csv",
     "source": "ib"
   },
   "NFLX|4h": {
-    "bars": 2008,
-    "fetched_at": "2026-09-02T14:25:33.815300-07:00",
+    "bars": 2010,
+    "fetched_at": "2026-09-03T14:25:38.902197-07:00",
     "path": "data/NFLX_4h.csv",
     "source": "ib"
   },
   "NTRS|1d": {
-    "bars": 2682,
-    "fetched_at": "2026-09-02T14:25:41.135211-07:00",
+    "bars": 2683,
+    "fetched_at": "2026-09-03T14:25:45.888301-07:00",
     "path": "data/NTRS_1d.csv",
     "source": "ib"
   },
   "NTRS|1h": {
-    "bars": 8257,
-    "fetched_at": "2026-09-02T14:25:51.965011-07:00",
+    "bars": 8264,
+    "fetched_at": "2026-09-03T14:25:53.393476-07:00",
     "path": "data/NTRS_1h.csv",
     "source": "ib"
   },
   "NTRS|4h": {
-    "bars": 2008,
-    "fetched_at": "2026-09-02T14:25:51.974901-07:00",
+    "bars": 2010,
+    "fetched_at": "2026-09-03T14:25:53.403819-07:00",
     "path": "data/NTRS_4h.csv",
     "source": "ib"
   },
   "NVDA|1d": {
-    "bars": 2541,
-    "fetched_at": "2026-09-02T14:00:10.729099-07:00",
+    "bars": 2542,
+    "fetched_at": "2026-09-03T14:00:10.606506-07:00",
     "path": "data/NVDA_1d.csv",
     "source": "ib"
   },
   "NVDA|1h": {
-    "bars": 8400,
-    "fetched_at": "2026-09-02T14:00:18.478483-07:00",
+    "bars": 8407,
+    "fetched_at": "2026-09-03T14:00:18.641218-07:00",
     "path": "data/NVDA_1h.csv",
     "source": "ib"
   },
   "NVDA|4h": {
-    "bars": 1523,
-    "fetched_at": "2026-09-02T14:00:18.489448-07:00",
+    "bars": 1525,
+    "fetched_at": "2026-09-03T14:00:18.651746-07:00",
     "path": "data/NVDA_4h.csv",
     "source": "ib"
   },
   "OC|1d": {
-    "bars": 2682,
-    "fetched_at": "2026-09-02T14:25:59.407985-07:00",
+    "bars": 2683,
+    "fetched_at": "2026-09-03T14:26:00.529981-07:00",
     "path": "data/OC_1d.csv",
     "source": "ib"
   },
   "OC|1h": {
-    "bars": 8257,
-    "fetched_at": "2026-09-02T14:26:18.643272-07:00",
+    "bars": 8264,
+    "fetched_at": "2026-09-03T14:26:12.105617-07:00",
     "path": "data/OC_1h.csv",
     "source": "ib"
   },
   "OC|4h": {
-    "bars": 2008,
-    "fetched_at": "2026-09-02T14:26:18.652689-07:00",
+    "bars": 2010,
+    "fetched_at": "2026-09-03T14:26:12.116739-07:00",
     "path": "data/OC_4h.csv",
     "source": "ib"
   },
   "OKLO|1d": {
-    "bars": 1295,
-    "fetched_at": "2026-09-02T14:26:25.965685-07:00",
+    "bars": 1296,
+    "fetched_at": "2026-09-03T14:26:19.052096-07:00",
     "path": "data/OKLO_1d.csv",
     "source": "ib"
   },
   "OKLO|1h": {
-    "bars": 7015,
-    "fetched_at": "2026-09-02T14:26:33.406849-07:00",
+    "bars": 7022,
+    "fetched_at": "2026-09-03T14:26:26.581391-07:00",
     "path": "data/OKLO_1h.csv",
     "source": "ib"
   },
   "OKLO|4h": {
-    "bars": 1653,
-    "fetched_at": "2026-09-02T14:26:33.417597-07:00",
+    "bars": 1655,
+    "fetched_at": "2026-09-03T14:26:26.590630-07:00",
     "path": "data/OKLO_4h.csv",
     "source": "ib"
   },
   "ONDS|1d": {
-    "bars": 1972,
-    "fetched_at": "2026-09-02T14:26:41.202575-07:00",
+    "bars": 1973,
+    "fetched_at": "2026-09-03T14:26:37.919633-07:00",
     "path": "data/ONDS_1d.csv",
     "source": "ib"
   },
   "ONDS|1h": {
-    "bars": 8253,
-    "fetched_at": "2026-09-02T14:26:54.708251-07:00",
+    "bars": 8260,
+    "fetched_at": "2026-09-03T14:26:49.967129-07:00",
     "path": "data/ONDS_1h.csv",
     "source": "ib"
   },
   "ONDS|4h": {
-    "bars": 2008,
-    "fetched_at": "2026-09-02T14:26:54.717583-07:00",
+    "bars": 2010,
+    "fetched_at": "2026-09-03T14:26:49.978393-07:00",
     "path": "data/ONDS_4h.csv",
     "source": "ib"
   },
   "ORCL|1d": {
-    "bars": 2682,
-    "fetched_at": "2026-09-02T14:27:02.178371-07:00",
+    "bars": 2683,
+    "fetched_at": "2026-09-03T14:26:57.120766-07:00",
     "path": "data/ORCL_1d.csv",
     "source": "ib"
   },
   "ORCL|1h": {
-    "bars": 8257,
-    "fetched_at": "2026-09-02T14:27:19.102181-07:00",
+    "bars": 8264,
+    "fetched_at": "2026-09-03T14:27:26.192633-07:00",
     "path": "data/ORCL_1h.csv",
     "source": "ib"
   },
   "ORCL|4h": {
-    "bars": 2008,
-    "fetched_at": "2026-09-02T14:27:19.111385-07:00",
+    "bars": 2010,
+    "fetched_at": "2026-09-03T14:27:26.205028-07:00",
     "path": "data/ORCL_4h.csv",
     "source": "ib"
   },
   "OSCR|1d": {
-    "bars": 1383,
-    "fetched_at": "2026-09-02T14:27:26.388097-07:00",
+    "bars": 1384,
+    "fetched_at": "2026-09-03T14:27:33.071343-07:00",
     "path": "data/OSCR_1d.csv",
     "source": "ib"
   },
   "OSCR|1h": {
-    "bars": 8257,
-    "fetched_at": "2026-09-02T14:27:33.949893-07:00",
+    "bars": 8264,
+    "fetched_at": "2026-09-03T14:27:40.586431-07:00",
     "path": "data/OSCR_1h.csv",
     "source": "ib"
   },
   "OSCR|4h": {
-    "bars": 2008,
-    "fetched_at": "2026-09-02T14:27:33.960955-07:00",
+    "bars": 2010,
+    "fetched_at": "2026-09-03T14:27:40.597370-07:00",
     "path": "data/OSCR_4h.csv",
     "source": "ib"
   },
   "PANW|1d": {
-    "bars": 2682,
-    "fetched_at": "2026-09-02T14:27:41.003101-07:00",
+    "bars": 2683,
+    "fetched_at": "2026-09-03T14:27:47.632615-07:00",
     "path": "data/PANW_1d.csv",
     "source": "ib"
   },
   "PANW|1h": {
-    "bars": 8257,
-    "fetched_at": "2026-09-02T14:27:48.493128-07:00",
+    "bars": 8264,
+    "fetched_at": "2026-09-03T14:27:55.119514-07:00",
     "path": "data/PANW_1h.csv",
     "source": "ib"
   },
   "PANW|4h": {
-    "bars": 2008,
-    "fetched_at": "2026-09-02T14:27:48.502382-07:00",
+    "bars": 2010,
+    "fetched_at": "2026-09-03T14:27:55.130871-07:00",
     "path": "data/PANW_4h.csv",
     "source": "ib"
   },
   "PB|1d": {
-    "bars": 2682,
-    "fetched_at": "2026-09-02T14:27:55.961732-07:00",
+    "bars": 2683,
+    "fetched_at": "2026-09-03T14:28:02.211891-07:00",
     "path": "data/PB_1d.csv",
     "source": "ib"
   },
   "PB|1h": {
-    "bars": 8257,
-    "fetched_at": "2026-09-02T14:28:18.812209-07:00",
+    "bars": 8264,
+    "fetched_at": "2026-09-03T14:28:26.040791-07:00",
     "path": "data/PB_1h.csv",
     "source": "ib"
   },
   "PB|4h": {
-    "bars": 2008,
-    "fetched_at": "2026-09-02T14:28:18.821540-07:00",
+    "bars": 2010,
+    "fetched_at": "2026-09-03T14:28:26.051967-07:00",
     "path": "data/PB_4h.csv",
     "source": "ib"
   },
   "PKW|1d": {
-    "bars": 2682,
-    "fetched_at": "2026-09-02T14:28:26.307225-07:00",
+    "bars": 2683,
+    "fetched_at": "2026-09-03T14:28:33.177575-07:00",
     "path": "data/PKW_1d.csv",
     "source": "ib"
   },
   "PKW|1h": {
-    "bars": 8149,
-    "fetched_at": "2026-09-02T14:28:33.840855-07:00",
+    "bars": 8156,
+    "fetched_at": "2026-09-03T14:28:40.639523-07:00",
     "path": "data/PKW_1h.csv",
     "source": "ib"
   },
   "PKW|4h": {
-    "bars": 2011,
-    "fetched_at": "2026-09-02T14:28:33.850594-07:00",
+    "bars": 2013,
+    "fetched_at": "2026-09-03T14:28:40.650074-07:00",
     "path": "data/PKW_4h.csv",
     "source": "ib"
   },
   "PLTR|1d": {
-    "bars": 1488,
-    "fetched_at": "2026-09-02T14:02:55.102325-07:00",
+    "bars": 1489,
+    "fetched_at": "2026-09-03T14:02:54.277593-07:00",
     "path": "data/PLTR_1d.csv",
     "source": "ib"
   },
   "PLTR|1h": {
-    "bars": 8388,
-    "fetched_at": "2026-09-02T14:03:17.967860-07:00",
+    "bars": 8395,
+    "fetched_at": "2026-09-03T14:03:17.968172-07:00",
     "path": "data/PLTR_1h.csv",
     "source": "ib"
   },
   "PLTR|4h": {
-    "bars": 1523,
-    "fetched_at": "2026-09-02T14:03:17.975521-07:00",
+    "bars": 1525,
+    "fetched_at": "2026-09-03T14:03:17.977391-07:00",
     "path": "data/PLTR_4h.csv",
     "source": "ib"
   },
   "QCOM|1d": {
-    "bars": 2682,
-    "fetched_at": "2026-09-02T14:28:40.819865-07:00",
+    "bars": 2683,
+    "fetched_at": "2026-09-03T14:28:47.648009-07:00",
     "path": "data/QCOM_1d.csv",
     "source": "ib"
   },
   "QCOM|1h": {
-    "bars": 8257,
-    "fetched_at": "2026-09-02T14:28:48.571569-07:00",
+    "bars": 8264,
+    "fetched_at": "2026-09-03T14:28:55.226367-07:00",
     "path": "data/QCOM_1h.csv",
     "source": "ib"
   },
   "QCOM|4h": {
-    "bars": 2008,
-    "fetched_at": "2026-09-02T14:28:48.582051-07:00",
+    "bars": 2010,
+    "fetched_at": "2026-09-03T14:28:55.238158-07:00",
     "path": "data/QCOM_4h.csv",
     "source": "ib"
   },
   "QQQ|1d": {
-    "bars": 2538,
-    "fetched_at": "2026-09-02T14:08:54.993617-07:00",
+    "bars": 2539,
+    "fetched_at": "2026-09-03T14:08:54.291552-07:00",
     "path": "data/QQQ_1d.csv",
     "source": "ib"
   },
   "QQQ|1h": {
-    "bars": 8400,
-    "fetched_at": "2026-09-02T14:09:17.824505-07:00",
+    "bars": 8407,
+    "fetched_at": "2026-09-03T14:09:17.847221-07:00",
     "path": "data/QQQ_1h.csv",
     "source": "ib"
   },
   "QQQ|4h": {
-    "bars": 1523,
-    "fetched_at": "2026-09-02T14:09:17.841866-07:00",
+    "bars": 1525,
+    "fetched_at": "2026-09-03T14:09:17.863911-07:00",
     "path": "data/QQQ_4h.csv",
     "source": "ib"
   },
   "RBC|1d": {
-    "bars": 2682,
-    "fetched_at": "2026-09-02T14:28:56.012293-07:00",
+    "bars": 2683,
+    "fetched_at": "2026-09-03T14:29:02.353589-07:00",
     "path": "data/RBC_1d.csv",
     "source": "ib"
   },
   "RBC|1h": {
-    "bars": 8257,
-    "fetched_at": "2026-09-02T14:29:18.903888-07:00",
+    "bars": 8264,
+    "fetched_at": "2026-09-03T14:29:26.039791-07:00",
     "path": "data/RBC_1h.csv",
     "source": "ib"
   },
   "RBC|4h": {
-    "bars": 2008,
-    "fetched_at": "2026-09-02T14:29:18.921228-07:00",
+    "bars": 2010,
+    "fetched_at": "2026-09-03T14:29:26.051107-07:00",
     "path": "data/RBC_4h.csv",
     "source": "ib"
   },
   "RBLX|1d": {
-    "bars": 1378,
-    "fetched_at": "2026-09-02T14:29:26.206241-07:00",
+    "bars": 1379,
+    "fetched_at": "2026-09-03T14:29:32.923589-07:00",
     "path": "data/RBLX_1d.csv",
     "source": "ib"
   },
   "RBLX|1h": {
-    "bars": 8257,
-    "fetched_at": "2026-09-02T14:29:33.689925-07:00",
+    "bars": 8264,
+    "fetched_at": "2026-09-03T14:29:40.426405-07:00",
     "path": "data/RBLX_1h.csv",
     "source": "ib"
   },
   "RBLX|4h": {
-    "bars": 2008,
-    "fetched_at": "2026-09-02T14:29:33.699375-07:00",
+    "bars": 2010,
+    "fetched_at": "2026-09-03T14:29:40.437705-07:00",
     "path": "data/RBLX_4h.csv",
     "source": "ib"
   },
   "REMX|1d": {
-    "bars": 2682,
-    "fetched_at": "2026-09-02T14:29:41.081624-07:00",
+    "bars": 2683,
+    "fetched_at": "2026-09-03T14:29:47.474982-07:00",
     "path": "data/REMX_1d.csv",
     "source": "ib"
   },
   "REMX|1h": {
-    "bars": 8257,
-    "fetched_at": "2026-09-02T14:29:48.606332-07:00",
+    "bars": 8264,
+    "fetched_at": "2026-09-03T14:29:54.958823-07:00",
     "path": "data/REMX_1h.csv",
     "source": "ib"
   },
   "REMX|4h": {
-    "bars": 2008,
-    "fetched_at": "2026-09-02T14:29:48.616318-07:00",
+    "bars": 2010,
+    "fetched_at": "2026-09-03T14:29:54.970964-07:00",
     "path": "data/REMX_4h.csv",
     "source": "ib"
   },
   "RGTI|1d": {
-    "bars": 1348,
-    "fetched_at": "2026-09-02T14:30:06.441652-07:00",
+    "bars": 1349,
+    "fetched_at": "2026-09-03T14:30:01.997239-07:00",
     "path": "data/RGTI_1d.csv",
     "source": "ib"
   },
@@ -1638,20 +1638,20 @@
     "source": "ib"
   },
   "RKLB|1d": {
-    "bars": 1454,
-    "fetched_at": "2026-09-02T14:04:54.752591-07:00",
+    "bars": 1455,
+    "fetched_at": "2026-09-03T14:04:54.376447-07:00",
     "path": "data/RKLB_1d.csv",
     "source": "ib"
   },
   "RKLB|1h": {
-    "bars": 8265,
-    "fetched_at": "2026-09-02T14:05:18.090279-07:00",
+    "bars": 8272,
+    "fetched_at": "2026-09-03T14:05:18.083240-07:00",
     "path": "data/RKLB_1h.csv",
     "source": "ib"
   },
   "RKLB|4h": {
-    "bars": 1582,
-    "fetched_at": "2026-09-02T14:05:18.097927-07:00",
+    "bars": 1584,
+    "fetched_at": "2026-09-03T14:05:18.093047-07:00",
     "path": "data/RKLB_4h.csv",
     "source": "ib"
   },
@@ -1674,20 +1674,20 @@
     "source": "ib"
   },
   "SHOP|1d": {
-    "bars": 2540,
-    "fetched_at": "2026-09-02T14:05:40.362596-07:00",
+    "bars": 2541,
+    "fetched_at": "2026-09-03T14:05:39.743936-07:00",
     "path": "data/SHOP_1d.csv",
     "source": "ib"
   },
   "SHOP|1h": {
-    "bars": 6654,
-    "fetched_at": "2026-09-02T14:06:05.635371-07:00",
+    "bars": 6661,
+    "fetched_at": "2026-09-03T14:06:05.720128-07:00",
     "path": "data/SHOP_1h.csv",
     "source": "ib"
   },
   "SHOP|4h": {
-    "bars": 1549,
-    "fetched_at": "2026-09-02T14:06:05.647399-07:00",
+    "bars": 1551,
+    "fetched_at": "2026-09-03T14:06:05.730159-07:00",
     "path": "data/SHOP_4h.csv",
     "source": "ib"
   },
@@ -1764,38 +1764,38 @@
     "source": "ib"
   },
   "SMH|1d": {
-    "bars": 2538,
-    "fetched_at": "2026-09-02T14:08:39.911260-07:00",
+    "bars": 2539,
+    "fetched_at": "2026-09-03T14:08:39.492316-07:00",
     "path": "data/SMH_1d.csv",
     "source": "ib"
   },
   "SMH|1h": {
-    "bars": 8400,
-    "fetched_at": "2026-09-02T14:08:47.564381-07:00",
+    "bars": 8407,
+    "fetched_at": "2026-09-03T14:08:47.173655-07:00",
     "path": "data/SMH_1h.csv",
     "source": "ib"
   },
   "SMH|4h": {
-    "bars": 1523,
-    "fetched_at": "2026-09-02T14:08:47.572952-07:00",
+    "bars": 1525,
+    "fetched_at": "2026-09-03T14:08:47.183083-07:00",
     "path": "data/SMH_4h.csv",
     "source": "ib"
   },
   "SNDK|1d": {
-    "bars": 390,
-    "fetched_at": "2026-09-02T14:01:24.824598-07:00",
+    "bars": 391,
+    "fetched_at": "2026-09-03T14:01:24.952691-07:00",
     "path": "data/SNDK_1d.csv",
     "source": "ib"
   },
   "SNDK|1h": {
-    "bars": 4807,
-    "fetched_at": "2026-09-02T14:01:32.317792-07:00",
+    "bars": 4814,
+    "fetched_at": "2026-09-03T14:01:32.513264-07:00",
     "path": "data/SNDK_1h.csv",
     "source": "ib"
   },
   "SNDK|4h": {
-    "bars": 780,
-    "fetched_at": "2026-09-02T14:01:32.323856-07:00",
+    "bars": 782,
+    "fetched_at": "2026-09-03T14:01:32.519797-07:00",
     "path": "data/SNDK_4h.csv",
     "source": "ib"
   },
@@ -1818,20 +1818,20 @@
     "source": "ib"
   },
   "SOXX|1d": {
-    "bars": 2540,
-    "fetched_at": "2026-09-02T14:08:25.011754-07:00",
+    "bars": 2541,
+    "fetched_at": "2026-09-03T14:08:24.902996-07:00",
     "path": "data/SOXX_1d.csv",
     "source": "ib"
   },
   "SOXX|1h": {
-    "bars": 8400,
-    "fetched_at": "2026-09-02T14:08:32.549332-07:00",
+    "bars": 8407,
+    "fetched_at": "2026-09-03T14:08:32.468203-07:00",
     "path": "data/SOXX_1h.csv",
     "source": "ib"
   },
   "SOXX|4h": {
-    "bars": 1523,
-    "fetched_at": "2026-09-02T14:08:32.557123-07:00",
+    "bars": 1525,
+    "fetched_at": "2026-09-03T14:08:32.478247-07:00",
     "path": "data/SOXX_4h.csv",
     "source": "ib"
   },
@@ -1908,38 +1908,38 @@
     "source": "ib"
   },
   "SPY|1d": {
-    "bars": 2540,
-    "fetched_at": "2026-09-02T14:09:24.944616-07:00",
+    "bars": 2541,
+    "fetched_at": "2026-09-03T14:09:24.990523-07:00",
     "path": "data/SPY_1d.csv",
     "source": "ib"
   },
   "SPY|1h": {
-    "bars": 8399,
-    "fetched_at": "2026-09-02T14:09:32.689846-07:00",
+    "bars": 8406,
+    "fetched_at": "2026-09-03T14:09:32.803385-07:00",
     "path": "data/SPY_1h.csv",
     "source": "ib"
   },
   "SPY|4h": {
-    "bars": 1523,
-    "fetched_at": "2026-09-02T14:09:32.698260-07:00",
+    "bars": 1525,
+    "fetched_at": "2026-09-03T14:09:32.811905-07:00",
     "path": "data/SPY_4h.csv",
     "source": "ib"
   },
   "STX|1d": {
-    "bars": 2527,
-    "fetched_at": "2026-09-02T14:01:39.799482-07:00",
+    "bars": 2528,
+    "fetched_at": "2026-09-03T14:01:39.613985-07:00",
     "path": "data/STX_1d.csv",
     "source": "ib"
   },
   "STX|1h": {
-    "bars": 6557,
-    "fetched_at": "2026-09-02T14:01:47.465173-07:00",
+    "bars": 6564,
+    "fetched_at": "2026-09-03T14:01:47.156516-07:00",
     "path": "data/STX_1h.csv",
     "source": "ib"
   },
   "STX|4h": {
-    "bars": 1522,
-    "fetched_at": "2026-09-02T14:01:47.475276-07:00",
+    "bars": 1524,
+    "fetched_at": "2026-09-03T14:01:47.166196-07:00",
     "path": "data/STX_4h.csv",
     "source": "ib"
   },
@@ -1980,20 +1980,20 @@
     "source": "ib"
   },
   "TSLA|1d": {
-    "bars": 2565,
-    "fetched_at": "2026-09-02T14:01:00.927913-07:00",
+    "bars": 2566,
+    "fetched_at": "2026-09-03T14:01:00.645231-07:00",
     "path": "data/TSLA_1d.csv",
     "source": "ib"
   },
   "TSLA|1h": {
-    "bars": 8400,
-    "fetched_at": "2026-09-02T14:01:18.042470-07:00",
+    "bars": 8407,
+    "fetched_at": "2026-09-03T14:01:18.065901-07:00",
     "path": "data/TSLA_1h.csv",
     "source": "ib"
   },
   "TSLA|4h": {
-    "bars": 1523,
-    "fetched_at": "2026-09-02T14:01:18.051294-07:00",
+    "bars": 1525,
+    "fetched_at": "2026-09-03T14:01:18.076297-07:00",
     "path": "data/TSLA_4h.csv",
     "source": "ib"
   },

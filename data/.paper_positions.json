@@ -1,5 +1,5 @@
 {
-  "equity": 92216.79,
+  "equity": 91836.4,
   "positions": [
     {
       "timestamp": "2026-07-20 07:00",
@@ -17185,15 +17185,45 @@
       "weight": 0.1,
       "tp1_seen": false,
       "pyramiding_notified": false
+    },
+    {
+      "timestamp": "2026-09-03 13:58",
+      "bar_date": "2026-09-03",
+      "symbol": "ORCL",
+      "tf": "1h",
+      "strategy": "RSI2",
+      "direction": "做多",
+      "entry_price": 154.05,
+      "atr": 2.0854,
+      "tp1": 0.0,
+      "tp2": 0.0,
+      "sl": 149.8793,
+      "market_score": 2.0,
+      "vix": 14.32,
+      "quality": 2,
+      "signal_id": "ORCL|1h|RSI2|2026-09-03|做多",
+      "source": "live",
+      "is_shadow": 0,
+      "source_strategy": "",
+      "params_json": "{\"atr_trail_mult\": 2.0, \"min_market_score\": 2, \"rsi2_entry\": 10.0}",
+      "sector_aligned": "",
+      "screener_rank": "",
+      "market_regime": "neutral",
+      "is_repeat": 0,
+      "opened_at": "2026-09-03T13:58:09",
+      "status": "closed",
+      "risk_pct": 0.0075,
+      "weight": 0.1,
+      "tp1_seen": false,
+      "pyramiding_notified": false,
+      "outcome": "时间止损",
+      "r_mult": -0.55,
+      "bars": 7,
+      "exit_model": "close",
+      "closed_at": "2026-09-03T13:58:37"
     }
   ],
   "events": [
-    {
-      "type": "closed",
-      "symbol": "SOXX",
-      "outcome": "时间止损",
-      "r_mult": 0.337
-    },
     {
       "type": "closed",
       "symbol": "AIS",
@@ -18387,6 +18417,12 @@
       "symbol": "IREN",
       "outcome": "止损",
       "r_mult": -1.446
+    },
+    {
+      "type": "closed",
+      "symbol": "ORCL",
+      "outcome": "时间止损",
+      "r_mult": -0.55
     }
   ]
 }

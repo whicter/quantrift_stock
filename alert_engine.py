@@ -914,6 +914,7 @@ def check_rsi2_signal(df_raw: pd.DataFrame, symbol: str, tf: str,
     use_pullback   = bool(p.get("use_pullback_filter", False))
     use_vol_score  = bool(p.get("use_vol_score",      False))
     use_vix_spike  = bool(p.get("use_vix_spike",      False))
+    use_vix_structural = bool(p.get("use_vix_structural", False))
     atr_trail_mult = float(p.get("atr_trail_mult",    2.5))
 
     sma200  = _sma(close, 200)
@@ -974,6 +975,16 @@ def check_rsi2_signal(df_raw: pd.DataFrame, symbol: str, tf: str,
         # VIX 分量（有数据时加入，最高分 4→5，阈值含义不变）
         if vix_value is not None and not math.isnan(vix_value):
             market_score -= float(vix_value > 20)
+        # QQQ 跌破 20 日低点的罚分。
+        # 2026-09-03 对账发现：rsi2_backtest.compute_signals 里这条罚分和
+        # 「VIX>20」是并列写在一起的（都在 `if df_vix is not None` 分支内），
+        # 期望表就是带着它跑出来的；而实盘这边只搬了 VIX 那一条，这条从来没实现。
+        # 后果是同一根 bar 上实盘的 market_score 比回测高 1 分——正好在大盘创
+        # 20 日新低、最该收紧的时候放行。这是实盘与回测**同一个策略却算着不同
+        # 分数**，属于对齐缺陷，不是参数选择。
+        q_low20 = qqq_c.rolling(20).min().shift(1)
+        if not math.isnan(float(q_low20.iloc[-1])):
+            market_score -= float(q < float(q_low20.iloc[-1]))
         # 成交量放量加分（Mega-cap / MU 专用）
         if use_vol_score and volume is not None:
             vol_avg = volume.rolling(20).mean()
@@ -994,6 +1005,19 @@ def check_rsi2_signal(df_raw: pd.DataFrame, symbol: str, tf: str,
                     vix_declining = vix_value < float(vix_close_hist.iloc[-4])
                     if vix_spiked and vix_declining:
                         market_score += 1.0
+            except Exception:
+                pass
+        # VIX 结构性分量（VIX < VIX_MA20 时 +0.5），同样是回测有、实盘漏掉的一项。
+        # 只在该路由显式开启 use_vix_structural 时生效，与回测一致。
+        if use_vix_structural and vix_value is not None and not math.isnan(vix_value):
+            try:
+                _provider = get_provider()
+                _vh = _provider.fetch_ohlcv("^VIX", "1d",
+                                            start=(datetime.now() - timedelta(days=60)).strftime("%Y-%m-%d"))
+                if _vh is not None and len(_vh) >= 20:
+                    _ma20 = float(_vh["Close"].rolling(20).mean().iloc[-1])
+                    if not math.isnan(_ma20):
+                        market_score += 0.5 * float(vix_value < _ma20)
             except Exception:
                 pass
         if math.isnan(market_score):

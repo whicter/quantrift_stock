@@ -1,0 +1,27 @@
+{
+ "ORCL|1h|RSI2|做多": {
+  "timestamp": "2026-09-03 13:58",
+  "bar_date": "2026-09-03",
+  "symbol": "ORCL",
+  "tf": "1h",
+  "strategy": "RSI2",
+  "direction": "做多",
+  "entry_price": 154.05,
+  "atr": 2.0854,
+  "tp1": 0.0,
+  "tp2": 0.0,
+  "sl": 149.8793,
+  "market_score": 2.0,
+  "vix": 14.32,
+  "quality": 2,
+  "signal_id": "ORCL|1h|RSI2|2026-09-03|做多",
+  "source": "live",
+  "is_shadow": 0,
+  "source_strategy": "",
+  "params_json": "{\"atr_trail_mult\": 2.0, \"min_market_score\": 2, \"rsi2_entry\": 10.0}",
+  "sector_aligned": "",
+  "screener_rank": "",
+  "market_regime": "neutral",
+  "is_repeat": 0
+ }
+}
