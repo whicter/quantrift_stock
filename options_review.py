@@ -83,6 +83,30 @@ def capture_ratio(df: pd.DataFrame) -> tuple[float, float, float] | None:
     return cw, cl, (cw / cl if cl else float("nan"))
 
 
+def bootstrap_ratio(df: pd.DataFrame, n: int = 1000, seed: int = 0) -> tuple[float, float, float] | None:
+    """赢输比的自助法 90% 区间。
+
+    点估计单独看会骗人：126 笔里 Confluence 的 1.20 看着像"期权对 Confluence
+    划算"，但重抽后区间是 [0.23, 3.19]，完全不能下结论。只有区间整体落在 1
+    的一侧才算有证据。
+    """
+    import numpy as np
+    base = capture_ratio(df)
+    if base is None:
+        return None
+    rng = np.random.default_rng(seed)
+    out = []
+    for _ in range(n):
+        r = capture_ratio(df.sample(len(df), replace=True,
+                                    random_state=int(rng.integers(1 << 31))))
+        if r:
+            out.append(r[2])
+    if len(out) < n // 10:
+        return None
+    lo, hi = float(np.percentile(out, 5)), float(np.percentile(out, 95))
+    return base[2], lo, hi
+
+
 def _block(df: pd.DataFrame, title: str) -> list[str]:
     if df.empty:
         return [f"── {title}：无记录 ──"]
@@ -105,6 +129,11 @@ def _block(df: pd.DataFrame, title: str) -> list[str]:
         out.append(f"  捕获率         正股每赚1R→期权 {abs(cr[0]):.1f}%　"
                    f"每亏1R→期权 -{abs(cr[1]):.1f}%　赢输比 {cr[2]:.2f}"
                    + ("　⚠️ <1：亏损被放大得比盈利更多" if cr[2] < 1 else ""))
+        bs = bootstrap_ratio(df)
+        if bs:
+            verdict = ("显著<1（期权是更差的载体）" if bs[2] < 1 else
+                       "显著>1" if bs[1] > 1 else "跨过1，样本不足以下结论")
+            out.append(f"  赢输比90%区间   [{bs[1]:.2f}, {bs[2]:.2f}]　{verdict}")
     out.append(f"  持仓           中位 {df.hold_d.median() * 24:.1f} 小时　"
                f"最长 {df.hold_d.max():.1f} 天")
     return out
