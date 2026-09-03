@@ -196,7 +196,12 @@ def run_backfill() -> pd.DataFrame:
         if strategy == "confluence":
             events += confluence_candidates(symbol, tf, raw, qqq, get_params(symbol, tf))
         elif strategy == "rsi2":
-            params = {**RSI2_DEFAULTS[tf], **RSI2_PARAMS[(symbol, tf)]}
+            # 必须用 .get：STRATEGY_MAP 里新增的 rsi2 路由不一定在 RSI2_PARAMS 里
+            # 有专属参数（走 DEFAULTS 即可）。直接下标会 KeyError——2026-07-26 把
+            # MU/STX 1h 从 confluence 升级成 rsi2 后，本脚本就是这样静默崩掉的，
+            # 到 9/3 才发现回填账本停在 7/24 整整六周没更新。alert_engine 一直用
+            # 的就是 .get，这里与它对齐。
+            params = {**RSI2_DEFAULTS[tf], **RSI2_PARAMS.get((symbol, tf), {})}
             events += rsi2_candidates(symbol, tf, raw, qqq, params)
             events += rsi2_candidates(symbol, tf, raw, qqq, params, strategy="RSI2_IBS_shadow", ibs_only=True)
     # Shadow exit variants, independent of whether they are primary live routes.
