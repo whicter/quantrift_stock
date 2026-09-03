@@ -37,6 +37,7 @@ options_paper.py — 期权纸面模拟（绝不下单）
 """
 
 import argparse
+import fcntl
 import json
 import warnings
 from datetime import date, datetime
@@ -56,6 +57,7 @@ load_dotenv()
 SIGNAL_LOG = Path("logs/signal_log.csv")
 LEDGER = Path("logs/options_paper_log.csv")
 STATE = Path("data/.options_positions.json")
+LOCK = Path("data/.options_paper.lock")
 
 # 白名单：`options_liquidity.py` 实测 ATM 未平仓量 ≥500 的标的（2026-08-15）。
 # 约束是"有没有真实的双边市场"，不是价差大小——用户明确要求按中间价成交、
@@ -89,6 +91,7 @@ FRESH_MINUTES = 30
 
 # 目标到期上限（天）。见 pick_contract 里的说明：超过约 60DTE 后，我们标的池里
 # 多数合约的未平仓量断崖式下跌，宁可承担多一些 theta 也不要开在无人交易的合约上。
+MIN_DTE = 30          # 到期硬下限：低于此天数的合约一律不选
 MAX_TARGET_DTE = 60
 
 FIELDS = [
@@ -114,6 +117,27 @@ def tg_alert(msg: str) -> None:
                                data=data, timeout=15)
     except Exception:
         pass
+
+
+def _acquire_lock():
+    """独占锁：同一时刻只允许一个实例改仓位。
+
+    2026-09-03 复盘发现账本 149 行里有 23 行是同一仓位被写了两次，closed_at
+    相差 1-3 秒、入场数据完全相同。日志里能看到两个进程的输出交错（同一分钟内
+    两次 "白名单 84 个标的｜当前持仓 13 个"）。原因是 `main()` 只在最后才
+    `_save_state()`，两个并发实例都读到同一份 state、都平掉同一批仓、都往账本
+    追加一行。重复行会把单笔盈亏重复计入统计，直接污染复盘结论。
+
+    返回文件句柄（须在进程存活期间持有）；拿不到锁返回 None。
+    """
+    LOCK.parent.mkdir(exist_ok=True)
+    fh = open(LOCK, "w")
+    try:
+        fcntl.flock(fh.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except BlockingIOError:
+        fh.close()
+        return None
+    return fh
 
 
 def _load_state() -> dict:
@@ -151,7 +175,7 @@ def pick_contract(symbol: str, direction: str, hold_days: float) -> dict | None:
     # 3.5 倍持仓是为了让出场时点仍在 30DTE 的 theta 陡坡之外，但**必须封顶**：
     # 机械外推会把长持仓路由推到没人交易的远月——LLY 持仓30天×3.5=105DTE 处
     # OI 只有 39，而它 34DTE 处 OI 有 602。远月省下的 theta 远不抵流动性损失。
-    target_dte = min(max(30, round(hold_days * 3.5)), MAX_TARGET_DTE)
+    target_dte = min(max(MIN_DTE, round(hold_days * 3.5)), MAX_TARGET_DTE)
     try:
         t = yf.Ticker(symbol)
         expiries = t.options
@@ -159,17 +183,27 @@ def pick_contract(symbol: str, direction: str, hold_days: float) -> dict | None:
             return None
         today = date.today()
 
+        def _dte(e: str) -> int:
+            return (pd.Timestamp(e).date() - today).days
+
         def _is_monthly(e: str) -> bool:
             d = pd.Timestamp(e)
             return d.dayofweek == 4 and 15 <= d.day <= 21   # 第三个周五
 
-        monthly = [e for e in expiries if _is_monthly(e)]
-        # 月度到期若与目标 DTE 相差不超过 3 周，优先用月度；否则退回全集取最近的
-        pool = monthly or list(expiries)
-        exp = min(pool, key=lambda e: abs((pd.Timestamp(e).date() - today).days - target_dte))
-        if abs((pd.Timestamp(exp).date() - today).days - target_dte) > 21:
-            exp = min(expiries, key=lambda e: abs((pd.Timestamp(e).date() - today).days - target_dte))
-        dte = (pd.Timestamp(exp).date() - today).days
+        # MIN_DTE 是**硬下限**，不是软目标。2026-09-03 复盘发现旧实现里月度优先
+        # 会把下限吃掉：目标 30DTE 时一张 16DTE 的月度合约因偏差 14 天（≤21）被
+        # 接受，全账本 49% 的入场落在 30 天以内、最短 16 天——正好在本模块注释
+        # 声明要避开的 theta 陡坡里面。先按下限过滤，再谈月度优先。
+        usable = [e for e in expiries if _dte(e) >= MIN_DTE]
+        if not usable:
+            return None
+        monthly = [e for e in usable if _is_monthly(e)]
+        # 月度到期若与目标 DTE 相差不超过 3 周，优先用月度；否则退回可用全集取最近的
+        pool = monthly or usable
+        exp = min(pool, key=lambda e: abs(_dte(e) - target_dte))
+        if abs(_dte(exp) - target_dte) > 21:
+            exp = min(usable, key=lambda e: abs(_dte(e) - target_dte))
+        dte = _dte(exp)
         chain = t.option_chain(exp)
         df = chain.calls if direction == "做多" else chain.puts
         spot = float(t.fast_info.get("lastPrice") or 0)
@@ -364,14 +398,22 @@ def main() -> None:
     ap.add_argument("--status", action="store_true", help="只看状态不动仓位")
     args = ap.parse_args()
 
-    state = _load_state()
     if args.status:
+        state = _load_state()
         print(f"当前持有纸面期权仓 {len(state)} 个:")
         for sid, p in state.items():
             print(f"  {p['symbol']} {p['tf']} {p['opt_right']}{p['opt_strike']} "
                   f"@{p['opt_expiry']} 入场ask ${p['opt_ask']}")
         summary()
         return
+
+    # 先拿锁再读 state：反过来的话，等锁的实例手里已经是一份过期快照，
+    # 拿到锁后就会基于旧仓位做决策，等于没锁。
+    lock = _acquire_lock()
+    if lock is None:
+        print("已有实例在运行，本轮跳过（避免重复开平仓）")
+        return
+    state = _load_state()
 
     print(f"白名单 {len(WHITELIST)} 个标的｜当前持仓 {len(state)} 个")
     c = close_finished(state)

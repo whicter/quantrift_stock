@@ -13,3 +13,6 @@ venv/
 data/.exec_ledger_state.json
 logs/*.bak
 data/.options_positions.json
+
+# 期权纸面模拟的进程锁（运行时产物）
+data/.options_paper.lock

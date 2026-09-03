@@ -859,3 +859,22 @@ ssh mac-studio "cd /Users/congrenhan/Documents/quantrift_stock && /opt/homebrew/
 - [x] **复盘来源分层**：实时日志新增 `source=live/shadow`；历史回填固定为 `historical_backfill` 并隔离存储；Meta-label 默认仅用 `live` 已决样本。
 - [ ] **Pyramiding 完整验证**：明确仅 Telegram 人工提示或完整纸面加仓状态；若后者，TP1 后创新高时补回半仓、保护止损移至 TP1，并由历史回放验证。
 - [ ] **持续收集复核**：确认新实时信号可创建 `data/.paper_positions.json` 与 `logs/paper_equity.csv`；定期审查影子样本数量，达到统计门槛后才转正。
+
+### ㉕ 期权账本复盘闭环（2026-09-03 完成）
+
+用户质问"开了那么多模拟单不复盘一个屁用"，属实——期权纸面模拟 8/15 上线后
+从未被复盘。三项修复：
+
+1. **`options_review.py`**（新增）：期权账本复盘，挂进 `run_weekly_review.sh`，
+   周日随正股复盘一起推 TG。常设指标为**捕获率**（正股每 1R 对应的期权涨跌），
+   附账本质量自检（重复行 / DTE 越界 / 出场剩余 DTE）。
+2. **并发锁**：`fcntl.flock` 非阻塞独占锁，先拿锁再读 state。历史 23 条重复行
+   已去重，原件存 `logs/options_paper_log.predupe-20260903.bak`。
+3. **DTE 硬下限 30 天**：低于 30 天的到期一律不选。理由是流动性（近月 ATM
+   OI 少一个数量级、价差翻倍），不是 theta。
+
+**首次复盘结论（126 笔）**：期权 mid 口径 -3.6%、正股 -0.19R、价差成本 9.2 点/笔、
+捕获率赢输比 0.73。当前持仓时长（中位 6 小时）下期权是负期望载体。
+
+**待观察**：DTE 下限生效后（9/3 起）新样本的捕获率是否上升。样本仍集中在一段
+下跌行情里，需要跨行情积累后才能定论。

@@ -148,7 +148,7 @@ ssh -A mac-studio "cd /Users/congrenhan/Documents/quantrift_stock && git push"
 | `stock-daily-screener` | 交易日 13:20 PT | 因子选股 Top15 → TG |
 | `stock-watchlist-events-am` | 交易日 07:45 PT | 事件雷达·盘中 → TG |
 | `stock-watchlist-events` | 交易日 13:35 PT | 事件雷达·收盘 → TG |
-| `stock-weekly-review` | 周日 18:15 PT | 90天复盘+衰减监控 → TG |
+| `stock-weekly-review` | 周日 18:15 PT | 90天正股复盘+衰减监控 **+ 期权账本复盘** → TG |
 | `stock-weekly-data-consolidate` | 周日 19:00 PT | 历史CSV迁外置盘留符号链接 |
 | `stock-monthly-reval` | 每月1日 06:00 PT | rejected 池复检 |
 | `stock-options-paper` | 每小时 :10 | 期权纸面模拟：对当轮新信号按 mid 开仓，正股出场时平仓（**绝不下单**） |
@@ -160,10 +160,27 @@ ssh -A mac-studio "cd /Users/congrenhan/Documents/quantrift_stock && git push"
 
 - 报价取 **yfinance 实时期权链**（options-lab 数据库 bid/ask 仅 7.6% 非空，
   只用于流动性/IV 的历史分析）
-- DTE = `clamp(持仓上限交易日 × 3.5, 30, 60)`，优先月度到期
+- DTE = `clamp(持仓上限交易日 × 3.5, 30, 60)`，优先月度到期。**30 是硬下限**
+  （2026-09-03 起）：低于 30 天的到期一律不选。理由是流动性不是 theta——实测
+  同一标的近月 vs 次月 ATM，PLTR OI 618→4,004、HOOD 208→3,161，价差双双腰斩；
+  而实际持仓中位仅 6 小时、出场时最少还剩 15.7 天 DTE，theta 从未咬到。
 - 准入看"有无真实双边市场"（OI≥50），**不按价差过滤**；账本同记保守口径
   （买ask/卖bid）供对照
+- **并发锁**（`data/.options_paper.lock`，2026-09-03 起）：`main()` 只在结尾
+  `_save_state()`，两个实例同时跑会各自平掉同一批仓、各写一行账本。上线首月
+  149 行里有 23 行就是这么来的（已去重，原件 `.predupe-20260903.bak`）。
 - 需要 `psycopg2-binary`（`options_liquidity.py` 读期权库时用）
+
+### 期权账本复盘（`options_review.py`，2026-09-03 起）
+
+期权账本从 8/15 上线到 9/3 **从未被复盘过**——`signal_review.py` 只看正股。
+现已挂进 `run_weekly_review.sh`，周日随正股复盘一起推 TG。
+
+核心指标是**捕获率**：正股每赚 1R 期权涨多少 %、每亏 1R 期权跌多少 %，两者
+之比。孤立看期权盈亏无法区分"策略不行"和"期权这个载体不行"，捕获率把正股
+表现除掉，只剩载体效率。全样本赢输比 **0.73（<1：同样 1R，亏的方向放大得更多）**，
+价差成本 **9.2 个点/笔**——这是目前最大的一项损耗，远超 theta。
+复盘同时自检账本质量（重复行、DTE 越界、出场时剩余 DTE）。
 
 ## 信号投递与降级（2026-08-15 起）
 
