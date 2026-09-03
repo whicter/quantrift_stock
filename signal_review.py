@@ -196,13 +196,55 @@ def _load_expectations() -> dict:
         return {}
 
 
-def _expected_r(expectations: dict, strategy: str, symbol: str, tf: str) -> tuple[float, str]:
+def _same_period_baseline(days: int) -> dict:
+    """同期回测基准：同一策略/周期在**同一段行情**里回测能拿到多少 R。
+
+    2026-09-03 发现的方法论缺陷：`expectations.json` 里的 mean_r 是十年样本的
+    长期均值（Confluence +0.285 / RSI2 +0.388），拿它当基准去判定最近 90 天的
+    实盘，等于把"这一季行情本来就不好"误读成"策略衰减"。实测同期回测（只算
+    真正开仓的行）最近 90 天 Confluence -0.163、RSI2 -0.060——也就是说回测
+    自己在这段行情里同样是亏的，而实盘 Confluence +0.289 其实是**跑赢**同期
+    回测的。用长期均值当基准，衰减监控会在每一段低于平均的行情里批量误报红灯，
+    进而触发自动降级——正好把策略在最不该关的时候关掉。
+
+    因此基准优先取同期回测；同期样本不足（<10 笔）才退回长期均值。
+    """
+    path = Path("logs/backfill_paper_equity.csv")
+    if not path.exists():
+        return {}
+    try:
+        b = pd.read_csv(path)
+        b["event_time"] = pd.to_datetime(b["event_time"], errors="coerce")
+        # 只算真正开过仓的：skip_max_open_positions / skip_duplicate_active
+        # 这些行也带 r_mult，但它们代表"没开成的仓"，混进来会稀释基准。
+        b = b[~b["decision"].astype(str).str.startswith("skip")]
+        b = b[b["event_time"] >= b["event_time"].max() - pd.Timedelta(days=days)]
+        b["r_mult"] = pd.to_numeric(b["r_mult"], errors="coerce")
+        b = b[b["r_mult"].notna()]
+    except Exception:
+        return {}
+    out = {}
+    for (strategy, tf), g in b.groupby(["strategy", "tf"]):
+        if len(g) >= 10:
+            out[(str(strategy), str(tf))] = float(g["r_mult"].mean())
+    return out
+
+
+def _expected_r(expectations: dict, strategy: str, symbol: str, tf: str,
+                same_period: dict | None = None) -> tuple[float, str]:
     """Baseline mean R for one combination, plus where it came from.
 
     Shadow variants fall back to their strategy family (RSI2_IBS_shadow ->
     RSI2), since they differ only in exit or filter handling and have no
     expectation rows of their own.
     """
+    # 同期回测基准优先（见 _same_period_baseline 的说明）
+    if same_period:
+        family = strategy[:-7] if strategy.endswith("_shadow") else strategy
+        for name in (strategy, family):
+            if (name, tf) in same_period:
+                return same_period[(name, tf)], "same_period"
+
     table = expectations.get("expectations", {})
     candidates = [strategy]
     if strategy.endswith("_shadow"):
@@ -240,6 +282,7 @@ def _append_with_schema_check(df: pd.DataFrame, path: Path) -> None:
 
 
 def _monitor(rdf: pd.DataFrame) -> None:
+    same_period = _same_period_baseline(90)
     """Write rolling live performance history and flag statistical degradation."""
     decided = rdf[pd.to_numeric(rdf["r_mult"], errors="coerce").notna()].copy()
     if decided.empty:
@@ -254,7 +297,7 @@ def _monitor(rdf: pd.DataFrame) -> None:
         recent = group.sort_values("timestamp").tail(20)
         mean = float(recent["r_mult"].mean())
         sigma = float(recent["r_mult"].std(ddof=0) / max(len(recent) ** 0.5, 1))
-        baseline, baseline_kind = _expected_r(expectations, strategy, symbol, tf)
+        baseline, baseline_kind = _expected_r(expectations, strategy, symbol, tf, same_period)
         # Measuring against this combination's own historical replay answers
         # "is it behaving worse than it ever did", rather than the far weaker
         # "did it lose money recently" that a 0R baseline tests.
@@ -283,7 +326,8 @@ def _monitor(rdf: pd.DataFrame) -> None:
     for row in sorted(graded, key=lambda r: r["z_vs_baseline"]):
         print(f"  {row['status']} {row['strategy']} {row['symbol']} {row['tf']}: "
               f"N={row['n']} 均R={row['mean_r']:+.2f} 期望={row['baseline_r']:+.2f}"
-              f"{'' if row['baseline_kind'] == 'backtest' else '(占位)'} z={row['z_vs_baseline']:+.2f}")
+              f"{ {'backtest': '', 'same_period': '(同期回测)'}.get(row['baseline_kind'], '(占位)') }"
+              f" z={row['z_vs_baseline']:+.2f}")
     if pending:
         names = ", ".join(f"{r['strategy']}/{r['symbol']}/{r['tf']}(N={r['n']})" for r in pending)
         print(f"  样本不足未判级：{names}")
@@ -310,6 +354,7 @@ def _telegram_summary(rdf: pd.DataFrame) -> None:
             lines.append(f"· {strategy}: N={len(group)} 胜率{wins:.0f}% 均R{group['r_mult'].mean():+.2f}")
 
         expectations = _load_expectations()
+        same_period = _same_period_baseline(90)
         red = []
         for (strategy, symbol, tf), group in decided.groupby(["strategy", "symbol", "tf"]):
             recent = group.sort_values("timestamp").tail(20)
@@ -317,7 +362,7 @@ def _telegram_summary(rdf: pd.DataFrame) -> None:
                 continue
             mean = float(recent["r_mult"].mean())
             sigma = float(recent["r_mult"].std(ddof=0) / max(len(recent) ** 0.5, 1))
-            baseline, _ = _expected_r(expectations, strategy, symbol, tf)
+            baseline, _ = _expected_r(expectations, strategy, symbol, tf, same_period)
             if sigma > 0 and (mean - baseline) / sigma < -2:
                 red.append(f"{strategy}/{symbol}/{tf}(均R{mean:+.2f} vs 期望{baseline:+.2f}, N={len(recent)})")
         if red:
@@ -326,7 +371,9 @@ def _telegram_summary(rdf: pd.DataFrame) -> None:
 
     lines.append("")
     meta = _load_expectations().get("_meta", {})
-    baseline_note = (f"基准=回测期望表（{meta['combinations']} 组合）" if meta
+    sp = _same_period_baseline(90)
+    baseline_note = (f"基准=同期回测（近90天，{len(sp)} 个策略/周期）" if sp
+                     else f"基准=回测期望表（{meta['combinations']} 组合）" if meta
                      else "基准=0R 占位（期望表缺失）")
     lines.append(f"{baseline_note}；N<{MIN_MONITOR_SAMPLES} 不判级")
     lines.append("详情：logs/review_history.csv")
