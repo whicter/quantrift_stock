@@ -28,6 +28,11 @@ from pathlib import Path
 warnings.filterwarnings("ignore")
 
 import pandas as pd
+from dotenv import load_dotenv
+
+# pm2 的 stock-weekly-review 会经 env 注入 TG 凭证，但手动跑时不会——
+# 补一次 .env 加载，让两条路径行为一致（否则手动复盘会静默不推送）。
+load_dotenv()
 
 LEDGER = Path("logs/options_paper_log.csv")
 MIN_DTE = 30          # 与 options_paper.MIN_DTE 对齐，用于数据质量校验
