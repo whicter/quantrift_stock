@@ -55,6 +55,7 @@ from data_providers import get_provider
 from mag7_rotation import run_rotation
 from meta_label import suggest as meta_label_suggest
 from paper_portfolio import open_position as paper_open_position, risk_warnings as paper_risk_warnings, update as paper_update
+import review_core
 from review_core import hold_description
 from sector_map import sector_of
 
@@ -470,7 +471,7 @@ _SIGNAL_LOG_PATH = Path("logs/signal_log.csv")
 _LOG_FIELDS = [
     "timestamp", "bar_date", "symbol", "tf", "strategy", "direction", "entry_price", "atr", "tp1", "tp2", "sl",
     "market_score", "vix", "quality", "signal_id", "source", "is_shadow", "source_strategy", "params_json",
-    "sector_aligned", "screener_rank", "market_regime",
+    "sector_aligned", "screener_rank", "market_regime", "is_repeat",
 ]
 
 def _ensure_log_schema():
@@ -490,7 +491,8 @@ def _ensure_log_schema():
 
 def _log_signal(symbol: str, tf: str, bar_date: str, sig: dict, *, params: dict | None = None,
                 is_shadow: bool = False, source_strategy: str = "", sector_aligned: bool | None = None,
-                screener_rank: int | None = None, market_regime: str = "") -> dict:
+                screener_rank: int | None = None, market_regime: str = "",
+                is_repeat: bool = False) -> dict:
     """将信号追加写入 logs/signal_log.csv（永久保留，不自动清理）。"""
     _SIGNAL_LOG_PATH.parent.mkdir(exist_ok=True)
     _ensure_log_schema()
@@ -518,6 +520,7 @@ def _log_signal(symbol: str, tf: str, bar_date: str, sig: dict, *, params: dict 
         "sector_aligned": sector_aligned if sector_aligned is not None else "",
         "screener_rank": screener_rank if screener_rank is not None else "",
         "market_regime": market_regime,
+        "is_repeat":    int(is_repeat),
     }
     write_header = not _SIGNAL_LOG_PATH.exists()
     with open(_SIGNAL_LOG_PATH, "a", newline="") as f:
@@ -526,6 +529,77 @@ def _log_signal(symbol: str, tf: str, bar_date: str, sig: dict, *, params: dict 
             writer.writeheader()
         writer.writerow(row)
     return row
+
+
+# ── 想法级去重 ──────────────────────────────────────────────────────────
+#
+# 2026-09-03 发现：引擎没有持仓状态，只要入场条件还成立，同一个交易想法每根
+# bar 都会重新播报一次。90 天内 470 条信号其实只有 210 个独立想法，平均每个
+# 播 2.1 次，NVDA/RSI2 曾连播 5 天、QQQ 连播 12 条。
+#
+# 后果有两层，第二层更严重：
+#   1. 用户被同一个想法反复打扰；
+#   2. 回测里一个想法只开一次仓，实盘却把每次重播都当成独立交易记进复盘，
+#      而重播都是同一波行情里越来越晚的入场点，均 R 被系统性拉低。实测
+#      Confluence 全部信号 +0.224R、只算首播 +0.282R，而回测期望是 +0.285R
+#      ——Confluence 所谓的「衰减」完全是这个口径问题造出来的假象。
+#
+# 判定「还是同一个想法」用的是回测同一套出场逻辑（review_core.evaluate）：
+# 首播那条信号若尚未出场，本次就是重播。这样实盘与回测的"一次交易"定义完全
+# 对齐，而不是靠"隔几天算新的"这种拍脑袋阈值。
+_OPEN_IDEAS_PATH = Path("data/.open_ideas.json")
+_open_ideas: dict | None = None
+
+
+def _idea_key(symbol: str, tf: str, strategy: str, direction: str) -> str:
+    return f"{symbol}|{tf}|{strategy}|{direction}"
+
+
+def _load_open_ideas() -> dict:
+    global _open_ideas
+    if _open_ideas is None:
+        try:
+            _open_ideas = json.loads(_OPEN_IDEAS_PATH.read_text())
+        except Exception:
+            _open_ideas = {}
+    return _open_ideas
+
+
+def _save_open_ideas() -> None:
+    if _open_ideas is None:
+        return
+    try:
+        _OPEN_IDEAS_PATH.parent.mkdir(exist_ok=True)
+        _OPEN_IDEAS_PATH.write_text(json.dumps(_open_ideas, ensure_ascii=False, indent=1))
+    except Exception as e:
+        print(f"  ⚠️ 写 open_ideas 失败: {e}")
+
+
+def _is_repeat_idea(symbol: str, tf: str, strategy: str, direction: str,
+                    price: pd.DataFrame) -> bool:
+    """首播的那笔若还没出场，本次信号就是重播。"""
+    ideas = _load_open_ideas()
+    prev = ideas.get(_idea_key(symbol, tf, strategy, direction))
+    if not prev:
+        return False
+    try:
+        res = review_core.evaluate(pd.Series(prev), price)
+        cap = review_core.hold_bars(pd.Series(prev))
+    except Exception:
+        return False          # 判不了就当新想法，宁可多发不可漏发
+    # review_core 走到数据末尾时一律返回「时间止损」，它分不清"真的到了持仓上限"
+    # 和"行情数据就到这儿了"。对实时判定来说这两者完全相反：前者是仓位已了结，
+    # 后者是仓位还开着。用已走过的 bar 数与该信号自身的持仓上限比较来区分。
+    outcome, bars = res.get("outcome"), int(res.get("bars") or 0)
+    if outcome == "未决" or (outcome == "时间止损" and bars < cap):
+        return True
+    ideas.pop(_idea_key(symbol, tf, strategy, direction), None)
+    return False
+
+
+def _register_idea(row: dict) -> None:
+    _load_open_ideas()[_idea_key(row["symbol"], row["tf"],
+                                 row["strategy"], row["direction"])] = row
 
 
 # ── Telegram ────────────────────────────────────────────────────────────
@@ -549,7 +623,12 @@ def tg_alert(msg: str):
 
 # ── IB 数据获取 ──────────────────────────────────────────────────────────
 
-_YF_PERIOD = {"1h": "60d", "4h": "60d", "1d": "3y"}
+# 4h 用 730d 而不是 60d：4h 由 1h 重采样而来，60d 只得到 ~119 根 4h bar，
+# 而 check_rsi2_signal 开头就是 `if len(df) < 210: return None`（SMA200 需要
+# 200 根）——于是 36 条 RSI2 4h 路由从上线起一条信号都没发过，signal_log 里
+# RSI2/4h 历史累计为 0。yfinance 的 1h 数据可回溯 730 天，重采样后有 ~1,700
+# 根 4h bar。实测 Confluence 4h 的当前 bar 判定不受影响（它只要 50 根）。
+_YF_PERIOD = {"1h": "60d", "4h": "730d", "1d": "3y"}
 _YF_INTERVAL = {"1h": "1h", "4h": "1h", "1d": "1d"}   # yfinance 无 4h，用 1h 重采样
 
 
@@ -1688,14 +1767,20 @@ def run_scan(ib=None):
                             msg += "\n" + extra
                         if portfolio:
                             msg += "\n" + portfolio
-                        print(f"\n  ⚡ 信号：{symbol} {tf} {sig['direction']} [Confluence]")
-                        print(msg)
-                        _queue_alert(queued_alerts, demoted_routes, symbol, tf,
-                                     "confluence", sig["direction"], msg)
+                        _repeat = _is_repeat_idea(symbol, tf, "Confluence", sig["direction"], df_raw)
                         row = _log_signal(symbol, tf, bar_date, sig, params=params,
                                           sector_aligned=not soxx_below_ma50 if symbol in SEMI_SYMBOLS else None,
-                                          screener_rank=screener_ranks.get(symbol), market_regime=market_regime)
-                        paper_open_position(row)
+                                          screener_rank=screener_ranks.get(symbol), market_regime=market_regime,
+                                          is_repeat=_repeat)
+                        if _repeat:
+                            print(f"  {symbol} {tf}: 同一想法尚未出场，记为重播不推送 [Confluence]")
+                        else:
+                            print(f"\n  ⚡ 信号：{symbol} {tf} {sig['direction']} [Confluence]")
+                            print(msg)
+                            _queue_alert(queued_alerts, demoted_routes, symbol, tf,
+                                         "confluence", sig["direction"], msg)
+                            paper_open_position(row)
+                            _register_idea(row)
                         if (symbol, tf) == ("TSLA", "4h"):
                             shadow_p = {**params, "exit_variant": "ssl_exit"}
                             _log_shadow(symbol, tf, bar_date, sig, shadow_p, "TSLA_SSLTrail",
@@ -1731,14 +1816,20 @@ def run_scan(ib=None):
                             msg += "\n" + extra
                         if portfolio:
                             msg += "\n" + portfolio
-                        print(f"\n  ⚡ 信号：{symbol} {tf} 做多 [RSI2 v2]")
-                        print(msg)
-                        _queue_alert(queued_alerts, demoted_routes, symbol, tf,
-                                     "rsi2", "做多", msg)
+                        _repeat = _is_repeat_idea(symbol, tf, "RSI2", "做多", df_raw)
                         row = _log_signal(symbol, tf, bar_date, sig, params=p,
                                           sector_aligned=not soxx_below_ma50 if symbol in SEMI_SYMBOLS else None,
-                                          screener_rank=screener_ranks.get(symbol), market_regime=market_regime)
-                        paper_open_position(row)
+                                          screener_rank=screener_ranks.get(symbol), market_regime=market_regime,
+                                          is_repeat=_repeat)
+                        if _repeat:
+                            print(f"  {symbol} {tf}: 同一想法尚未出场，记为重播不推送 [RSI2]")
+                        else:
+                            print(f"\n  ⚡ 信号：{symbol} {tf} 做多 [RSI2 v2]")
+                            print(msg)
+                            _queue_alert(queued_alerts, demoted_routes, symbol, tf,
+                                         "rsi2", "做多", msg)
+                            paper_open_position(row)
+                            _register_idea(row)
                         if _ibs(df_raw) < 0.2:
                             shadow_p = {**p, "use_ibs_filter": True}
                             _log_shadow(symbol, tf, bar_date, sig, shadow_p, "RSI2_IBS",
@@ -1771,14 +1862,20 @@ def run_scan(ib=None):
                             msg += "\n" + extra
                         if portfolio:
                             msg += "\n" + portfolio
-                        print(f"\n  ⚡ 信号：{symbol} {tf} 做多 [MR]")
-                        print(msg)
-                        _queue_alert(queued_alerts, demoted_routes, symbol, tf,
-                                     "mr", "做多", msg)
+                        _repeat = _is_repeat_idea(symbol, tf, "MR", "做多", df_raw)
                         row = _log_signal(symbol, tf, bar_date, sig, params=p,
                                           sector_aligned=not soxx_below_ma50 if symbol in SEMI_SYMBOLS else None,
-                                          screener_rank=screener_ranks.get(symbol), market_regime=market_regime)
-                        paper_open_position(row)
+                                          screener_rank=screener_ranks.get(symbol), market_regime=market_regime,
+                                          is_repeat=_repeat)
+                        if _repeat:
+                            print(f"  {symbol} {tf}: 同一想法尚未出场，记为重播不推送 [MR]")
+                        else:
+                            print(f"\n  ⚡ 信号：{symbol} {tf} 做多 [MR]")
+                            print(msg)
+                            _queue_alert(queued_alerts, demoted_routes, symbol, tf,
+                                         "mr", "做多", msg)
+                            paper_open_position(row)
+                            _register_idea(row)
                         _sent_signals[dedup_key] = bar_date
                         _save_sent_signals(_sent_signals)
                         found += 1
@@ -1819,14 +1916,20 @@ def run_scan(ib=None):
                     msg += "\n" + extra
                 if portfolio:
                     msg += "\n" + portfolio
-                print(f"\n  🚀 突破信号：{symbol} 1d [Breakout52W]")
-                print(msg)
-                _queue_alert(queued_alerts, demoted_routes, symbol, "1d",
-                             "breakout", "做多", msg)
+                _repeat = _is_repeat_idea(symbol, "1d", "Breakout52W", "做多", df_raw)
                 row = _log_signal(symbol, "1d", bar_date, sig, params=BREAKOUT_PARAMS.get(symbol, {}),
                                   sector_aligned=not soxx_below_ma50 if symbol in SEMI_SYMBOLS else None,
-                                  screener_rank=screener_ranks.get(symbol), market_regime=market_regime)
-                paper_open_position(row)
+                                  screener_rank=screener_ranks.get(symbol), market_regime=market_regime,
+                                  is_repeat=_repeat)
+                if _repeat:
+                    print(f"  {symbol} 1d: 同一想法尚未出场，记为重播不推送 [Breakout52W]")
+                else:
+                    print(f"\n  🚀 突破信号：{symbol} 1d [Breakout52W]")
+                    print(msg)
+                    _queue_alert(queued_alerts, demoted_routes, symbol, "1d",
+                                 "breakout", "做多", msg)
+                    paper_open_position(row)
+                    _register_idea(row)
                 _sent_signals[dedup_key] = bar_date
                 _save_sent_signals(_sent_signals)
                 found += 1
@@ -1854,6 +1957,7 @@ def run_scan(ib=None):
         tg_alert(f"⚠️ 数据源异常：本轮扫描 {fetch_failures}/{fetch_attempts} 次拉取失败"
                  f"（>20%），yfinance 可能被限流，信号覆盖不完整")
     _flush_sector_alerts(queued_alerts)
+    _save_open_ideas()
     print(f"\n扫描完成，发现 {found} 个信号（数据拉取 {fetch_attempts - fetch_failures}/{fetch_attempts}），推送 {len(queued_alerts)} 条分 {len({a['sector'] for a in queued_alerts})} 个板块）")
     if found == 0:
         print("  (无信号)")

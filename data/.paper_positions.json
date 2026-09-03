@@ -1,5 +1,5 @@
 {
-  "equity": 90849.81,
+  "equity": 92216.79,
   "positions": [
     {
       "timestamp": "2026-07-20 07:00",
@@ -16751,11 +16751,16 @@
       "screener_rank": "",
       "market_regime": "neutral",
       "opened_at": "2026-09-02T13:00:14",
-      "status": "open",
+      "status": "closed",
       "risk_pct": 0.0075,
       "weight": 0.1,
       "tp1_seen": false,
-      "pyramiding_notified": false
+      "pyramiding_notified": false,
+      "outcome": "时间止损",
+      "r_mult": 1.196,
+      "bars": 1,
+      "exit_model": "close",
+      "closed_at": "2026-09-03T13:00:28"
     },
     {
       "timestamp": "2026-09-02 13:00",
@@ -16781,11 +16786,16 @@
       "screener_rank": "",
       "market_regime": "neutral",
       "opened_at": "2026-09-02T13:00:14",
-      "status": "open",
+      "status": "closed",
       "risk_pct": 0.0075,
       "weight": 0.1,
       "tp1_seen": false,
-      "pyramiding_notified": false
+      "pyramiding_notified": false,
+      "outcome": "时间止损",
+      "r_mult": 1.656,
+      "bars": 1,
+      "exit_model": "close",
+      "closed_at": "2026-09-03T13:00:28"
     },
     {
       "timestamp": "2026-09-02 13:00",
@@ -16811,11 +16821,16 @@
       "screener_rank": "",
       "market_regime": "neutral",
       "opened_at": "2026-09-02T13:00:18",
-      "status": "open",
+      "status": "closed",
       "risk_pct": 0.0075,
       "weight": 0.1,
       "tp1_seen": false,
-      "pyramiding_notified": false
+      "pyramiding_notified": false,
+      "outcome": "时间止损",
+      "r_mult": 0.896,
+      "bars": 1,
+      "exit_model": "close",
+      "closed_at": "2026-09-03T13:00:28"
     },
     {
       "timestamp": "2026-09-02 13:00",
@@ -16841,11 +16856,16 @@
       "screener_rank": "",
       "market_regime": "neutral",
       "opened_at": "2026-09-02T13:00:27",
-      "status": "open",
+      "status": "closed",
       "risk_pct": 0.0075,
       "weight": 0.1,
       "tp1_seen": false,
-      "pyramiding_notified": false
+      "pyramiding_notified": false,
+      "outcome": "时间止损",
+      "r_mult": -0.284,
+      "bars": 1,
+      "exit_model": "close",
+      "closed_at": "2026-09-03T13:00:28"
     },
     {
       "timestamp": "2026-09-03 08:00",
@@ -17099,39 +17119,75 @@
       "exit_model": "close",
       "ambiguity": null,
       "closed_at": "2026-09-03T10:00:28"
+    },
+    {
+      "timestamp": "2026-09-03 13:00",
+      "bar_date": "2026-09-03",
+      "symbol": "IREN",
+      "tf": "1h",
+      "strategy": "Confluence",
+      "direction": "做多",
+      "entry_price": 41.62,
+      "atr": 0.8156,
+      "tp1": 42.4356,
+      "tp2": 44.8824,
+      "sl": 40.4407,
+      "market_score": 3.0,
+      "vix": 14.36,
+      "quality": 6,
+      "signal_id": "IREN|1h|Confluence|2026-09-03|做多",
+      "source": "live",
+      "is_shadow": 0,
+      "source_strategy": "",
+      "params_json": "{\"adx_len\": 14, \"adx_threshold\": 25.0, \"allow_reversal_flip\": true, \"allow_short\": true, \"atr_sl_mult\": 1.5, \"atr_tp1_mult\": 1.0, \"atr_tp2_mult\": 4.0, \"cash\": 100000, \"ci_len\": 14, \"ci_threshold\": 61.8, \"commission\": 0.001, \"conflict_threshold\": 2, \"contract_size\": 1, \"exit_len\": 14, \"interval\": \"1h\", \"macd_fast\": 12, \"macd_signal\": 7, \"macd_slow\": 26, \"margin\": 0.5, \"max_market_score_short\": 2, \"min_market_score\": 2, \"min_score\": 5, \"n_contracts\": 1, \"reversal_score\": 2, \"rsi_len\": 17, \"rsi_mr_ob\": 65.0, \"rsi_mr_os\": 35.0, \"rsi_ob\": 70, \"rsi_os\": 30, \"sqz_bbl\": 20, \"sqz_bbm\": 2.0, \"sqz_kcl\": 20, \"sqz_kcm\": 2.4, \"ssl2_len\": 10, \"ssl_len\": 20, \"ssl_mult\": 0.22, \"tp1_portion\": 0.34, \"trend_filter_len\": 200, \"use_adx\": true, \"use_bbmc_dir\": true, \"use_breakeven_after_tp1\": false, \"use_ci\": true, \"use_fixed_initial_sl\": true, \"use_regime_filter\": true, \"use_squeeze_mr\": false, \"use_staged_tp\": true, \"use_trend_filter\": true, \"use_vol\": true, \"ut_atr\": 8, \"ut_key\": 1.5, \"vol_len\": 20, \"vol_mult\": 1.0}",
+      "sector_aligned": "",
+      "screener_rank": "",
+      "market_regime": "neutral",
+      "opened_at": "2026-09-03T13:00:05",
+      "status": "closed",
+      "risk_pct": 0.0075,
+      "weight": 0.1,
+      "tp1_seen": false,
+      "pyramiding_notified": false,
+      "outcome": "止损",
+      "r_mult": -1.446,
+      "bars": 1,
+      "exit_model": "close",
+      "ambiguity": null,
+      "closed_at": "2026-09-03T13:00:28"
+    },
+    {
+      "timestamp": "2026-09-03 13:00",
+      "bar_date": "2026-09-03",
+      "symbol": "CSCO",
+      "tf": "1d",
+      "strategy": "RSI2",
+      "direction": "做多",
+      "entry_price": 108.61,
+      "atr": 2.9067,
+      "tp1": 0.0,
+      "tp2": 0.0,
+      "sl": 101.3432,
+      "market_score": 3.0,
+      "vix": 14.36,
+      "quality": 7,
+      "signal_id": "CSCO|1d|RSI2|2026-09-03|做多",
+      "source": "live",
+      "is_shadow": 0,
+      "source_strategy": "",
+      "params_json": "{\"max_hold_bars\": 30, \"use_rs_filter\": false}",
+      "sector_aligned": "",
+      "screener_rank": "",
+      "market_regime": "neutral",
+      "opened_at": "2026-09-03T13:00:28",
+      "status": "open",
+      "risk_pct": 0.0075,
+      "weight": 0.1,
+      "tp1_seen": false,
+      "pyramiding_notified": false
     }
   ],
   "events": [
-    {
-      "type": "closed",
-      "symbol": "LUNR",
-      "outcome": "时间止损",
-      "r_mult": 0.0
-    },
-    {
-      "type": "closed",
-      "symbol": "STX",
-      "outcome": "时间止损",
-      "r_mult": 0.235
-    },
-    {
-      "type": "closed",
-      "symbol": "WDC",
-      "outcome": "时间止损",
-      "r_mult": 0.337
-    },
-    {
-      "type": "closed",
-      "symbol": "MU",
-      "outcome": "时间止损",
-      "r_mult": 0.314
-    },
-    {
-      "type": "closed",
-      "symbol": "PLTR",
-      "outcome": "时间止损",
-      "r_mult": 0.0
-    },
     {
       "type": "closed",
       "symbol": "SOXX",
@@ -18301,6 +18357,36 @@
       "symbol": "SMCI",
       "outcome": "止损",
       "r_mult": 0.013
+    },
+    {
+      "type": "closed",
+      "symbol": "MSFT",
+      "outcome": "时间止损",
+      "r_mult": 1.196
+    },
+    {
+      "type": "closed",
+      "symbol": "PLTR",
+      "outcome": "时间止损",
+      "r_mult": 1.656
+    },
+    {
+      "type": "closed",
+      "symbol": "CRWD",
+      "outcome": "时间止损",
+      "r_mult": 0.896
+    },
+    {
+      "type": "closed",
+      "symbol": "CSCO",
+      "outcome": "时间止损",
+      "r_mult": -0.284
+    },
+    {
+      "type": "closed",
+      "symbol": "IREN",
+      "outcome": "止损",
+      "r_mult": -1.446
     }
   ]
 }

@@ -371,6 +371,15 @@ def main():
     else:
         df["source"] = df["source"].fillna("live").replace("", "live")
 
+    # 重播不计入复盘。引擎在同一个交易想法尚未出场时会每根 bar 重新播报一次，
+    # 而回测里一个想法只开一次仓。把重播当成独立交易统计，等于把同一波行情里
+    # 越来越晚的入场点全部计入，均 R 被系统性拉低——实测 Confluence 含重播
+    # +0.224R、去重后 +0.289R，而回测期望 +0.285R。所谓的「Confluence 衰减」
+    # 完全是这个口径造出来的假象。重播仍然写进 signal_log（账本记全），只是
+    # 不参与绩效统计。
+    if "is_repeat" in df:
+        df = df[pd.to_numeric(df["is_repeat"], errors="coerce").fillna(0) != 1]
+
     df["timestamp"] = pd.to_datetime(df["timestamp"])
     df["tp1"] = pd.to_numeric(df["tp1"], errors="coerce").fillna(0)
     df["tp2"] = pd.to_numeric(df["tp2"], errors="coerce").fillna(0)
