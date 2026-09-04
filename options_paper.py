@@ -91,6 +91,12 @@ FRESH_MINUTES = 30
 
 # 目标到期上限（天）。见 pick_contract 里的说明：超过约 60DTE 后，我们标的池里
 # 多数合约的未平仓量断崖式下跌，宁可承担多一些 theta 也不要开在无人交易的合约上。
+# 每笔期权分配的名义预算。正股纸面组合按 RISK_PCT=0.75% 的风险预算下单，
+# 期权买方最大亏损就是权利金，故直接把「每笔投入的美元」定成同一量级，
+# 两边的盈亏才有可比性。2026-09-03 之前账本只记百分比、不记数量，导致
+# 「这套东西到底赚了多少钱」根本算不出来——复盘只能停在百分比上。
+BUDGET_USD = 750.0
+
 MIN_DTE = 30          # 到期硬下限：低于此天数的合约一律不选
 MAX_TARGET_DTE = 60
 
@@ -99,7 +105,7 @@ FIELDS = [
     "contract", "expiry", "strike", "right", "dte_at_entry",
     "stock_entry", "stock_exit", "stock_r",
     "opt_entry_ask", "opt_entry_mid", "opt_exit_bid", "opt_exit_mid",
-    "opt_return_pct", "opt_return_mid_pct", "iv_entry", "oi_entry", "exit_reason",
+    "opt_return_pct", "opt_return_mid_pct", "iv_entry", "oi_entry", "exit_reason", "contracts", "cost_usd", "pnl_usd",
 ]
 
 
@@ -293,7 +299,12 @@ def open_new(state: dict) -> int:
         c = pick_contract(str(r["symbol"]), str(r["direction"]), _hold_days(r))
         if not c:
             continue
+        # 一张合约 = 100 股。预算买不起一张就买一张（如实记录真实成本），
+        # 不为了凑预算去编一个分数张数。
+        contracts = max(1, int(BUDGET_USD // (c["mid"] * 100))) if c["mid"] > 0 else 1
         state[sid] = {
+            "contracts": contracts,
+            "cost_usd": round(c["mid"] * 100 * contracts, 2),
             "opened_at": datetime.now().isoformat(timespec="seconds"),
             "symbol": str(r["symbol"]), "tf": str(r["tf"]),
             "strategy": str(r["strategy"]), "direction": str(r["direction"]),
@@ -352,6 +363,10 @@ def close_finished(state: dict) -> int:
             "opt_return_mid_pct": round(ret_mid, 1) if ret_mid is not None else "",
             "iv_entry": pos["opt_iv"], "oi_entry": pos["opt_oi"],
             "exit_reason": res.get("outcome"),
+            "contracts": pos.get("contracts", ""),
+            "cost_usd": pos.get("cost_usd", ""),
+            "pnl_usd": (round((q["mid"] - entry_mid) * 100 * pos["contracts"], 2)
+                        if pos.get("contracts") else ""),
         })
         print(f"  － {pos['symbol']} {pos['tf']} 平仓：正股 {res.get('r_mult'):+.2f}R "
               f"／期权(mid) {ret_mid:+.1f}%　保守口径 {ret:+.1f}%（{res.get('outcome')}）")

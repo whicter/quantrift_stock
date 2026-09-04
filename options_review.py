@@ -136,6 +136,18 @@ def _block(df: pd.DataFrame, title: str) -> list[str]:
             out.append(f"  赢输比90%区间   [{bs[1]:.2f}, {bs[2]:.2f}]　{verdict}")
     out.append(f"  持仓           中位 {df.hold_d.median() * 24:.1f} 小时　"
                f"最长 {df.hold_d.max():.1f} 天")
+
+    # 美元口径。复盘停在百分比上是不够的——"赢输比 0.86"回答不了"这套东西
+    # 到底赚了多少钱"。2026-09-03 之前账本连张数都不记，根本算不出来。
+    # 注意「累计权利金」是**换手额**不是占用资金：这些仓位是三周里前后开的，
+    # 不同时持有。
+    if "cost_usd" in df and df["cost_usd"].notna().any():
+        c = pd.to_numeric(df["cost_usd"], errors="coerce")
+        pm = pd.to_numeric(df.get("pnl_usd"), errors="coerce")
+        have = c.notna() & pm.notna()
+        if have.any():
+            out.append(f"  美元口径       累计权利金 ${c[have].sum():,.0f}（换手额，非占用资金）　"
+                       f"盈亏 ${pm[have].sum():+,.0f}　单笔均值 ${pm[have].mean():+,.1f}")
     return out
 
 
@@ -219,6 +231,10 @@ def telegram(days: int) -> None:
     dupes, under = d.attrs.get("dupes_dropped", 0), int((d.dte_at_entry < MIN_DTE).sum())
     if dupes or under:
         lines += ["", f"⚠️ 账本：重复 {dupes} 条／DTE 越界 {under} 笔"]
+    if "pnl_usd" in d:
+        pm = pd.to_numeric(d["pnl_usd"], errors="coerce").dropna()
+        if len(pm):
+            lines.append(f"美元盈亏 ${pm.sum():+,.0f}（{len(pm)} 笔有金额记录）")
     lines.append("详情：logs/options_paper_log.csv")
 
     import requests
