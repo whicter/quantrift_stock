@@ -213,6 +213,23 @@ module.exports = {
       log_date_format: "YYYY-MM-DD HH:mm:ss",
     },
     {
+      // 期权白名单重测。周三 11:00 PT = 14:00 ET，稳稳落在盘中——
+      // options_whitelist.py 自己也会拒绝盘后运行，双保险。
+      name: "stock-options-whitelist",
+      script: "/bin/zsh",
+      args: "run_options_whitelist.sh",
+      cwd: "/Users/congrenhan/Documents/quantrift_stock",
+      interpreter: "none",
+      autorestart: false,
+      cron_restart: "0 11 * * 3",
+      env: {
+        TG_TOKEN: envVars.TG_TOKEN || "",
+        TG_CHAT_ID: envVars.TG_CHAT_ID || "",
+      },
+      out_file: "logs/options_whitelist_pm2_out.log",
+      error_file: "logs/options_whitelist_pm2_err.log",
+    },
+    {
       // 每月1日 06:00 PT：rejected 池复检（四策略回测+成本/walk-forward 全套验证），
       // 通过者仅推送候选报告，接入仍需人工确认。频率刻意不高于月度：
       // 反复重测同一批标的会抬高多重比较假阳性。
