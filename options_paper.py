@@ -105,7 +105,7 @@ FIELDS = [
     "contract", "expiry", "strike", "right", "dte_at_entry",
     "stock_entry", "stock_exit", "stock_r",
     "opt_entry_ask", "opt_entry_mid", "opt_exit_bid", "opt_exit_mid",
-    "opt_return_pct", "opt_return_mid_pct", "iv_entry", "oi_entry", "exit_reason", "contracts", "cost_usd", "pnl_usd",
+    "opt_return_pct", "opt_return_mid_pct", "iv_entry", "oi_entry", "exit_reason", "contracts", "cost_usd", "pnl_usd", "iv_exit", "spot_entry", "spot_exit", "contaminated",
 ]
 
 
@@ -250,7 +250,16 @@ def quote_contract(symbol: str, expiry: str, strike: float, right: str) -> dict 
             return None
         row = m.iloc[0]
         bid, ask = float(row.get("bid") or 0), float(row.get("ask") or 0)
-        return {"bid": bid, "ask": ask, "mid": round((bid + ask) / 2, 4)}
+        # 出场也记 IV 与标的价。只有入场/出场两端都有，才能把这笔的盈亏拆成
+        # 「标的走了多少」「IV 变了多少」「时间耗掉多少」三块——否则复盘只能
+        # 说「期权亏了 3%」，回答不了「亏在哪」，也就无从改进。
+        spot = 0.0
+        try:
+            spot = float(yf.Ticker(symbol).fast_info.get("lastPrice") or 0)
+        except Exception:
+            pass
+        return {"bid": bid, "ask": ask, "mid": round((bid + ask) / 2, 4),
+                "iv": float(row.get("impliedVolatility") or 0), "spot": spot}
     except Exception:
         return None
 
@@ -260,9 +269,30 @@ def _hold_days(row: pd.Series) -> float:
     return hold_bars(row, tf) / review_core.BARS_PER_DAY.get(tf, 1)
 
 
+_price_cache: dict[tuple[str, str], object] = {}
+
+
+def load_price(symbol: str, tf: str):
+    """出场判定用的行情：与引擎发信号时同一条数据链（yfinance 为主 + 本地兜底）。
+
+    2026-09-03 之前这里直接读本地 CSV。本地数据由夜间 IB 任务保鲜，而那个任务
+    会静默失败——实测 25 个已路由标的的 1h/4h 停在 8/21，于是 8/24 之后开的
+    期权仓位在评估时 `future` 是空的，出场判定永远得不出结果。信号是用 yfinance
+    生成的，出场却拿陈旧的本地数据判，这个错配本身就是 bug：两边必须同源。
+    """
+    key = (symbol, tf)
+    if key not in _price_cache:
+        try:
+            import alert_engine as ae
+            _price_cache[key] = ae.fetch_bars(None, symbol, tf)
+        except Exception:
+            import rsi2_backtest as r2
+            _price_cache[key] = r2.load_data(symbol, tf)
+    return _price_cache[key]
+
+
 def r2_load(symbol: str, tf: str):
-    import rsi2_backtest as r2
-    return r2.load_data(symbol, tf)
+    return load_price(symbol, tf)
 
 
 def open_new(state: dict) -> int:
@@ -304,6 +334,7 @@ def open_new(state: dict) -> int:
         contracts = max(1, int(BUDGET_USD // (c["mid"] * 100))) if c["mid"] > 0 else 1
         state[sid] = {
             "contracts": contracts,
+            "spot_entry": float(r.get("entry_price") or 0),
             "cost_usd": round(c["mid"] * 100 * contracts, 2),
             "opened_at": datetime.now().isoformat(timespec="seconds"),
             "symbol": str(r["symbol"]), "tf": str(r["tf"]),
@@ -328,13 +359,12 @@ def open_new(state: dict) -> int:
 
 def close_finished(state: dict) -> int:
     """正股信号已出场的，按当前期权报价平掉纸面仓。"""
-    import rsi2_backtest as r2
     closed = 0
     msgs: list[str] = []
     for sid in list(state):
         pos = state[sid]
         row = pd.Series(pos["signal_row"])
-        price = r2.load_data(pos["symbol"], pos["tf"])
+        price = load_price(pos["symbol"], pos["tf"])
         if price is None:
             continue
         res = evaluate(row, price)
@@ -367,6 +397,9 @@ def close_finished(state: dict) -> int:
             "cost_usd": pos.get("cost_usd", ""),
             "pnl_usd": (round((q["mid"] - entry_mid) * 100 * pos["contracts"], 2)
                         if pos.get("contracts") else ""),
+            "iv_exit": round(q.get("iv", 0), 4),
+            "spot_entry": pos.get("spot_entry", ""),
+            "spot_exit": round(q.get("spot", 0), 4),
         })
         print(f"  － {pos['symbol']} {pos['tf']} 平仓：正股 {res.get('r_mult'):+.2f}R "
               f"／期权(mid) {ret_mid:+.1f}%　保守口径 {ret:+.1f}%（{res.get('outcome')}）")

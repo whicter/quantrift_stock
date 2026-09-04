@@ -55,6 +55,17 @@ def load_ledger() -> pd.DataFrame:
     d = d.drop_duplicates(subset=["signal_id", "opened_at"], keep="first")
     d.attrs["dupes_dropped"] = n_raw - len(d)
 
+    # 2026-09-03 之前的全部记录作废：那时 review_core 走到数据末尾会返回
+    # 「时间止损」，于是每个仓位在开仓后一两根 bar 就被判为出场（136 笔里
+    # 中位持仓 6 小时、75% 不到 8 小时）。基于它算出来的赢输比、价差成本、
+    # 「持仓中位 6 小时」全部无效，不能混进新样本里稀释结论。
+    if "contaminated" in d:
+        bad = pd.to_numeric(d["contaminated"], errors="coerce").fillna(0) == 1
+        d.attrs["contaminated_dropped"] = int(bad.sum())
+        d = d[~bad]
+    else:
+        d.attrs["contaminated_dropped"] = 0
+
     for c in ("opt_return_mid_pct", "opt_return_pct", "stock_r",
               "opt_entry_mid", "opt_entry_ask", "dte_at_entry"):
         d[c] = pd.to_numeric(d[c], errors="coerce")
@@ -156,6 +167,9 @@ def _quality(df: pd.DataFrame) -> list[str]:
     out = ["── 账本质量 ──"]
     dupes = df.attrs.get("dupes_dropped", 0)
     out.append(f"  重复行 {dupes} 条（已剔除）" + ("　⚠️ 并发锁可能失效" if dupes else "　✅"))
+    bad = df.attrs.get("contaminated_dropped", 0)
+    if bad:
+        out.append(f"  作废 {bad} 条（2026-09-03 提前平仓 bug 之前的记录，已排除）")
     under = int((df.dte_at_entry < MIN_DTE).sum())
     out.append(f"  入场 DTE < {MIN_DTE} 的 {under} 笔 / {len(df)}"
                + ("　⚠️ 违反到期下限" if under else "　✅"))
@@ -168,6 +182,13 @@ def _quality(df: pd.DataFrame) -> list[str]:
 def report(days: int) -> str:
     d = load_ledger()
     if d.empty:
+        bad = d.attrs.get("contaminated_dropped", 0)
+        if bad:
+            return (f"期权纸面账本：{bad} 条历史记录已作废（2026-09-03 提前平仓 bug），"
+                    f"干净样本尚未积累。\n"
+                    f"修复内容：review_core 不再把「数据走完」当成「时间止损」；"
+                    f"出场判定改用与引擎同源的行情；出场记录 IV 与两端标的价以便归因。\n"
+                    f"新样本从今天起累积，下周复盘才有可用结论。")
         return "期权纸面账本无已平仓记录。"
     cutoff = pd.Timestamp.now().normalize() - pd.Timedelta(days=days)
     recent = d[d.closed_at >= cutoff]
