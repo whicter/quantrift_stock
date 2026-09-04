@@ -226,6 +226,17 @@ def eval_confluence(row: pd.Series | dict, price: pd.DataFrame, max_bars: int) -
         prev_close = close
     remaining = 1 - sum(STAGED_PORTIONS[:stage - 1])
     realized += remaining * _r(entry, float(future["Close"].iloc[-1]), atr, direction)
+    # 数据没走完 ≠ 到了持仓上限。走到 future 末尾却还没满 max_bars，说明只是
+    # 「行情数据就到这儿了」，仓位其实还开着——这两种情况的语义完全相反。
+    # 2026-09-03 之前这里一律返回「时间止损」，后果是 paper_portfolio.update()
+    # 把每个刚开的仓在下一轮扫描就判为已平仓：484 笔里 459 笔是「时间止损」、
+    # 平均持仓 1.87 根 bar、68% 只持有 1 根 bar，于是权益曲线量的根本不是策略，
+    # 而是「每笔交易一根 bar 就砍掉」。options_paper 的平仓判定同样中招。
+    if len(future) < max_bars:
+        # 返回结构随出场与否而变会坑到调用方（测试就是靠 "ambiguity" 这个键
+        # 判断走的是哪条评估路径），故未决也保持本路径的完整结构。
+        return {"outcome": "未决", "r_mult": None, "bars": len(future),
+                "exit_model": "close", "ambiguity": ambiguity}
     return {"outcome": "时间止损", "r_mult": round(realized, 3), "bars": len(future), "exit_model": "close", "ambiguity": ambiguity}
 
 
@@ -259,6 +270,14 @@ def eval_rsi2(row: pd.Series | dict, price: pd.DataFrame, max_bars: int) -> dict
             realized += (0.5 if half_closed else 1.0) * _r(entry, close, atr, "做多")
             return {"outcome": "ATR追踪出场" if hit_trail else "RSI出场", "r_mult": round(realized, 3), "bars": n, "exit_model": "close"}
     realized += (0.5 if half_closed else 1.0) * _r(entry, float(future["Close"].iloc[-1]), atr, "做多")
+    # 数据没走完 ≠ 到了持仓上限。走到 future 末尾却还没满 max_bars，说明只是
+    # 「行情数据就到这儿了」，仓位其实还开着——这两种情况的语义完全相反。
+    # 2026-09-03 之前这里一律返回「时间止损」，后果是 paper_portfolio.update()
+    # 把每个刚开的仓在下一轮扫描就判为已平仓：484 笔里 459 笔是「时间止损」、
+    # 平均持仓 1.87 根 bar、68% 只持有 1 根 bar，于是权益曲线量的根本不是策略，
+    # 而是「每笔交易一根 bar 就砍掉」。options_paper 的平仓判定同样中招。
+    if len(future) < max_bars:
+        return {"outcome": "未决", "r_mult": None, "bars": len(future), "exit_model": "close"}
     return {"outcome": "时间止损", "r_mult": round(realized, 3), "bars": len(future), "exit_model": "close"}
 
 
@@ -286,6 +305,14 @@ def eval_mr(row: pd.Series | dict, price: pd.DataFrame, max_bars: int) -> dict:
         trail = max(trail, close - trail_mult * current_atr)
         if close < trail:
             return {"outcome": "ATR追踪出场", "r_mult": round(_r(entry, close, atr, "做多"), 3), "bars": n, "exit_model": "close"}
+    # 数据没走完 ≠ 到了持仓上限。走到 future 末尾却还没满 max_bars，说明只是
+    # 「行情数据就到这儿了」，仓位其实还开着——这两种情况的语义完全相反。
+    # 2026-09-03 之前这里一律返回「时间止损」，后果是 paper_portfolio.update()
+    # 把每个刚开的仓在下一轮扫描就判为已平仓：484 笔里 459 笔是「时间止损」、
+    # 平均持仓 1.87 根 bar、68% 只持有 1 根 bar，于是权益曲线量的根本不是策略，
+    # 而是「每笔交易一根 bar 就砍掉」。options_paper 的平仓判定同样中招。
+    if len(future) < max_bars:
+        return {"outcome": "未决", "r_mult": None, "bars": len(future), "exit_model": "close"}
     return {"outcome": "时间止损", "r_mult": round(_r(entry, float(future["Close"].iloc[-1]), atr, "做多"), 3),
             "bars": len(future), "exit_model": "close"}
 
