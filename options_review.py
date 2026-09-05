@@ -159,6 +159,16 @@ def _block(df: pd.DataFrame, title: str) -> list[str]:
         if have.any():
             out.append(f"  美元口径       累计权利金 ${c[have].sum():,.0f}（换手额，非占用资金）　"
                        f"盈亏 ${pm[have].sum():+,.0f}　单笔均值 ${pm[have].mean():+,.1f}")
+            # 超配仓位单独标出来。仓位大小相差十几倍时，加总盈亏反映的是仓位
+            # 差异而不是载体效率——2026-09-04 实测未平仓账面 +$4,862 里有 88%
+            # 来自 SNDK 一笔（单张 $16,280 = 预算的 21.7 倍）。
+            over = have & (c > 1500)
+            if over.any():
+                out.append(f"  ⚠️ 超配仓位     {int(over.sum())} 笔单张 >$1,500，"
+                           f"占权利金 {c[over].sum()/c[have].sum()*100:.0f}%、"
+                           f"盈亏 ${pm[over].sum():+,.0f}；"
+                           f"剔除后盈亏 ${pm[have & ~over].sum():+,.0f}"
+                           f"（{int((have & ~over).sum())} 笔）")
     return out
 
 

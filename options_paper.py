@@ -97,6 +97,19 @@ FRESH_MINUTES = 30
 # 「这套东西到底赚了多少钱」根本算不出来——复盘只能停在百分比上。
 BUDGET_USD = 750.0
 
+# 一张合约的成本超过预算这么多倍就**放弃这笔**，而不是硬买一张。
+#
+# 2026-09-04 发现：原来写的是"买不起也买一张，如实记真实成本"，看着诚实，
+# 后果是测量失效——21 个未平仓里 13 个超预算，SNDK 一张 $16,280（预算的 21.7
+# 倍、用户账户净值的 54%），13 个超配仓位占掉 89% 的资金，账面 +$4,862 浮盈
+# 里 88% 来自 SNDK 那一笔。仓位大小相差 21 倍时，加总盈亏回答不了"同一个信号
+# 做正股还是做期权划算"——那是仓位差异，不是载体差异。
+#
+# 放弃也比编造诚实：这个账户规模确实买不起那张合约。被跳过的标的会记进
+# logs/options_skipped.csv，免得"覆盖率下降"变成又一个静默失败。
+MAX_COST_MULT = 2.0
+SKIP_LOG = Path("logs/options_skipped.csv")
+
 MIN_DTE = 30          # 到期硬下限：低于此天数的合约一律不选
 MAX_TARGET_DTE = 60
 
@@ -158,6 +171,19 @@ def _load_state() -> dict:
 def _save_state(d: dict) -> None:
     STATE.parent.mkdir(exist_ok=True)
     STATE.write_text(json.dumps(d, indent=1, ensure_ascii=False))
+
+
+def _log_skip(symbol: str, tf: str, strategy: str, one_lot: float) -> None:
+    """记录因单张成本过高而放弃的信号。不记的话"覆盖率下降"就是又一次静默失败。"""
+    import csv as _csv
+    SKIP_LOG.parent.mkdir(exist_ok=True)
+    new = not SKIP_LOG.exists()
+    with open(SKIP_LOG, "a", newline="") as fh:
+        w = _csv.writer(fh)
+        if new:
+            w.writerow(["timestamp", "symbol", "tf", "strategy", "one_lot_usd", "budget_usd"])
+        w.writerow([datetime.now().isoformat(timespec="seconds"), symbol, tf, strategy,
+                    round(one_lot, 2), BUDGET_USD])
 
 
 def _append(row: dict) -> None:
@@ -329,9 +355,14 @@ def open_new(state: dict) -> int:
         c = pick_contract(str(r["symbol"]), str(r["direction"]), _hold_days(r))
         if not c:
             continue
-        # 一张合约 = 100 股。预算买不起一张就买一张（如实记录真实成本），
-        # 不为了凑预算去编一个分数张数。
-        contracts = max(1, int(BUDGET_USD // (c["mid"] * 100))) if c["mid"] > 0 else 1
+        # 一张合约 = 100 股。买不起一张且超出容忍倍数就跳过，不硬吃一个超配仓位。
+        one_lot = c["mid"] * 100
+        if one_lot > BUDGET_USD * MAX_COST_MULT:
+            _log_skip(str(r["symbol"]), str(r["tf"]), str(r["strategy"]), one_lot)
+            print(f"  ~ {r['symbol']} {r['tf']}: 单张 ${one_lot:,.0f} > 预算 "
+                  f"${BUDGET_USD:,.0f}×{MAX_COST_MULT}，跳过（账户规模买不起）")
+            continue
+        contracts = max(1, int(BUDGET_USD // one_lot)) if one_lot > 0 else 1
         state[sid] = {
             "contracts": contracts,
             "spot_entry": float(r.get("entry_price") or 0),
