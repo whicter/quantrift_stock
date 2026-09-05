@@ -570,7 +570,14 @@ def main():
     # ── 汇总统计 ─────────────────────────────────────────────────────────────
     print(f"\n📊 汇总统计（共 {len(rdf)} 条）\n")
 
-    decided = rdf[rdf["outcome"].isin(["TP1命中", "TP2命中", "止损", "时间止损"])]
+    # 「已决」= 复盘算得出 R 的，而不是一份写死的出场名单。旧写法只认
+    # TP1/TP2/止损/时间止损，把 ATR追踪出场 / RSI出场 / SSL追踪出场 全漏了——
+    # 而 ATR 追踪正是 RSI2 与 MR 的**主要**出场方式（RSI2 根本没有固定 TP）。
+    # 后果：RSI2 的 84 笔 ATR 出场从未进入任何汇总，只剩 47 笔"跑满时间没被
+    # 止损"的幸存者，于是显示 85% 胜率 / +1.25R。典型的生存者偏差。
+    # 衰减监控用的一直是 r_mult 口径，所以只有这份给人看的汇总在骗人。
+    _r = pd.to_numeric(rdf["r_mult"], errors="coerce")
+    decided = rdf[_r.notna()]
     pending = rdf[rdf["outcome"] == "未决"]
 
     tp2_n  = len(rdf[rdf["outcome"] == "TP2命中"])
@@ -579,7 +586,10 @@ def main():
     tsl_n  = len(rdf[rdf["outcome"] == "时间止损"])
     pen_n  = len(pending)
 
-    print(f"  TP2命中: {tp2_n}  TP1命中: {tp1_n}  止损: {sl_n}  时间止损: {tsl_n}  未决: {pen_n}")
+    other = {k: int(v) for k, v in rdf["outcome"].value_counts().items()
+             if k not in ("TP2命中", "TP1命中", "止损", "时间止损", "未决")}
+    print(f"  TP2命中: {tp2_n}  TP1命中: {tp1_n}  止损: {sl_n}  时间止损: {tsl_n}  未决: {pen_n}"
+          + ("  " + "  ".join(f"{k}: {v}" for k, v in other.items()) if other else ""))
 
     if len(decided) > 0:
         win_rate = (pd.to_numeric(decided["r_mult"], errors="coerce") > 0).mean() * 100
@@ -595,7 +605,7 @@ def main():
     print()
     for strat in rdf["strategy"].unique():
         sub = rdf[rdf["strategy"] == strat]
-        dec = sub[sub["outcome"].isin(["TP1命中", "TP2命中", "止损", "时间止损"])]
+        dec = sub[pd.to_numeric(sub["r_mult"], errors="coerce").notna()]
         pen = sub[sub["outcome"] == "未决"]
         line = f"  [{strat}] 共{len(sub)}条"
         if len(dec) > 0:
