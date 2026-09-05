@@ -19,6 +19,23 @@ RISK_PCT = 0.0075
 POSITION_WEIGHT = 0.10
 SECTOR_LIMIT = 0.45
 
+# 同板块并发持仓上限（2026-09-04 起）。
+#
+# 此前只有 risk_warnings() 发一句警告、open_position() 照开不误，而且只认上面
+# 那个写死的 12 个半导体标的。实测 45 天里同日同板块 ≥4 条信号出现了 21 天，
+# 单日单板块最多 9 条（7/28 半导体）——每仓 0.75% 风险 × 9 个同向标的 = 6.75%
+# 权益同涨同跌，这就是 -33% 回撤的来源。
+#
+# 用 264 笔已决交易回放不同上限（收益 / 最大回撤 / 比值）：
+#   不限 +7.99% / -33.13% / 0.24      5 → +9.17% / -28.26% / 0.32
+#   4    +16.33% / -24.27% / 0.67     3 → +15.35% / -20.14% / 0.76
+#   2    +11.04% / -16.43% / 0.67
+# 2-5 全都改善回撤，方向是稳的；但精确最优值属样本内拟合，别把 4 当成调出来的
+# 参数——它只是"限制同板块并发"这个结构性约束的一个合理取值。
+#
+# **只约束纸面组合的建仓，不过滤信号推送**——用户明确要求信号全发。
+SECTOR_MAX_CONCURRENT = 4
+
 
 def load() -> dict:
     if not POSITIONS_PATH.exists():
@@ -36,6 +53,22 @@ def save(book: dict) -> None:
 
 def _open_positions(book: dict) -> list[dict]:
     return [p for p in book["positions"] if p.get("status") == "open"]
+
+
+_sector_cache: dict[str, str] = {}
+
+
+def _sector(symbol: str) -> str:
+    """真实板块归类。原来用写死的 12 个半导体标的，覆盖不到其余 96 个已路由标的。"""
+    if not symbol:
+        return ""
+    if symbol not in _sector_cache:
+        try:
+            from sector_map import sector_of
+            _sector_cache[symbol] = sector_of(symbol) or ""
+        except Exception:
+            _sector_cache[symbol] = "半导体" if symbol in SEMIS else ""
+    return _sector_cache[symbol]
 
 
 def risk_warnings(symbol: str, book: dict | None = None) -> list[str]:
@@ -57,10 +90,20 @@ def open_position(row: dict, book: dict | None = None) -> list[str]:
     if any(p.get("signal_id") == signal_id for p in book["positions"]):
         return []
     warnings = risk_warnings(str(row["symbol"]), book)
+
+    # 同板块并发上限：超了就不建仓（信号照发，只是纸面组合不吃这一笔）
+    sector = _sector(str(row["symbol"]))
+    if sector:
+        same = sum(1 for p in _open_positions(book) if _sector(p.get("symbol", "")) == sector)
+        if same >= SECTOR_MAX_CONCURRENT:
+            warnings.append(f"⚠️ 虚拟账本：{sector} 已有 {same} 个并发仓位"
+                            f"（上限 {SECTOR_MAX_CONCURRENT}），本笔不建仓")
+            return warnings
+
     book["positions"].append({
         **row, "signal_id": signal_id, "opened_at": datetime.now().isoformat(timespec="seconds"),
         "status": "open", "risk_pct": RISK_PCT, "weight": POSITION_WEIGHT,
-        "tp1_seen": False, "pyramiding_notified": False,
+        "sector": sector, "tp1_seen": False, "pyramiding_notified": False,
     })
     save(book)
     return warnings

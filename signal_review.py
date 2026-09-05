@@ -225,13 +225,18 @@ def _same_period_baseline(days: int) -> dict:
         return {}
     out = {}
     for (strategy, tf), g in b.groupby(["strategy", "tf"]):
-        if len(g) >= 10:
-            out[(str(strategy), str(tf))] = float(g["r_mult"].mean())
+        # 门槛从 10 提到 25。2026-09-04 实测：n=19 的 Confluence 4h 基准点估计
+        # +0.57、自助法 90% 区间却是 [+0.15, +1.00]；n=31 的 RSI2 1d 是 +0.57
+        # 而区间 [-0.08, +1.26]——基准本身可能就是 0。拿这种基准去宣告「实盘落后
+        # 0.86R」，得出的缺口全是噪声。基准不够硬时宁可退回长期均值。
+        if len(g) >= 25:
+            se = float(g["r_mult"].std(ddof=1) / max(len(g) ** 0.5, 1))
+            out[(str(strategy), str(tf))] = (float(g["r_mult"].mean()), se)
     return out
 
 
 def _expected_r(expectations: dict, strategy: str, symbol: str, tf: str,
-                same_period: dict | None = None) -> tuple[float, str]:
+                same_period: dict | None = None) -> tuple[float, str, float]:
     """Baseline mean R for one combination, plus where it came from.
 
     Shadow variants fall back to their strategy family (RSI2_IBS_shadow ->
@@ -243,7 +248,8 @@ def _expected_r(expectations: dict, strategy: str, symbol: str, tf: str,
         family = strategy[:-7] if strategy.endswith("_shadow") else strategy
         for name in (strategy, family):
             if (name, tf) in same_period:
-                return same_period[(name, tf)], "same_period"
+                mean, se = same_period[(name, tf)]
+                return mean, "same_period", se
 
     table = expectations.get("expectations", {})
     candidates = [strategy]
@@ -254,8 +260,8 @@ def _expected_r(expectations: dict, strategy: str, symbol: str, tf: str,
     for name in candidates:
         entry = table.get(name, {}).get(symbol, {}).get(tf)
         if entry:
-            return float(entry["mean_r"]), "backtest"
-    return 0.0, "placeholder"
+            return float(entry["mean_r"]), "backtest", 0.0
+    return 0.0, "placeholder", 0.0
 
 
 def _append_with_schema_check(df: pd.DataFrame, path: Path) -> None:
@@ -297,32 +303,52 @@ def _monitor(rdf: pd.DataFrame) -> None:
         recent = group.sort_values("timestamp").tail(20)
         mean = float(recent["r_mult"].mean())
         sigma = float(recent["r_mult"].std(ddof=0) / max(len(recent) ** 0.5, 1))
-        baseline, baseline_kind = _expected_r(expectations, strategy, symbol, tf, same_period)
+        baseline, baseline_kind, base_se = _expected_r(expectations, strategy, symbol, tf, same_period)
         # Measuring against this combination's own historical replay answers
         # "is it behaving worse than it ever did", rather than the far weaker
         # "did it lose money recently" that a 0R baseline tests.
-        z = (mean - baseline) / sigma if sigma > 0 else 0.0
+        #
+        # 分母必须把**基准自身的标准误**也算进去。只用实盘样本的 se，等于假设
+        # 基准是一个精确已知的常数——而同期基准是从几十笔回测里估出来的，它自己
+        # 的 90% 区间往往有 ±0.4R 宽。忽略这一项会系统性高估 |z|，把噪声判成红灯，
+        # 而红灯会喂给 decay_action 触发自动降级。
+        denom = (sigma ** 2 + base_se ** 2) ** 0.5
+        z = (mean - baseline) / denom if denom > 0 else 0.0
         # A handful of trades cannot support a degradation verdict; flagging
         # N=1 as "red" is noise that invites acting on nothing.
         if len(recent) < MIN_MONITOR_SAMPLES:
             level = "样本不足"
+        elif baseline_kind != "same_period":
+            # 没有足够样本的**同期**基准时不判级。退回十年均值看似有基准，实则
+            # 在低于平均的行情里必然批量误报——而红灯会喂给 decay_action 触发
+            # 自动降级，等于在最不该关的时候关掉策略。宁可说"判不了"。
+            # 长期期望表仍然有用，但那是回答"这条路由本身成不成立"的结构性问题，
+            # 不是回答"最近这段有没有变差"。
+            level = "基准不足"
         else:
             level = "红" if z < -2 else "黄" if z < -1 else "绿"
         rows.append({"timestamp": datetime.now().isoformat(timespec="seconds"), "strategy": strategy,
                      "symbol": symbol, "tf": tf, "n": len(recent), "mean_r": round(mean, 4),
                      "se": round(sigma, 4), "baseline_r": round(baseline, 4),
+                     "baseline_se": round(base_se, 4),
                      "baseline_kind": baseline_kind, "z_vs_baseline": round(z, 3), "status": level})
     hist = pd.DataFrame(rows)
     path.parent.mkdir(exist_ok=True)
     _append_with_schema_check(hist, path)
-    graded = [r for r in rows if r["status"] != "样本不足"]
+    graded = [r for r in rows if r["status"] not in ("样本不足", "基准不足")]
     pending = [r for r in rows if r["status"] == "样本不足"]
+    nobase = [r for r in rows if r["status"] == "基准不足"]
     meta = expectations.get("_meta", {})
     if meta:
         src = f"回测期望表（{meta.get('combinations', '?')} 组合，{meta.get('generated_at', '?')} 生成）"
     else:
         src = "0R 占位（strategy_expectations.json 缺失，运行 build_expectations.py 生成）"
-    print(f"\n🚦 衰减监控（最近20笔；基准={src}；N<{MIN_MONITOR_SAMPLES} 不判级）")
+    print(f"\n🚦 衰减监控（最近20笔；基准=同期回测(n>=25，含基准自身标准误)；"
+          f"N<{MIN_MONITOR_SAMPLES} 或无同期基准则不判级）")
+    if nobase:
+        combos = sorted({f"{r['strategy']}/{r['tf']}" for r in nobase})
+        print(f"  ⚪ 基准不足未判级 {len(nobase)} 项（同期回测样本 <25，"
+              f"退回十年均值会批量误报）：{', '.join(combos)}")
     for row in sorted(graded, key=lambda r: r["z_vs_baseline"]):
         print(f"  {row['status']} {row['strategy']} {row['symbol']} {row['tf']}: "
               f"N={row['n']} 均R={row['mean_r']:+.2f} 期望={row['baseline_r']:+.2f}"
@@ -362,8 +388,9 @@ def _telegram_summary(rdf: pd.DataFrame) -> None:
                 continue
             mean = float(recent["r_mult"].mean())
             sigma = float(recent["r_mult"].std(ddof=0) / max(len(recent) ** 0.5, 1))
-            baseline, _ = _expected_r(expectations, strategy, symbol, tf, same_period)
-            if sigma > 0 and (mean - baseline) / sigma < -2:
+            baseline, _, base_se = _expected_r(expectations, strategy, symbol, tf, same_period)
+            denom = (sigma ** 2 + base_se ** 2) ** 0.5
+            if denom > 0 and (mean - baseline) / denom < -2:
                 red.append(f"{strategy}/{symbol}/{tf}(均R{mean:+.2f} vs 期望{baseline:+.2f}, N={len(recent)})")
         if red:
             lines.append("")

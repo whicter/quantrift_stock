@@ -573,5 +573,30 @@
   "screener_rank": "",
   "market_regime": "risk_on",
   "is_repeat": 0
+ },
+ "MSOS|1d|Confluence|做多": {
+  "timestamp": "2026-09-04 19:00",
+  "bar_date": "2026-09-04",
+  "symbol": "MSOS",
+  "tf": "1d",
+  "strategy": "Confluence",
+  "direction": "做多",
+  "entry_price": 5.11,
+  "atr": 0.2124,
+  "tp1": 5.3224,
+  "tp2": 5.7473,
+  "sl": 4.4948,
+  "market_score": 4.0,
+  "vix": 14.53,
+  "quality": 5,
+  "signal_id": "MSOS|1d|Confluence|2026-09-04|做多",
+  "source": "live",
+  "is_shadow": 0,
+  "source_strategy": "",
+  "params_json": "{\"adx_len\": 14, \"adx_threshold\": 20.0, \"allow_reversal_flip\": true, \"allow_short\": true, \"atr_sl_mult\": 2.0, \"atr_tp1_mult\": 1.0, \"atr_tp2_mult\": 3.0, \"cash\": 100000, \"ci_len\": 14, \"ci_threshold\": 70.9, \"commission\": 0.001, \"conflict_threshold\": 2, \"contract_size\": 1, \"exit_len\": 15, \"interval\": \"1d\", \"macd_fast\": 12, \"macd_signal\": 8, \"macd_slow\": 26, \"margin\": 0.5, \"max_market_score_short\": 2, \"min_market_score\": 2, \"min_score\": 3, \"n_contracts\": 1, \"reversal_score\": 3, \"rsi_len\": 17, \"rsi_mr_ob\": 65.0, \"rsi_mr_os\": 35.0, \"rsi_ob\": 70, \"rsi_os\": 30, \"sqz_bbl\": 20, \"sqz_bbm\": 1.97, \"sqz_kcl\": 20, \"sqz_kcm\": 1.3, \"ssl2_len\": 3, \"ssl_len\": 40, \"ssl_mult\": 0.34, \"tp1_portion\": 0.34, \"trend_filter_len\": 200, \"use_adx\": true, \"use_bbmc_dir\": true, \"use_breakeven_after_tp1\": false, \"use_ci\": false, \"use_fixed_initial_sl\": true, \"use_regime_filter\": true, \"use_squeeze_mr\": false, \"use_staged_tp\": true, \"use_trend_filter\": true, \"use_vol\": true, \"ut_atr\": 5, \"ut_key\": 3.0, \"vol_len\": 20, \"vol_mult\": 1.0}",
+  "sector_aligned": "",
+  "screener_rank": "",
+  "market_regime": "risk_on",
+  "is_repeat": 0
  }
 }
