@@ -58,7 +58,13 @@ from universes import get_universe  # noqa: E402
 # IB 参数
 IB_BAR_SIZE = {"1h": "1 hour", "1d": "1 day"}
 IB_DURATION  = {"1h": "2 Y",   "1d": "10 Y"}
-PACING_SLEEP = 6  # 每次请求后等待秒数
+# IB 历史数据限额是 **60 请求 / 10 分钟**，且这个配额与同机的期货 bot 共享。
+# 原来的 6 秒 = 10 请求/分钟 = 100 请求/10 分钟，是限额的 1.7 倍。后果不是被
+# 拒绝单个请求，而是**整条 socket 被 IB 掐断**：2026-09-11 的日志里 194 个成功
+# 请求之后出现 Error 1100 + "Peer closed connection"，其后 82 个请求全是
+# "Not connected"，且每轮都断在同一处（字母序 RGTI 之后的 27 个标的固定被饿死）。
+# 12 秒 = 50 请求/10 分钟，给期货 bot 留出余量。
+PACING_SLEEP = 12
 REQUEST_TIMEOUT = 45  # Gateway 无响应时跳过，不能阻塞整个补拉批次
 
 
@@ -238,6 +244,16 @@ def main():
         symbols = ALL_SYMBOLS
         tfs     = [args.tf] if args.tf else ["1d", "1h", "4h"]
 
+    # 最陈旧的排最前。即便某轮又中途断了，被截掉的也是**上轮刚更新过**的那批，
+    # 而不是固定同一批永远轮不到——2026-09-11 之前按字母序跑，导致 RGTI 之后的
+    # 27 个标的连续一周没更新过。
+    def _staleness(sym: str) -> float:
+        ts = [(DATA_DIR / f"{sym}_{tf}.csv").stat().st_mtime
+              for tf in tfs if (DATA_DIR / f"{sym}_{tf}.csv").exists()]
+        return min(ts) if ts else 0.0
+    if len(symbols) > 1:
+        symbols = sorted(symbols, key=_staleness)
+
     ib = IB()
     # qualifyContracts() also performs a Gateway request; apply the same bound
     # as historical bars so an unavailable API cannot stall the entire batch.
@@ -255,6 +271,23 @@ def main():
     failed: list[str] = []
     try:
         for sym in symbols:
+            # 断线就重连再继续。一次掉线不该让整轮剩下的标的全部报废——那正是
+            # 27 个标的连续陈旧一周的原因（每轮都在同一处断，后面的永远轮不到）。
+            if not ib.isConnected():
+                print(f"\n  ⚠️ 连接已断，重连中（{sym} 之前）...", flush=True)
+                for attempt in range(3):
+                    try:
+                        time.sleep(15)
+                        ib.connect(IB_HOST, args.port, clientId=args.clientId,
+                                   timeout=REQUEST_TIMEOUT)
+                        print("  ✅ 重连成功，继续", flush=True)
+                        break
+                    except Exception as exc:
+                        print(f"  重连失败 {attempt + 1}/3: {exc}", flush=True)
+                if not ib.isConnected():
+                    print("  ❌ 重连三次均失败，中止本轮", flush=True)
+                    failed.extend(symbols[symbols.index(sym):])
+                    break
             before = {tf: (DATA_DIR / f"{sym}_{tf}.csv").stat().st_mtime
                       if (DATA_DIR / f"{sym}_{tf}.csv").exists() else 0 for tf in tfs}
             fetch_symbol(ib, sym, tfs, merge=args.merge)
