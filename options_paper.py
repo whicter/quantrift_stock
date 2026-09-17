@@ -108,6 +108,9 @@ BUDGET_USD = 750.0
 # 放弃也比编造诚实：这个账户规模确实买不起那张合约。被跳过的标的会记进
 # logs/options_skipped.csv，免得"覆盖率下降"变成又一个静默失败。
 MAX_COST_MULT = 2.0
+# 拦截上线（9/4 22:30）之前已经硬买的 5 笔超配仓位（单张 $1,550–$16,280）于
+# 2026-09-17 标为 contaminated=1 / reason=oversized：按现行规则它们根本不会开仓，
+# 留在样本里会让美元口径被 SNDK 一笔主导（剔除前 -$1,526、剔除后 -$4,266）。
 SKIP_LOG = Path("logs/options_skipped.csv")
 
 MIN_DTE = 30          # 到期硬下限：低于此天数的合约一律不选
@@ -119,6 +122,9 @@ FIELDS = [
     "stock_entry", "stock_exit", "stock_r",
     "opt_entry_ask", "opt_entry_mid", "opt_exit_bid", "opt_exit_mid",
     "opt_return_pct", "opt_return_mid_pct", "iv_entry", "oi_entry", "exit_reason", "contracts", "cost_usd", "pnl_usd", "iv_exit", "spot_entry", "spot_exit", "contaminated",
+    # 作废原因：early_exit_bug（9/3 前提前平仓 bug）/ oversized（9/4 拦截上线前
+    # 硬买的超配仓位）。只有一个 0/1 标记时，复盘说不清「为什么作废」。
+    "contaminated_reason",
 ]
 
 

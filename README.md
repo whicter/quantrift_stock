@@ -63,6 +63,13 @@ theoretical R.
 > that data (capture ratio, spread cost, hold length, "RSI2 is significantly
 > negative through options") **is retracted**. Clean sampling restarts
 > 2026-09-03. Original kept at `.contaminated-20260903.bak`.
+>
+> A second batch was voided on 2026-09-17: the 5 oversized positions bought
+> before the cost cap landed (single contracts of $1,550–$16,280 against a $750
+> budget) carry `contaminated=1 / contaminated_reason=oversized`. They netted
+> +$2,740 and hid a **-$4,266** result across the other 39 trades. Original at
+> `.preoversize-20260917.bak`. The DTE-floor check only inspects positions
+> opened after the floor went live (2026-09-03).
 
 - Quotes come from yfinance's live chain. The options-lab Postgres has 320k
   contract snapshots but only 7.6% carry bid/ask and its cadence doesn't line
@@ -280,6 +287,22 @@ evaluation path keeping its own return shape (tests key off the `"ambiguity"`
 field to tell which path ran, so a shape that varies with outcome breaks
 callers). Pre-fix ledgers kept at `logs/paper_equity.prebug-20260903.bak` and
 `data/.paper_positions.prebug-20260903.bak`.
+
+**Follow-up (2026-09-17)**: the fix was deployed but the contaminated rows were
+only backed up, not quarantined, and the `stock-alert` process kept running the
+old code until its restart at 21:46 PT on 09-04. The live ledger therefore kept
+compounding 505 one-bar closes: it showed **-16.99%** where the clean stretch
+(34 closes since 09-08) is **-9.91%** (SPY -1.55%). Positions closed before
+2026-09-05 now carry `contaminated: true`, `paper_equity.csv` has a
+`contaminated` column, and equity is rebased to the clean stretch (90,091.81).
+Filter on `contaminated` before computing anything from either file. Originals
+at `.precontam-20260917.bak`.
+
+`signal_review.py` also now excludes signals from routes no longer in
+`STRATEGY_MAP` (`--include-retired` restores them). Of the 90-day RSI2 1d total
+of -21.5R, -32.4R came from four 1d routes retired on 08-15; the routes still
+live are at +0.14R. The September RSI2 drawdown (live -0.74R vs same-period
+backtest -0.93R) is regime, not decay.
 
 **Takeaway**: any replay-to-a-point-in-time evaluator must distinguish "not
 enough data" from "condition met". When it can't, the more often it runs (here,

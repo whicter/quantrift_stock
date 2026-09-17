@@ -170,16 +170,58 @@ def add_signal_manually():
 
 
 def _quality_report(rdf: pd.DataFrame) -> None:
-    """Show whether the published quality score predicts realized R."""
+    """Show whether the published quality score predicts realized R.
+
+    三个分桶单看会误导：2026-09-17 的 30 天窗口里 8-10 分桶均 R -0.60、0-4 分桶
+    -0.64，看起来像「高分反指」，但 90 天 695 笔的 Spearman 秩相关是 -0.03
+    （p=0.50），Confluence +0.05 / RSI2 -0.05 都不显著——和 alert_engine 里记录的
+    15,969 笔回放 +0.002 一致。结论只有一个：quality 没有预测力，既不正向也不
+    反向。分桶差异是样本切分噪声。所以这里把秩相关和 p 值一起打出来，避免每次
+    换个窗口就得出一个新方向。quality 目前没有任何实盘消费者（告警不展示、
+    meta_label 模型未训练），只是记录字段。
+    """
     decided = rdf[pd.to_numeric(rdf["r_mult"], errors="coerce").notna()].copy()
     if decided.empty:
         return
     decided["quality"] = pd.to_numeric(decided["quality"], errors="coerce").fillna(0)
-    print("\n📏 Quality 校准")
+    decided["r_mult"] = pd.to_numeric(decided["r_mult"], errors="coerce")
+    print("\n📏 Quality 校准（无实盘消费者，仅记录字段）")
     for label, low, high in (("0-4", 0, 4), ("5-7", 5, 7), ("8-10", 8, 10)):
         group = decided[decided["quality"].between(low, high)]
         if not group.empty:
             print(f"  {label}: N={len(group)} 胜率={(group['r_mult'] > 0).mean() * 100:.1f}% 平均R={group['r_mult'].mean():+.2f}")
+    try:
+        from scipy.stats import spearmanr
+    except ImportError:
+        return
+    groups = [("全部", decided)] + [(s, g) for s, g in decided.groupby("strategy") if len(g) >= 30]
+    for name, g in groups:
+        if g["quality"].nunique() < 2:
+            continue
+        rho, p = spearmanr(g["quality"], g["r_mult"])
+        verdict = ("无预测力" if p >= 0.05 else ("正向" if rho > 0 else "反向"))
+        print(f"  秩相关 {name}: N={len(g)} rho={rho:+.3f} p={p:.3f} → {verdict}")
+
+
+def _retired_mask(df: pd.DataFrame) -> pd.Series:
+    """True = 该行的 (symbol, tf, 策略族) 现在已不在 STRATEGY_MAP 里，且不是影子信号。"""
+    try:
+        from alert_engine import BREAKOUT_PARAMS, STRATEGY_MAP
+    except Exception:
+        return pd.Series(False, index=df.index)
+    shadow = pd.to_numeric(df.get("is_shadow", 0), errors="coerce").fillna(0) == 1
+    shadow |= df["strategy"].astype(str).str.endswith("_shadow")
+
+    def _routed(symbol: str, tf: str, strategy: str) -> bool:
+        family = review_family({"strategy": strategy})
+        # 52 周突破的扫描循环遍历的是 BREAKOUT_PARAMS（仅日线），不走 STRATEGY_MAP
+        if family == "breakout":
+            return tf == "1d" and symbol in BREAKOUT_PARAMS
+        return STRATEGY_MAP.get((symbol, tf)) == family
+
+    routed = pd.Series([_routed(str(s), str(t), str(st))
+                        for s, t, st in zip(df["symbol"], df["tf"], df["strategy"])], index=df.index)
+    return ~routed & ~shadow
 
 
 MIN_MONITOR_SAMPLES = 5
@@ -422,6 +464,8 @@ def main():
     parser.add_argument("--monitor", action="store_true", help="写入最近20笔策略衰减监控")
     parser.add_argument("--train-meta", action="store_true", help="样本>=150时训练逻辑回归元标签模型")
     parser.add_argument("--telegram", action="store_true", help="发送复盘摘要到 Telegram")
+    parser.add_argument("--include-retired", action="store_true",
+                        help="把已从 STRATEGY_MAP 下线的路由的历史信号也计入统计")
     args = parser.parse_args()
 
     if args.add:
@@ -466,6 +510,19 @@ def main():
         df = df[df["symbol"].str.upper() == args.symbol.upper()]
     if args.tf:
         df = df[df["tf"] == args.tf]
+
+    # 已下线路由不计入现役绩效。
+    # 2026-09-17 复核：90 天 RSI2 1d 共 106 笔、总 -21.5R，其中 29 笔（-32.4R）来自
+    # SOXX/SMH/MRVL/AAPL 的 1d 路由——它们 8/15 已按方向/衰减验证结果下线；剔除后
+    # 现役 RSI2 1d 是 77 笔、均 +0.14R。把已经关掉的路由继续算进「RSI2 衰减」，
+    # 等于每周拿一个已修的问题反复报警（TASK.md 里「仅实盘有的 11 条 -1.45R」也是
+    # 同一件事：同期回测按现役 STRATEGY_MAP 跑，自然没有这些路由）。影子信号不受
+    # 此过滤——它们本来就是实验记录。
+    if not args.include_retired:
+        retired = _retired_mask(df)
+        if retired.any():
+            print(f"ℹ️ 已排除 {int(retired.sum())} 条已下线路由的信号（--include-retired 可含）")
+            df = df[~retired]
 
     if df.empty:
         print("过滤后无信号。")

@@ -14,7 +14,20 @@ from review_core import evaluate
 
 POSITIONS_PATH = Path("data/.paper_positions.json")
 EQUITY_PATH = Path("logs/paper_equity.csv")
-SEMIS = {"MU", "MRVL", "STX", "SNDK", "NVDA", "INTC", "AMD", "AMAT", "KLAC", "SOXX", "SMH", "TSM"}
+EQUITY_HEADER = "timestamp,equity,event,symbol,r_mult,contaminated"
+
+# 2026-09-05 之前平仓的记录全部作废（contaminated）。
+#
+# review_core「数据走完 = 时间止损」的 bug 于 9/3 修复，但 stock-alert 进程直到
+# 9/4 21:46 PT 才重启，其间仍按旧代码平仓：9/4 当天 21 笔平仓里 18 笔 R=0、全部
+# 「时间止损」，与修复前一模一样。9/3 只备份了账本（.prebug-20260903.bak），没有把
+# 505 笔「一根 bar 就砍掉」的旧仓从实时账本里隔离出来，于是权益曲线一直带着
+# -7.86% 的假亏损往下累积：账面 -16.99%，其中干净期（9/8 起 34 笔）只有 -9.91%。
+# 现在与期权账本同一处理：旧行保留、打 contaminated 标记、权益按干净期从
+# 100,000 重新起算（2026-09-17 迁移，原件 .precontam-20260917.bak）。
+# 凡是读这两份文件做统计的，必须先剔除 contaminated。
+CONTAMINATED_BEFORE = "2026-09-05"
+SEMIS ={"MU", "MRVL", "STX", "SNDK", "NVDA", "INTC", "AMD", "AMAT", "KLAC", "SOXX", "SMH", "TSM"}
 RISK_PCT = 0.0075
 POSITION_WEIGHT = 0.10
 SECTOR_LIMIT = 0.45
@@ -146,11 +159,18 @@ def update(price_by_key: dict[tuple[str, str], pd.DataFrame],
     if events:
         EQUITY_PATH.parent.mkdir(exist_ok=True)
         new = not EQUITY_PATH.exists()
+        if not new:
+            # 列结构演进时表头必须跟着换，否则下游 read_csv 直接解析失败
+            # （review_history.csv 2026-08-15 出过同样的事故）。
+            with open(EQUITY_PATH) as fh:
+                if fh.readline().strip() != EQUITY_HEADER:
+                    EQUITY_PATH.rename(EQUITY_PATH.with_suffix(f".schema-{datetime.now():%Y%m%d}.bak"))
+                    new = True
         with open(EQUITY_PATH, "a") as fh:
             if new:
-                fh.write("timestamp,equity,event,symbol,r_mult\n")
+                fh.write(EQUITY_HEADER + "\n")
             for event in events:
-                fh.write(f"{datetime.now().isoformat(timespec='seconds')},{book['equity']},{event['type']},{event['symbol']},{event['r_mult']}\n")
+                fh.write(f"{datetime.now().isoformat(timespec='seconds')},{book['equity']},{event['type']},{event['symbol']},{event['r_mult']},0\n")
         book["events"].extend(events)
         book["events"] = book["events"][-200:]
         save(book)

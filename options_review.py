@@ -36,6 +36,10 @@ load_dotenv()
 
 LEDGER = Path("logs/options_paper_log.csv")
 MIN_DTE = 30          # 与 options_paper.MIN_DTE 对齐，用于数据质量校验
+# DTE 硬下限 2026-09-03 09:55 才上线；之前开的仓不受此约束，校验只看之后开的。
+# 否则 8/24–8/28 开的 6 笔（DTE 21–25）会永远被报成「违反到期下限」。
+DTE_FLOOR_SINCE = pd.Timestamp("2026-09-03")
+OVERSIZE_USD = 1500.0  # = options_paper.BUDGET_USD × MAX_COST_MULT，超此即超配
 
 
 def load_ledger() -> pd.DataFrame:
@@ -62,9 +66,15 @@ def load_ledger() -> pd.DataFrame:
     if "contaminated" in d:
         bad = pd.to_numeric(d["contaminated"], errors="coerce").fillna(0) == 1
         d.attrs["contaminated_dropped"] = int(bad.sum())
+        reasons = (d.loc[bad, "contaminated_reason"] if "contaminated_reason" in d
+                   else pd.Series(dtype=str))
+        d.attrs["contaminated_reasons"] = (reasons.fillna("early_exit_bug")
+                                           .replace("", "early_exit_bug")
+                                           .value_counts().to_dict())
         d = d[~bad]
     else:
         d.attrs["contaminated_dropped"] = 0
+        d.attrs["contaminated_reasons"] = {}
 
     for c in ("opt_return_mid_pct", "opt_return_pct", "stock_r",
               "opt_entry_mid", "opt_entry_ask", "dte_at_entry"):
@@ -162,9 +172,9 @@ def _block(df: pd.DataFrame, title: str) -> list[str]:
             # 超配仓位单独标出来。仓位大小相差十几倍时，加总盈亏反映的是仓位
             # 差异而不是载体效率——2026-09-04 实测未平仓账面 +$4,862 里有 88%
             # 来自 SNDK 一笔（单张 $16,280 = 预算的 21.7 倍）。
-            over = have & (c > 1500)
+            over = have & (c > OVERSIZE_USD)
             if over.any():
-                out.append(f"  ⚠️ 超配仓位     {int(over.sum())} 笔单张 >$1,500，"
+                out.append(f"  ⚠️ 超配仓位     {int(over.sum())} 笔单张 >${OVERSIZE_USD:,.0f}，"
                            f"占权利金 {c[over].sum()/c[have].sum()*100:.0f}%、"
                            f"盈亏 ${pm[over].sum():+,.0f}；"
                            f"剔除后盈亏 ${pm[have & ~over].sum():+,.0f}"
@@ -179,9 +189,14 @@ def _quality(df: pd.DataFrame) -> list[str]:
     out.append(f"  重复行 {dupes} 条（已剔除）" + ("　⚠️ 并发锁可能失效" if dupes else "　✅"))
     bad = df.attrs.get("contaminated_dropped", 0)
     if bad:
-        out.append(f"  作废 {bad} 条（2026-09-03 提前平仓 bug 之前的记录，已排除）")
-    under = int((df.dte_at_entry < MIN_DTE).sum())
-    out.append(f"  入场 DTE < {MIN_DTE} 的 {under} 笔 / {len(df)}"
+        why = {"early_exit_bug": "提前平仓 bug", "oversized": "超配仓位"}
+        detail = "、".join(f"{why.get(k, k)} {v}" for k, v in
+                          df.attrs.get("contaminated_reasons", {}).items())
+        out.append(f"  作废 {bad} 条已排除（{detail}）")
+    since_floor = df.opened_at >= DTE_FLOOR_SINCE
+    under = int(((df.dte_at_entry < MIN_DTE) & since_floor).sum())
+    out.append(f"  入场 DTE < {MIN_DTE} 的 {under} 笔 / {int(since_floor.sum())}"
+               f"（下限 {DTE_FLOOR_SINCE.date()} 起生效）"
                + ("　⚠️ 违反到期下限" if under else "　✅"))
     if df.dte_left_at_exit.notna().any():
         out.append(f"  出场时最少剩余 DTE {df.dte_left_at_exit.min():.1f} 天"
@@ -259,7 +274,8 @@ def telegram(days: int) -> None:
     if cr_all:
         lines.append(f"全样本赢输比 {cr_all[2]:.2f}"
                      + ("（<1：亏损放大更多）" if cr_all[2] < 1 else ""))
-    dupes, under = d.attrs.get("dupes_dropped", 0), int((d.dte_at_entry < MIN_DTE).sum())
+    dupes = d.attrs.get("dupes_dropped", 0)
+    under = int(((d.dte_at_entry < MIN_DTE) & (d.opened_at >= DTE_FLOOR_SINCE)).sum())
     if dupes or under:
         lines += ["", f"⚠️ 账本：重复 {dupes} 条／DTE 越界 {under} 笔"]
     if "pnl_usd" in d:
