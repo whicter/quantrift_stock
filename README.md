@@ -92,8 +92,9 @@ theoretical R.
   forward window and no reachable exit.
 - **Dollar accounting**: `BUDGET_USD = 750`, matching the stock paper book's
   0.75% risk budget so the two are comparable. Records `contracts`,
-  `cost_usd`, `pnl_usd`. If one contract costs more than the budget it still
-  buys one and records the true cost.
+  `cost_usd`, `pnl_usd`. Since 2026-09-04 a signal is skipped (and logged to
+  `options_skipped.csv`) when one contract costs more than 2x the budget;
+  buying one anyway let a single $16,280 SNDK contract dominate the totals.
 - **Attribution fields**: IV and spot are recorded at both entry and exit, so
   P&L can be split into underlying move / IV change / time decay. Without both
   ends a review can only say "options lost 3%" without saying where it went.
@@ -105,7 +106,7 @@ theoretical R.
 - Entry: z-score ≤ −0.9 (near BB lower band) AND RSI < 40 AND ADX < 25 AND close > 200 SMA
 - Exit: ATR trailing stop（不在中轨止盈，让趋势跑起来）
 - Originally researched for broad ETFs (SOXX/SMH/QQQ/SPY) but paused for insufficient sample size across the board (see LEARNING.md); those four still run on RSI2 in production
-- **2026-07-25**: first live deployment via `check_mr_signal()`, discovered through the watchlist batch probe rather than the original broad-ETF research — currently `TSM` (1h) and `FDVV` (1h) only, on unoptimized default params
+- **2026-07-25**: first live deployment via `check_mr_signal()`, discovered through the watchlist batch probe rather than the original broad-ETF research — currently `TSM`, `FDVV` and `MKSI` (all 1h), on unoptimized default params
 
 ## Timeframes
 
@@ -258,8 +259,9 @@ Two measurement rules the review depends on, both learned the hard way:
   auto-demotion chain and switch strategies off at precisely the wrong moment.
   `_same_period_baseline(90)` reads `backfill_paper_equity.csv`, counting only
   rows that actually opened a position (`skip_*` rows are positions never taken
-  and dilute the baseline); it falls back to the long-run average below 10
-  samples.
+  and dilute the baseline). Since 2026-09-04 a combination with fewer than 25
+  same-period trades is left ungraded rather than judged against the ten-year
+  average, and the z-score includes the baseline's own standard error.
 
 ## The review_core off-the-end bug (fixed 2026-09-03)
 
@@ -348,6 +350,18 @@ throughout — no crash-restart was triggered.
 
 `fetch_ib_data.py` still bounds contract and historical requests to 45
 seconds as a standing safeguard, independent of this incident.
+
+### Nightly refresh vs. the Gateway's daily restart (2026-09-18)
+
+IBC is configured with `AutoRestartTime=02:30 PM`, so the Gateway restarts
+every day at 14:30 PT. The nightly refresh used to start at 14:00 and needs
+about 55 minutes, so every run was cut off at 14:30. The reconnect added on
+09-11 referenced an undefined `IB_HOST` and never succeeded, which left 56–57
+of 124 symbols stale on each run from 09-15 to 09-18. The 09-11 diagnosis
+(rate limiting) was wrong: halving the request rate moved the request count
+at the break but not the clock time. The job now starts at 14:40 and
+reconnect waits up to 6x30s. A manual rerun on 09-18 updated 124/124 with
+no disconnect.
 
 If the IB historical-data farm goes offline again before this is fixed
 upstream, the same yfinance fallback used on 2026-07-18 remains available:

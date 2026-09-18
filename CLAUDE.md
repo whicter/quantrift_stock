@@ -123,7 +123,7 @@ ssh -A mac-studio "cd /Users/congrenhan/Documents/quantrift_stock && git push"
 - **周期**：1h / 4h / 1d，三周期独立信号
 - **策略路由**：`STRATEGY_MAP` 按 `(symbol, tf)` 路由到 confluence / rsi2 / breakout / mr；**未显式列出的组合不发信号**（2026-07-26 起取消默认 confluence fall-through）
 - **52周突破**：`BREAKOUT_PARAMS` 独立配置（NVDA/MU/MSFT/PLTR/TSLA/AAPL + 2026-07-25 新增 DGRO/SPYM/VOO/VTI），仅日线
-- **MR 均值回归**（2026-07-25 首次接入实时扫描）：`check_mr_signal()` + `MR_PARAMS`，只做多，入场 z-score≤-0.9 + RSI<40 + ADX<25 + close>200SMA，出场纯 ATR 追踪+时间止损（无固定TP）。目前仅 `TSM`(1h)/`FDVV`(1h) 接入；`mr_backtest.py` 存在多年但此前从未接入实时告警，是这次才补的缺口
+- **MR 均值回归**（2026-07-25 首次接入实时扫描）：`check_mr_signal()` + `MR_PARAMS`，只做多，入场 z-score≤-0.9 + RSI<40 + ADX<25 + close>200SMA，出场纯 ATR 追踪+时间止损（无固定TP）。目前 `TSM`/`FDVV`/`MKSI`（均 1h）接入；`mr_backtest.py` 存在多年但此前从未接入实时告警，是这次才补的缺口
 - **RSI2-Trend 变体（2026-08-15）**：非独立策略，是 RSI2 + `{use_rs_filter:False, max_hold_bars:30}` 的参数覆盖，适配"长期趋势型"标的（200SMA上方≥65%、年化波动≤40%）。已接入 LLY/CSCO/ISRG/AVDV/VYM/DGRO/TSM/CRWD 的 1d。**8个标的共用同一套参数，不可逐标的调参**（泛化检验依赖于此）
 - **出场模式**：`use_staged_tp=True`，止损用 utTS，TP1/TP2 固定 ATR 倍数
 - **数据源（2026-07-27 起为混合架构）**：`fetch_bars()` 以 yfinance 为主（软限制，15分钟延时）；1d 近期缺 bar 用本地 IB 数据实时填补；yfinance 拉空时整段回退本地 IB 数据；本地 IB 数据由 `stock-nightly-ib-refresh`（每交易日 14:40 PT，避开 Gateway 14:30 自重启）自动 `--merge` 保鲜，最多落后一个交易日。引擎**不直连 IB**（历史教训：Error 162 crash-restart 循环）。单轮扫描拉取失败率 >20% 会发 Telegram 告警；财报日期按日缓存（省 ~90 请求/小时）。
@@ -151,6 +151,7 @@ ssh -A mac-studio "cd /Users/congrenhan/Documents/quantrift_stock && git push"
 - **恢复序列已跑完**：① NVDA 1d 单标的验证成功（2512行）② `fetch_ib_data.py --merge` 全量补拉 42 次请求 0 失败 ③ `data_audit.py --write` 复审：全部 `fresh`，数据来源已从 `yfinance` 切回 `ib`，覆盖至 2026-07-23 ④ `historical_backfill.py --write` 重跑：7302 候选信号，9986 条已决，2135 条影子。
 - **期货 bot 未受影响**：同机 8 个 `ib-bot*` pm2 进程重连期间 PID 和重启计数均未变化，未触发 crash-restart。
 - **ETF 扫描器数据已回补**：`fetch_etf_data.py` 在 Gateway 恢复后重跑，47 个 ETF + SPY/QQQ + VIX 共 50 次请求全部成功；此前停留在 2026-06-17/18 的文件均已刷新至 2026-07-23（VIX 至 07-24）。ETF 扫描结果现可视为最新。
+- **Gateway 每日 14:30 PT 自重启（2026-09-18 查明）**：IBC `AutoRestartTime=02:30 PM`。夜间保鲜原定 14:00 开跑、一轮约 55 分钟，每轮都在 14:30 被切断；叠加 9/11 加的重连引用了未定义的 `IB_HOST`（从未成功过），9/15–9/18 每轮 56–57 个标的未更新。已改 14:40 开跑、重连放宽到 6×30s；9/18 补跑 124/124 全部更新。9/11 把断线归因到限流是错的（12s 间隔保留，因 6s 确实超限额）。
 - **历史事实保留**：`fetch_ib_data.py` 对合约解析和历史请求仍保留 45 秒超时（当时用于诊断 HMDS 断连，现继续作为常规保护）；2026-07-18 曾用 `fetch_data.py --merge` 做 yfinance 备用回补覆盖 72 个文件，该记录仅作历史参考，当前数据源已是 IB。
 
 ## 后台任务（pm2，均已 pm2 save）
@@ -246,8 +247,9 @@ pm2 `stock-options-whitelist` 周三 11:00 PT（= 14:00 ET，盘中）跑。
   Confluence **+0.289** 其实是**跑赢**同期回测的。用长期均值当基准会在每段低于
   平均的行情里批量误报红灯 → 触发自动降级 → 正好把策略在最不该关的时候关掉。
   改用 `_same_period_baseline(90)`（读 `backfill_paper_equity.csv`，**只算真正
-  开过仓的行**，`skip_*` 代表没开成的仓，混进来会稀释基准）；同期样本 <10 笔
-  才退回长期均值。红灯从遍地收敛到 11 项。
+  开过仓的行**，`skip_*` 代表没开成的仓，混进来会稀释基准）；同期样本 <25 笔
+  则该组合**不判级**（2026-09-04 起；不再退回十年均值，那正是批量误报的来源），
+  z 值同时计入基准自身的标准误。红灯从遍地收敛到 11 项。
 - **复盘只统计现役路由（2026-09-17 起）**：`signal_review.py` 默认排除已从
   `STRATEGY_MAP` 下线的路由的历史信号（`--include-retired` 可含，影子不受影响）。
   90 天 RSI2 1d 共 106 笔、总 -21.5R，其中 29 笔 -32.4R 来自 8/15 已下线的

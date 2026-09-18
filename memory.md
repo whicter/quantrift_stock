@@ -37,7 +37,7 @@
 ## 数据源架构（2026-07-27 起为混合模式）
 
 - **实时扫描主源 yfinance**：软限制（非官方接口，偶发瞬时拉空/整根缺bar），每小时约 200-270 请求（财报按日缓存后）。失败率 >20%/轮会发 Telegram 告警。
-- **本地 IB 数据 = data/*.csv 磁盘快照**：由 `stock-nightly-ib-refresh`（每交易日 14:00 PT）自动 `fetch_ib_data --merge` 保鲜（108标的），最多落后一个交易日。它是回测/回放/期望表的权威数据源。
+- **本地 IB 数据 = data/*.csv 磁盘快照**：由 `stock-nightly-ib-refresh`（每交易日 14:40 PT，避开 Gateway 14:30 自重启）自动 `fetch_ib_data --merge` 保鲜（108标的），最多落后一个交易日。它是回测/回放/期望表的权威数据源。
 - **两级兜底**：1d 近期缺 bar 用本地 IB 实时填补（仅近10天窗口，防复权基准错位）；yfinance 整体拉空时整段回退本地 IB（整段替换不拼接，避免 IB 整点锚 vs yf 半点锚混网格）。
 - **引擎绝不直连 IB**：IB 历史接口 60请求/10分钟（Gateway 全局），每小时扫描需求超其 5 倍；直连曾致 Error 162 → crash-restart 死循环。yfinance 大面积失败时直连兜底会瞬间打爆配额——所以兜底必须走本地存储。
 - **完整 bar 语义**：信号只在完整 bar 上产生（1d 收盘后、1h/4h 丢进行中bar），且仅在新鲜窗口内发出（1h=4h/4h=12h/1d=30h）。2026-07-27 曾因半根bar缺陷在早盘急跌时发出一串 1d 做多（已作废）。
@@ -58,7 +58,7 @@
 | 任务 | 时间 | 作用 |
 |---|---|---|
 | `stock-alert` | 常驻，每小时扫描 | 主告警引擎（108标的/130条路由；信号按板块合并推送） |
-| `stock-nightly-ib-refresh` | 交易日 14:00 PT | IB 全池 `--merge` 保鲜本地数据 |
+| `stock-nightly-ib-refresh` | 交易日 14:40 PT | IB 全池 `--merge` 保鲜本地数据 |
 | `stock-daily-screener` | 交易日 13:20 PT | watchlist 全池因子选股 Top15 → TG |
 | `stock-watchlist-events` | 交易日 13:35 PT | 事件雷达·收盘（52W突破/放量新高/异动）→ TG |
 | `stock-watchlist-events-am` | 交易日 07:45 PT | 事件雷达·盘中（开盘75分钟后，量比按已过时段折算）→ TG |
@@ -102,6 +102,8 @@
 - **出场判定与引擎同源**（`load_price()` → `alert_engine.fetch_bars`，9/03 起）。
   此前直接读本地 CSV，而本地由会静默失败的夜间 IB 任务保鲜——25 个已路由标的的
   1h/4h 曾停在 8/21，之后开的仓 `future` 为空、永远出不了场。
+- **超配跳过（9/04 起）**：单张 >预算 2 倍直接跳过（记 `options_skipped.csv`）。拦截上线前
+  硬买的 5 笔已于 9/17 标 `contaminated=1 / contaminated_reason=oversized`，复盘排除。
 - **金额与归因字段（9/03 起）**：`BUDGET_USD=750`（与正股纸面组合 `RISK_PCT=0.75%`
   同量级）→ `contracts`/`cost_usd`/`pnl_usd`；两端都记 IV 与标的价
   （`iv_entry`/`iv_exit`/`spot_entry`/`spot_exit`）以便把盈亏拆成标的/IV/时间三块。
@@ -144,12 +146,28 @@ bar**、**68% 只持有 1 根**（无任何路由上限是 1）。权益曲线�
 RSI2 **-0.060**，实盘 Confluence **+0.289** 其实**跑赢**同期。长期均值当基准会在
 每段低于平均的行情里批量误报红灯 → 自动降级 → 在最不该关的时候关掉策略。
 `_same_period_baseline(90)` 读 `backfill_paper_equity.csv`，**只算真正开过仓的行**
-（`skip_*` 是没开成的仓，混进来稀释基准）；同期 <10 笔才退回长期均值。
+（`skip_*` 是没开成的仓，混进来稀释基准）；同期 <25 笔则不判级（9/4 起，不再退回
+长期均值），z 值计入基准自身标准误。
 
 **其他同批修复**：`_YF_PERIOD["4h"]` 60d→730d（36 条 RSI2 4h 路由此前从未发过
 信号）；实盘补上回测有而实盘漏掉的「QQQ 跌破20日低」罚分与 `vix_structural`；
 `historical_backfill.py` 的 `RSI2_PARAMS[...]` 改 `.get`（崩溃 6 周导致对照失效，
 36 条死路由因此没被发现）；`fetch_ib_data.py` 加失败告警（静默失败 13 天）。
+
+## ⚠️ 账本隔离、复盘口径、IB 保鲜（2026-09-17/18）
+
+- **正股纸面账本隔离**：9/3 修 bug 后旧样本只备份未隔离，且 `stock-alert` 到 9/4 21:46
+  才重启。9/5 前平仓的 505 笔打 `contaminated=True`，`paper_equity.csv` 加 `contaminated`
+  列，权益按干净期重算为 90,091.81（账面 -16.99% → 干净期 -9.91%，SPY -1.55%）。
+  `paper_portfolio.CONTAMINATED_BEFORE` 记录边界。**读这两份账本必须先剔除 contaminated。**
+- **复盘只统计现役路由**：`signal_review.py` 默认排除已下线路由（`--include-retired`）。
+  RSI2 1d 的 90 天亏损全部来自 8/15 已下线的 4 条路由；9 月 RSI2 下跌是行情（同期
+  回测 -0.93R 比实盘 -0.74R 还差），未动参数。
+- **quality 无预测力**（rho -0.03, p=0.50），仅记录字段；RSI2_IBS_shadow 差异不显著，继续记录。
+- **IB 保鲜**：Gateway 每日 14:30 PT 自重启（IBC `AutoRestartTime`），原 14:00 开跑必被切断；
+  重连曾因未定义 `IB_HOST` 从未成功。现 14:40 开跑、重连 6×30s。
+- **本会话跑在 Mac Studio 本机**：git push 直接可用；改了被常驻进程加载的模块后要
+  `pm2 restart`，污染边界按进程实际重启时点划。
 
 ## 策略速查
 
