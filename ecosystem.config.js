@@ -117,7 +117,10 @@ module.exports = {
       log_date_format: "YYYY-MM-DD HH:mm:ss",
     },
     {
-      // 每交易日 14:00 PT（17:00 ET 收盘后）：IB 全池历史合并补拉。
+      // 每交易日 14:40 PT（17:40 ET 收盘后）：IB 全池历史合并补拉。
+      // 2026-09-18 从 14:00 改到 14:40：IBC `AutoRestartTime=02:30 PM` 让 Gateway
+      // 每天 14:30 自重启，一轮约 55 分钟的任务 14:00 开跑必然被腰斩（9/11–9/18
+      // 每轮 56–57 个标的未更新）。14:40 开跑、约 15:35 结束，避开重启窗口。
       // 2026-07-27 加入：期货侧收敛为单一 data fetcher 后 Gateway 额度富余，
       // 本地 IB 数据从"手动按需补拉"升级为每日自动刷新——它是回测/回放/
       // alert_engine 1d 缺口填补的权威数据源。
@@ -127,7 +130,7 @@ module.exports = {
       cwd: "/Users/congrenhan/Documents/quantrift_stock",
       interpreter: "none",
       autorestart: false,
-      cron_restart: "0 14 * * 1-5",
+      cron_restart: "40 14 * * 1-5",
       out_file: "logs/nightly_ib_refresh_pm2_out.log",
       error_file: "logs/nightly_ib_refresh_pm2_err.log",
       merge_logs: true,

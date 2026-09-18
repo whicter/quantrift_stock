@@ -143,7 +143,7 @@ rsync -av mac-studio:/Users/congrenhan/Documents/quantrift_stock/data/ /Users/co
 yfinance (primary, 15-min delayed)      IB Gateway :4001 (clientId=2)
         │                                       │
         │  gaps / empty responses               │  fetch_ib_data.py --merge
-        └──────────► data/*.csv ◄───────────────┘  (nightly 14:00 PT)
+        └──────────► data/*.csv ◄───────────────┘  (nightly 14:40 PT)
                         │
                    alert_engine.py   ── signals only on COMPLETE, FRESH bars
                         ├── route via STRATEGY_MAP (no default fall-through)

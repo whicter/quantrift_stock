@@ -6,7 +6,7 @@ alert_engine.py — 股票信号监控引擎（仅告警，不下单）
   - 满足入场条件时发 Telegram 告警
   - 实时数据源为 yfinance（不连 IB Gateway，历史教训：直连曾撞 60次/10分钟
     限速触发 Error 162 crash-restart 循环）；本地 IB 快照仅作缺口/整体拉空
-    兜底，由 fetch_ib_data.py（clientId=2，交易日14:00 PT 自动刷新）保鲜
+    兜底，由 fetch_ib_data.py（clientId=2，交易日14:40 PT 自动刷新）保鲜
   - 支持 Confluence / RSI2 v2 / MR / Breakout 四策略路由
 
 用法：

@@ -9,7 +9,7 @@ fetch_ib_data.py — 通过 IB Gateway 拉取历史 bar 数据
 IB pacing 限制：
   - 同一合约同参数请求：间隔 ≥ 15s
   - 所有请求：每 10 分钟不超过 60 次
-  - 脚本在每次请求后固定等 6s，安全起见
+  - 脚本在每次请求后固定等 12s（PACING_SLEEP），安全起见
 
 数据保存到 data/{SYMBOL}_{TF}.csv（ADJUSTED_LAST，已还权）
 4h 由 1h 重采样生成。
@@ -58,14 +58,21 @@ from universes import get_universe  # noqa: E402
 # IB 参数
 IB_BAR_SIZE = {"1h": "1 hour", "1d": "1 day"}
 IB_DURATION  = {"1h": "2 Y",   "1d": "10 Y"}
-# IB 历史数据限额是 **60 请求 / 10 分钟**，且这个配额与同机的期货 bot 共享。
-# 原来的 6 秒 = 10 请求/分钟 = 100 请求/10 分钟，是限额的 1.7 倍。后果不是被
-# 拒绝单个请求，而是**整条 socket 被 IB 掐断**：2026-09-11 的日志里 194 个成功
-# 请求之后出现 Error 1100 + "Peer closed connection"，其后 82 个请求全是
-# "Not connected"，且每轮都断在同一处（字母序 RGTI 之后的 27 个标的固定被饿死）。
-# 12 秒 = 50 请求/10 分钟，给期货 bot 留出余量。
+# IB 历史数据限额是 60 请求 / 10 分钟，且与同机期货 bot 共享；12 秒 = 50 请求 /
+# 10 分钟，留出余量。
+#
+# ⚠️ 2026-09-11 我把「每轮中途 Peer closed connection」归因到限流、把间隔从 6s
+# 调到 12s——**这个归因是错的**。真正原因是 IBC 的 `AutoRestartTime=02:30 PM`：
+# Gateway 每天 14:30 PT 自重启，而本任务 14:00 开跑、一轮约 55 分钟，所以每轮
+# 都在 14:30 被切断（9/17、9/18 最后一次写入都在 14:30，9/18 Gateway 进程启动
+# 时间 14:30:04）。9/18 14:32 手动补跑同样连续 30 分钟、133 个请求，零断线。
+# 调度已改到 14:40（见 ecosystem.config.js）。12s 仍保留，因为 6s 本身确实超限。
 PACING_SLEEP = 12
 REQUEST_TIMEOUT = 45  # Gateway 无响应时跳过，不能阻塞整个补拉批次
+# 首连与断线重连共用。2026-09-11 加重连时引用了这个常量却没定义，重连每次
+# NameError、三次后中止本轮——9/15–9/18 每轮都在同一处断、剩下 56–57 个标的全部
+# 报废，重连逻辑从上线起一次都没成功过。
+IB_HOST = "127.0.0.1"
 
 
 def resample_4h(df_1h: pd.DataFrame) -> pd.DataFrame:
@@ -258,8 +265,8 @@ def main():
     # qualifyContracts() also performs a Gateway request; apply the same bound
     # as historical bars so an unavailable API cannot stall the entire batch.
     ib.RequestTimeout = REQUEST_TIMEOUT
-    print(f"连接 IB Gateway 127.0.0.1:{args.port} clientId={args.clientId} ...")
-    ib.connect("127.0.0.1", args.port, clientId=args.clientId)
+    print(f"连接 IB Gateway {IB_HOST}:{args.port} clientId={args.clientId} ...")
+    ib.connect(IB_HOST, args.port, clientId=args.clientId)
     print("✅ 已连接\n")
     print(f"下载 {len(symbols)} 个标的 × {tfs}（每次请求间隔 {PACING_SLEEP}s）")
 
@@ -275,17 +282,19 @@ def main():
             # 27 个标的连续陈旧一周的原因（每轮都在同一处断，后面的永远轮不到）。
             if not ib.isConnected():
                 print(f"\n  ⚠️ 连接已断，重连中（{sym} 之前）...", flush=True)
-                for attempt in range(3):
+                # 6 × 30s = 3 分钟：足以覆盖 Gateway 一次自重启（进程拉起到端口
+                # 重新监听）。原来 3 × 15s 只有 45 秒，就算没有 NameError 也接不上。
+                for attempt in range(6):
                     try:
-                        time.sleep(15)
+                        time.sleep(30)
                         ib.connect(IB_HOST, args.port, clientId=args.clientId,
                                    timeout=REQUEST_TIMEOUT)
                         print("  ✅ 重连成功，继续", flush=True)
                         break
                     except Exception as exc:
-                        print(f"  重连失败 {attempt + 1}/3: {exc}", flush=True)
+                        print(f"  重连失败 {attempt + 1}/6: {exc}", flush=True)
                 if not ib.isConnected():
-                    print("  ❌ 重连三次均失败，中止本轮", flush=True)
+                    print("  ❌ 重连 6 次均失败，中止本轮", flush=True)
                     failed.extend(symbols[symbols.index(sym):])
                     break
             before = {tf: (DATA_DIR / f"{sym}_{tf}.csv").stat().st_mtime
