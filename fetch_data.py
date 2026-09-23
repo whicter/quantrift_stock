@@ -20,6 +20,8 @@ from pathlib import Path
 import pandas as pd
 import yaml
 
+from consolidate_data import write_target
+
 try:
     import yfinance as yf
 except ImportError:
@@ -110,9 +112,11 @@ def save_bars(path: Path, frame: pd.DataFrame, symbol: str, tf: str, merge: bool
         existing = pd.read_csv(path, index_col=0, parse_dates=True)
         existing.columns = [column.capitalize() for column in existing.columns]
     output = merge_bars(existing, frame) if merge else frame
-    temporary = path.with_suffix(".tmp")
+    # 写穿符号链接（见 consolidate_data.write_target）
+    target = write_target(path)
+    temporary = target.with_suffix(".tmp")
     output.to_csv(temporary)
-    os.replace(temporary, path)
+    os.replace(temporary, target)
     try:
         manifest = json.loads(SOURCE_MANIFEST.read_text()) if SOURCE_MANIFEST.exists() else {}
     except (OSError, json.JSONDecodeError):

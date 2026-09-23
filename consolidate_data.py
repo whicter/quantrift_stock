@@ -26,6 +26,22 @@ import argparse
 import shutil
 from pathlib import Path
 
+
+def write_target(path: Path) -> Path:
+    """原子写入应当落到的真实路径——符号链接要写穿到外置盘，而不是被替换掉。
+
+    2026-09-23：`data/` 下每周都有 286–369 个文件从符号链接变回本地实体文件，
+    每次 `consolidate_data.py` 又把它们搬走一遍，来回循环、本地每周回流约 100M。
+    根因是 `os.replace(temp, path)`：`path` 是符号链接时，replace 替换的是**链接
+    本身**（POSIX rename 不跟随符号链接），外置盘上的目标文件原地不动，本地多出
+    一个实体文件。证据是那 370 个实体文件的 mtime 全部落在上一次夜间刷新的时间窗。
+    普通 `to_csv(path)` 没有这个问题（open() 跟随符号链接写穿）。
+
+    所以凡是"写临时文件 + os.replace"的写法，都要先 resolve 到真实目标；临时文件
+    也必须跟目标同目录，否则跨文件系统 rename 会直接失败。
+    """
+    return path.resolve() if path.is_symlink() else path
+
 LOCAL_DIR = Path("data")
 EXTERNAL_ROOT = Path("/Volumes/X9_Pro/data_seriliazation/quantrift_stock/data")
 

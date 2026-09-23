@@ -53,6 +53,7 @@ ALL_SYMBOLS = (
     + cfg["symbols"].get("watchlist_2026_07", [])
 )
 
+from consolidate_data import write_target  # noqa: E402
 from universes import get_universe  # noqa: E402
 
 # IB 参数
@@ -121,9 +122,12 @@ def _record_source(path: Path, symbol: str, tf: str, bars: int):
 
 def save_bars(path: Path, df: pd.DataFrame, symbol: str, tf: str, merge: bool):
     output = merge_bars(_load_existing(path), df) if merge else df
-    temp = path.with_suffix(".tmp")
+    # 写穿符号链接（见 consolidate_data.write_target）：data/ 下的历史 CSV 多数是
+    # 指向外置盘的符号链接，直接 os.replace 会把链接替换成本地实体文件。
+    target = write_target(path)
+    temp = target.with_suffix(".tmp")
     output.to_csv(temp)
-    os.replace(temp, path)
+    os.replace(temp, target)
     _record_source(path, symbol, tf, len(output))
     return output
 

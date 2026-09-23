@@ -50,6 +50,11 @@
 - **`data/` 下的历史行情CSV已迁到外置盘** `/Volumes/X9_Pro/data_seriliazation/quantrift_stock/data/`，本地 `data/*.csv` 均为指向外置盘的符号链接（逐文件链接，不是整个目录链接）。所有代码零改动，Python文件IO透明跟随符号链接。
 - **6个小文件仍在本地**（不符号链接，外置盘掉线不受影响）：`.sent_signals.json`（去重状态）、`.paper_positions.json`（纸面持仓）、`.data_sources.json`（IB数据源清单，均git跟踪）、`screener_results.csv`（每轮扫描读取的选股排名）、`russell2000_tickers.txt`（git跟踪）。
 - **`logs/pm2_err.log`/`pm2_out.log` 死文件已归档**到外置盘 `archived_logs/`（337M+5.6M，6月30日后未再写入，`ecosystem.config.js`的`out_file`早已失效，真正生效路径是 `~/.pm2/logs/stock-alert-*.log`）。
+- **⚠️ 写符号链接必须写穿（2026-09-23 修）**：`os.replace(temp, path)` 在 `path` 是符号链接时
+  替换的是**链接本身**（rename 不跟随符号链接），于是每次夜间刷新都把 369 个文件变回本地实体
+  文件、每周 consolidate 再搬走一遍，本地每周回流约 100M。`fetch_ib_data`/`fetch_data` 的
+  `save_bars` 现在先 `consolidate_data.write_target(path)` resolve 到外置盘真实路径，临时文件
+  也放在目标同目录（跨文件系统 rename 会失败）。普通 `to_csv(path)` 无此问题（open 跟随链接）。
 - **`consolidate_data.py`**：幂等整理脚本，每周日19:00 PT自动跑（`stock-weekly-data-consolidate`），把新产生的历史CSV搬到外置盘并留本地符号链接；外置盘未挂载时安全跳过。
 - **权衡**：外置盘掉线不影响yfinance主链路和上述6个本地小文件，但会影响缺口填补/整体拉空兜底、夜间IB刷新、每日选股、事件雷达、手动回测（这些是历史CSV的真正重度消费者）。
 
