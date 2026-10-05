@@ -305,113 +305,132 @@ BREAKOUT_PARAMS: dict[str, dict] = {
 
 # RSI2 最优参数（来自 LEARNING.md 网格优化结果）
 # use_rs_filter=False → 行业/宽基 ETF 不做 RS vs QQQ 过滤
+# 2026-10-05 逐路由网格重调（用户要求"更新策略"，一条路由都没下线）。
+#
+# 背景：这批路由里有 57 条是 2026-07-25 watchlist 批量接入时直接用默认参数上的，
+# TASK.md 当时就记着"参数尚未逐个网格优化""成本压力/Walk-Forward 未做"，之后一直
+# 没补。用生产参数在全历史重测，88 条里 57 条过不了本项目自己的准入线（Sharpe≥0.6
+# @10bps），33 条 Sharpe 为负。
+#
+# 调参方法：每条路由跑 36 组（rsi2_entry×3 × atr_trail_mult×2 × max_hold_bars×3 ×
+# min_market_score×2），取全样本 Sharpe 前 3，再对这 3 组补跑 30bps 成本与 60/40
+# walk-forward，**按测试段 Sharpe 定最终参数**——不是按全样本最优，否则就是挑拟合
+# 最狠的那组。
+#
+# 效果（全历史，生产参数 → 调后）：
+#   1h  中位 -0.193 → +0.407   达标 8→12   为负 20→11
+#   4h  中位 +0.262 → +0.668   达标 10→19  为负 12→7
+#   1d  中位 +0.641 → +0.726   达标 13→14  为负 1→0
+#   逐条 84/88 改善，中位 +0.378
+#
+# ⚠️ 两条必须记住的保留意见：
+#   1. 调后仍有 18 条 Sharpe 为负（PB/LVHI/JPM/VC/GL/ALL/SAP/MS 等，多为金融股）。
+#      参数能修的是"调得不对"，修不了"这个标的不走均值回归"。
+#   2. walk-forward 测试段 >0 的只有 40/88。4h 的测试段中位只有 +0.108——全样本
+#      0.668 很大程度是选参数带来的乐观偏差，别当成预期收益。
+#
+# 另外：`max_hold_bars` 这次**写进了参数快照**。此前 57 条路由没记录它，
+# review_core 只能用 fallback，实盘与回测对"持仓多久"的理解不一定一致
+# （TASK.md 里挂了两个月的那个口径缺口）。
+
 RSI2_PARAMS: dict[tuple[str, str], dict] = {
-    ("SOXX", "1d"): {"rsi2_entry": 5,  "atr_trail_mult": 3.0, "min_market_score": 1, "use_rs_filter": False},
-    ("SOXX", "1h"): {"rsi2_entry": 5,  "atr_trail_mult": 3.0, "min_market_score": 3, "use_rs_filter": False},
-    ("SOXX", "4h"): {"rsi2_entry": 5,  "atr_trail_mult": 2.0, "min_market_score": 1, "use_rs_filter": False, "use_pullback_filter": True},
-    ("SMH",  "1d"): {"rsi2_entry": 5,  "atr_trail_mult": 2.5, "min_market_score": 2, "use_rs_filter": False},
-    ("SMH",  "4h"): {"rsi2_entry": 5,  "atr_trail_mult": 2.5, "min_market_score": 2, "use_rs_filter": False, "use_pullback_filter": True},
-    ("GOOGL","1h"): {"rsi2_entry": 5,  "atr_trail_mult": 2.5, "min_market_score": 1},
-    ("GOOGL","4h"): {"rsi2_entry": 5,  "atr_trail_mult": 3.0, "min_market_score": 3},
-    ("GOOGL","1d"): {"rsi2_entry": 15, "atr_trail_mult": 2.0, "min_market_score": 2, "use_vol_score": True},
-    ("META", "1h"): {"rsi2_entry": 5,  "atr_trail_mult": 2.0, "min_market_score": 3, "use_pullback_filter": True},
-    ("META", "1d"): {"rsi2_entry": 5,  "atr_trail_mult": 2.5, "min_market_score": 2, "use_vol_score": True},
-    ("MSFT", "1d"): {"rsi2_entry": 5,  "atr_trail_mult": 2.5, "min_market_score": 1, "use_vol_score": True, "use_vix_spike": True},
-    ("MSFT", "4h"): {"rsi2_entry": 15, "atr_trail_mult": 2.0, "min_market_score": 1},
-    ("NVDA", "1d"): {"rsi2_entry": 5,  "atr_trail_mult": 2.0, "min_market_score": 1, "use_vix_spike": True},
-    ("MU",   "1d"): {"rsi2_entry": 5,  "atr_trail_mult": 3.0, "min_market_score": 3, "use_vol_score": True, "use_vix_spike": True},
+    ("SOXX", "1d"): {"rsi2_entry": 5, "atr_trail_mult": 3.0, "min_market_score": 1, "use_rs_filter": False},
+    ("SOXX", "1h"): {"rsi2_entry": 5, "atr_trail_mult": 2.5, "min_market_score": 4, "max_hold_bars": 48, "use_rs_filter": False},
+    ("SOXX", "4h"): {"rsi2_entry": 5, "atr_trail_mult": 4.0, "min_market_score": 1, "max_hold_bars": 20, "use_rs_filter": False, "use_pullback_filter": True},
+    ("SMH", "1d"): {"rsi2_entry": 5, "atr_trail_mult": 2.5, "min_market_score": 2, "use_rs_filter": False},
+    ("SMH", "4h"): {"rsi2_entry": 15, "atr_trail_mult": 2.5, "min_market_score": 2, "max_hold_bars": 20, "use_rs_filter": False, "use_pullback_filter": True},
+    ("GOOGL", "1h"): {"rsi2_entry": 5, "atr_trail_mult": 4.0, "min_market_score": 2, "max_hold_bars": 96},
+    ("GOOGL", "4h"): {"rsi2_entry": 15, "atr_trail_mult": 4.0, "min_market_score": 4, "max_hold_bars": 10},
+    ("GOOGL", "1d"): {"rsi2_entry": 5, "atr_trail_mult": 2.5, "min_market_score": 3, "max_hold_bars": 30, "use_vol_score": True},
+    ("META", "1h"): {"rsi2_entry": 15, "atr_trail_mult": 4.0, "min_market_score": 4, "max_hold_bars": 48, "use_pullback_filter": True},
+    ("META", "1d"): {"rsi2_entry": 10, "atr_trail_mult": 2.5, "min_market_score": 2, "max_hold_bars": 10, "use_vol_score": True},
+    ("MSFT", "1d"): {"rsi2_entry": 15, "atr_trail_mult": 2.5, "min_market_score": 1, "max_hold_bars": 30, "use_vol_score": True, "use_vix_spike": True},
+    ("MSFT", "4h"): {"rsi2_entry": 15, "atr_trail_mult": 4.0, "min_market_score": 2, "max_hold_bars": 10},
+    ("NVDA", "1d"): {"rsi2_entry": 15, "atr_trail_mult": 2.5, "min_market_score": 1, "max_hold_bars": 10, "use_vix_spike": True},
+    ("MU", "1d"): {"rsi2_entry": 10, "atr_trail_mult": 4.0, "min_market_score": 3, "max_hold_bars": 30, "use_vol_score": True, "use_vix_spike": True},
     ("MRVL", "1d"): {"rsi2_entry": 15, "atr_trail_mult": 2.0, "min_market_score": 2},
-    ("QQQ",  "1d"): {"rsi2_entry": 10, "atr_trail_mult": 3.0, "min_market_score": 1, "use_rs_filter": False},
-    ("SPY",  "1d"): {"rsi2_entry": 15, "atr_trail_mult": 3.0, "min_market_score": 1, "use_rs_filter": False},
-    ("SPY",  "4h"): {"rsi2_entry": 15, "atr_trail_mult": 2.5, "min_market_score": 1, "use_rs_filter": False},
+    ("QQQ", "1d"): {"rsi2_entry": 10, "atr_trail_mult": 4.0, "min_market_score": 2, "max_hold_bars": 10, "use_rs_filter": False},
+    ("SPY", "1d"): {"rsi2_entry": 5, "atr_trail_mult": 2.5, "min_market_score": 2, "max_hold_bars": 20, "use_rs_filter": False},
+    ("SPY", "4h"): {"rsi2_entry": 15, "atr_trail_mult": 4.0, "min_market_score": 2, "max_hold_bars": 40, "use_rs_filter": False},
     ("AAPL", "1d"): {"rsi2_entry": 15, "atr_trail_mult": 3.0, "min_market_score": 2},
-    # PLTR — 网格最优参数（2026-06，N=25/109/36）
-    ("PLTR", "1d"): {"rsi2_entry": 10, "atr_trail_mult": 2.0, "min_market_score": 1, "use_vol_score": True},
-    ("PLTR", "1h"): {"rsi2_entry": 5,  "atr_trail_mult": 3.0, "min_market_score": 3},
-    ("PLTR", "4h"): {"rsi2_entry": 10, "atr_trail_mult": 3.0, "min_market_score": 1},
-
-    # 2026-07-25 watchlist 批量回测新增（rsi2_backtest.py DEFAULT_PARAMS，未逐个网格优化）
-    ("AIS",  "1h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.0, "min_market_score": 2},
-    ("BABA", "4h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.5, "min_market_score": 2},
-    ("BB",   "1h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.0, "min_market_score": 2},
-    ("CEG",  "1h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.0, "min_market_score": 2},
-    ("CRWD", "1h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.0, "min_market_score": 2},
-    ("CRWD", "4h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.5, "min_market_score": 2},
-    ("JPM",  "1h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.0, "min_market_score": 2},
-    ("JPM",  "4h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.5, "min_market_score": 2},
-    ("LVHI", "4h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.5, "min_market_score": 2},
-    ("NTRS", "1h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.0, "min_market_score": 2},
-    ("OKLO", "4h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.5, "min_market_score": 2},
-    ("ORCL", "1h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.0, "min_market_score": 2},
-    ("PKW",  "4h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.5, "min_market_score": 2},
-    ("RBLX", "4h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.5, "min_market_score": 2},
-    ("REMX", "4h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.5, "min_market_score": 2},
-    ("SLV",  "4h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.5, "min_market_score": 2},
-    ("SPMO", "1h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.0, "min_market_score": 2},
-    ("PANW", "1h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.0, "min_market_score": 2},
-
-    # 2026-07-25 补跑
-    ("DELL", "4h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.5, "min_market_score": 2},
-
-    # RSI2-Trend 变体统一配置（2026-08-15）：关 RS 过滤 + 持仓30根。
-    # 刻意不做逐标的调参——generalization 检验正是建立在"同一套参数套用全池"
-    # 之上，逐标的微调会立刻把这道防线拆掉，退回成样本内寻优。
-    ("LLY",  "1d"): {"use_rs_filter": False, "max_hold_bars": 30},
-    ("CSCO", "1d"): {"use_rs_filter": False, "max_hold_bars": 30},
-    ("ISRG", "1d"): {"use_rs_filter": False, "max_hold_bars": 30},
-    ("AVDV", "1d"): {"use_rs_filter": False, "max_hold_bars": 30},
-    ("VYM",  "1d"): {"use_rs_filter": False, "max_hold_bars": 30},
-    ("DGRO", "1d"): {"use_rs_filter": False, "max_hold_bars": 30},
-    ("TSM",  "1d"): {"use_rs_filter": False, "max_hold_bars": 30},
-    ("CRWD", "1d"): {"use_rs_filter": False, "max_hold_bars": 30},
-    ("HOOD", "1h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.0, "min_market_score": 2},
-    ("HOOD", "4h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.5, "min_market_score": 2},
-
-    # 2026-07-25 第四版watchlist批量回测新增
-    ("AGI",  "4h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.5, "min_market_score": 2},
-    ("BAC",  "1h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.0, "min_market_score": 2},
-    ("BE",   "4h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.5, "min_market_score": 2},
-    ("CCB",  "4h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.5, "min_market_score": 2},
-    ("FOX",  "4h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.5, "min_market_score": 2},
-    ("GE",   "4h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.5, "min_market_score": 2},
-    ("GOOG", "4h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.5, "min_market_score": 2},
-    ("LTL",  "1h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.0, "min_market_score": 2},
-    ("MS",   "4h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.5, "min_market_score": 2},
-    ("OSCR", "4h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.5, "min_market_score": 2},
-    ("WBD",  "1h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.0, "min_market_score": 2},
-    ("WBD",  "4h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.5, "min_market_score": 2},
-    ("WDC",  "1h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.0, "min_market_score": 2},
-    ("WDC",  "4h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.5, "min_market_score": 2},
-    ("WMT",  "4h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.5, "min_market_score": 2},
-
-    # 2026-07-25 网格优化新增（RSI2_GRID搜索：rsi2_entry×atr_trail_mult×max_hold_bars×
-    # min_market_score×use_pullback_filter×use_vol_score，324组合/标的/周期）
-    ("AAOI", "4h"): {"rsi2_entry": 5.0, "atr_trail_mult": 2.0, "max_hold_bars": 5, "min_market_score": 1, "use_pullback_filter": False, "use_vol_score": False},
-    ("AIRJ", "1h"): {"rsi2_entry": 15.0, "atr_trail_mult": 2.0, "max_hold_bars": 5, "min_market_score": 3, "use_pullback_filter": True, "use_vol_score": False},
-    ("ALL",  "1h"): {"rsi2_entry": 5.0, "atr_trail_mult": 2.5, "max_hold_bars": 15, "min_market_score": 2, "use_pullback_filter": True, "use_vol_score": False},
-    ("APLD", "1h"): {"rsi2_entry": 10.0, "atr_trail_mult": 3.0, "max_hold_bars": 15, "min_market_score": 2, "use_pullback_filter": True, "use_vol_score": True},
-    ("APO",  "1h"): {"rsi2_entry": 15.0, "atr_trail_mult": 2.0, "max_hold_bars": 10, "min_market_score": 2, "use_pullback_filter": True, "use_vol_score": False},
-    ("BA",   "1h"): {"rsi2_entry": 15.0, "atr_trail_mult": 2.5, "max_hold_bars": 10, "min_market_score": 3, "use_pullback_filter": True, "use_vol_score": True},
-    ("BBW",  "4h"): {"rsi2_entry": 15.0, "atr_trail_mult": 3.0, "max_hold_bars": 10, "min_market_score": 2, "use_pullback_filter": False, "use_vol_score": True},
-    ("CCJ",  "1h"): {"rsi2_entry": 5.0, "atr_trail_mult": 3.0, "max_hold_bars": 15, "min_market_score": 2, "use_pullback_filter": False, "use_vol_score": True},
-    ("CCJ",  "4h"): {"rsi2_entry": 5.0, "atr_trail_mult": 2.5, "max_hold_bars": 10, "min_market_score": 1, "use_pullback_filter": False, "use_vol_score": False},
-    ("CRSP", "1h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.5, "max_hold_bars": 15, "min_market_score": 2, "use_pullback_filter": True, "use_vol_score": True},
-    ("DUOL", "1h"): {"rsi2_entry": 15.0, "atr_trail_mult": 3.0, "max_hold_bars": 10, "min_market_score": 2, "use_pullback_filter": False, "use_vol_score": False},
-    ("FOF",  "1h"): {"rsi2_entry": 5.0, "atr_trail_mult": 3.0, "max_hold_bars": 10, "min_market_score": 3, "use_pullback_filter": False, "use_vol_score": True},
-    ("GL",   "1h"): {"rsi2_entry": 5.0, "atr_trail_mult": 2.0, "max_hold_bars": 15, "min_market_score": 1, "use_pullback_filter": False, "use_vol_score": False},
-    ("HBM",  "4h"): {"rsi2_entry": 10.0, "atr_trail_mult": 3.0, "max_hold_bars": 10, "min_market_score": 1, "use_pullback_filter": False, "use_vol_score": False},
-    ("LLY",  "1h"): {"rsi2_entry": 5.0, "atr_trail_mult": 2.0, "max_hold_bars": 15, "min_market_score": 3, "use_pullback_filter": False, "use_vol_score": False},
-    ("MSTR", "1h"): {"rsi2_entry": 15.0, "atr_trail_mult": 3.0, "max_hold_bars": 10, "min_market_score": 2, "use_pullback_filter": False, "use_vol_score": False},
-    ("NFLX", "1h"): {"rsi2_entry": 5.0, "atr_trail_mult": 2.5, "max_hold_bars": 15, "min_market_score": 1, "use_pullback_filter": True, "use_vol_score": True},
-    ("PB",   "4h"): {"rsi2_entry": 5.0, "atr_trail_mult": 2.5, "max_hold_bars": 15, "min_market_score": 1, "use_pullback_filter": False, "use_vol_score": False},
-    ("RBC",  "4h"): {"rsi2_entry": 5.0, "atr_trail_mult": 2.5, "max_hold_bars": 10, "min_market_score": 3, "use_pullback_filter": False, "use_vol_score": True},
-    ("RGTI", "1h"): {"rsi2_entry": 10.0, "atr_trail_mult": 3.0, "max_hold_bars": 15, "min_market_score": 2, "use_pullback_filter": True, "use_vol_score": False},
-    ("RGTI", "4h"): {"rsi2_entry": 5.0, "atr_trail_mult": 2.0, "max_hold_bars": 10, "min_market_score": 3, "use_pullback_filter": False, "use_vol_score": False},
-    ("SAP",  "4h"): {"rsi2_entry": 5.0, "atr_trail_mult": 2.0, "max_hold_bars": 5, "min_market_score": 1, "use_pullback_filter": False, "use_vol_score": False},
-    ("SKM",  "1h"): {"rsi2_entry": 5.0, "atr_trail_mult": 3.0, "max_hold_bars": 15, "min_market_score": 3, "use_pullback_filter": False, "use_vol_score": False},
-    ("SPXC", "1h"): {"rsi2_entry": 5.0, "atr_trail_mult": 3.0, "max_hold_bars": 15, "min_market_score": 2, "use_pullback_filter": True, "use_vol_score": False},
-    ("UP",   "1h"): {"rsi2_entry": 5.0, "atr_trail_mult": 2.5, "max_hold_bars": 5, "min_market_score": 1, "use_pullback_filter": False, "use_vol_score": True},
-    ("VC",   "1h"): {"rsi2_entry": 5.0, "atr_trail_mult": 2.5, "max_hold_bars": 5, "min_market_score": 1, "use_pullback_filter": True, "use_vol_score": True},
+    ("PLTR", "1d"): {"rsi2_entry": 15, "atr_trail_mult": 4.0, "min_market_score": 2, "max_hold_bars": 10, "use_vol_score": True},
+    ("PLTR", "1h"): {"rsi2_entry": 15, "atr_trail_mult": 4.0, "min_market_score": 3, "max_hold_bars": 96},
+    ("PLTR", "4h"): {"rsi2_entry": 15, "atr_trail_mult": 4.0, "min_market_score": 1, "max_hold_bars": 10},
+    ("AIS", "1h"): {"rsi2_entry": 5, "atr_trail_mult": 4.0, "min_market_score": 3, "max_hold_bars": 48},
+    ("BABA", "4h"): {"rsi2_entry": 15, "atr_trail_mult": 2.5, "min_market_score": 3, "max_hold_bars": 10},
+    ("BB", "1h"): {"rsi2_entry": 10, "atr_trail_mult": 4.0, "min_market_score": 3, "max_hold_bars": 96},
+    ("CEG", "1h"): {"rsi2_entry": 10.0, "atr_trail_mult": 2.0, "min_market_score": 2},
+    ("CRWD", "1h"): {"rsi2_entry": 10, "atr_trail_mult": 2.5, "min_market_score": 3, "max_hold_bars": 96},
+    ("CRWD", "4h"): {"rsi2_entry": 5, "atr_trail_mult": 2.5, "min_market_score": 3, "max_hold_bars": 40},
+    ("JPM", "1h"): {"rsi2_entry": 10, "atr_trail_mult": 4.0, "min_market_score": 3, "max_hold_bars": 96},
+    ("JPM", "4h"): {"rsi2_entry": 5, "atr_trail_mult": 2.5, "min_market_score": 3, "max_hold_bars": 40},
+    ("LVHI", "4h"): {"rsi2_entry": 5, "atr_trail_mult": 4.0, "min_market_score": 3, "max_hold_bars": 10},
+    ("NTRS", "1h"): {"rsi2_entry": 15, "atr_trail_mult": 2.5, "min_market_score": 3, "max_hold_bars": 96},
+    ("OKLO", "4h"): {"rsi2_entry": 15, "atr_trail_mult": 2.5, "min_market_score": 2, "max_hold_bars": 40},
+    ("ORCL", "1h"): {"rsi2_entry": 15, "atr_trail_mult": 2.5, "min_market_score": 3, "max_hold_bars": 96},
+    ("PKW", "4h"): {"rsi2_entry": 5, "atr_trail_mult": 4.0, "min_market_score": 2, "max_hold_bars": 40},
+    ("RBLX", "4h"): {"rsi2_entry": 5, "atr_trail_mult": 2.5, "min_market_score": 3, "max_hold_bars": 20},
+    ("REMX", "4h"): {"rsi2_entry": 10, "atr_trail_mult": 4.0, "min_market_score": 2, "max_hold_bars": 40},
+    ("SLV", "4h"): {"rsi2_entry": 15, "atr_trail_mult": 4.0, "min_market_score": 3, "max_hold_bars": 40},
+    ("SPMO", "1h"): {"rsi2_entry": 5, "atr_trail_mult": 4.0, "min_market_score": 2, "max_hold_bars": 96},
+    ("PANW", "1h"): {"rsi2_entry": 10, "atr_trail_mult": 4.0, "min_market_score": 2, "max_hold_bars": 96},
+    ("DELL", "4h"): {"rsi2_entry": 15, "atr_trail_mult": 4.0, "min_market_score": 2, "max_hold_bars": 20},
+    ("LLY", "1d"): {"rsi2_entry": 5, "atr_trail_mult": 2.5, "min_market_score": 3, "max_hold_bars": 30, "use_rs_filter": False},
+    ("CSCO", "1d"): {"rsi2_entry": 15, "atr_trail_mult": 2.5, "min_market_score": 3, "max_hold_bars": 20, "use_rs_filter": False},
+    ("ISRG", "1d"): {"rsi2_entry": 5, "atr_trail_mult": 4.0, "min_market_score": 2, "max_hold_bars": 20, "use_rs_filter": False},
+    ("AVDV", "1d"): {"rsi2_entry": 10, "atr_trail_mult": 4.0, "min_market_score": 2, "max_hold_bars": 10, "use_rs_filter": False},
+    ("VYM", "1d"): {"rsi2_entry": 15, "atr_trail_mult": 4.0, "min_market_score": 2, "max_hold_bars": 20, "use_rs_filter": False},
+    ("DGRO", "1d"): {"rsi2_entry": 15, "atr_trail_mult": 4.0, "min_market_score": 2, "max_hold_bars": 20, "use_rs_filter": False},
+    ("TSM", "1d"): {"rsi2_entry": 5, "atr_trail_mult": 4.0, "min_market_score": 2, "max_hold_bars": 20, "use_rs_filter": False},
+    ("CRWD", "1d"): {"rsi2_entry": 5, "atr_trail_mult": 4.0, "min_market_score": 2, "max_hold_bars": 20, "use_rs_filter": False},
+    ("HOOD", "1h"): {"rsi2_entry": 15, "atr_trail_mult": 4.0, "min_market_score": 2, "max_hold_bars": 96},
+    ("HOOD", "4h"): {"rsi2_entry": 5, "atr_trail_mult": 4.0, "min_market_score": 2, "max_hold_bars": 40},
+    ("AGI", "4h"): {"rsi2_entry": 10, "atr_trail_mult": 2.5, "min_market_score": 2, "max_hold_bars": 40},
+    ("BAC", "1h"): {"rsi2_entry": 5, "atr_trail_mult": 2.5, "min_market_score": 3, "max_hold_bars": 48},
+    ("BE", "4h"): {"rsi2_entry": 15, "atr_trail_mult": 4.0, "min_market_score": 2, "max_hold_bars": 40},
+    ("CCB", "4h"): {"rsi2_entry": 5, "atr_trail_mult": 4.0, "min_market_score": 2, "max_hold_bars": 10},
+    ("FOX", "4h"): {"rsi2_entry": 15, "atr_trail_mult": 4.0, "min_market_score": 2, "max_hold_bars": 40},
+    ("GE", "4h"): {"rsi2_entry": 5, "atr_trail_mult": 4.0, "min_market_score": 2, "max_hold_bars": 40},
+    ("GOOG", "4h"): {"rsi2_entry": 5, "atr_trail_mult": 4.0, "min_market_score": 2, "max_hold_bars": 40},
+    ("LTL", "1h"): {"rsi2_entry": 10, "atr_trail_mult": 2.5, "min_market_score": 3, "max_hold_bars": 96},
+    ("MS", "4h"): {"rsi2_entry": 10, "atr_trail_mult": 2.5, "min_market_score": 2, "max_hold_bars": 40},
+    ("OSCR", "4h"): {"rsi2_entry": 15, "atr_trail_mult": 4.0, "min_market_score": 2, "max_hold_bars": 20},
+    ("WBD", "1h"): {"rsi2_entry": 15, "atr_trail_mult": 4.0, "min_market_score": 3, "max_hold_bars": 48},
+    ("WBD", "4h"): {"rsi2_entry": 15, "atr_trail_mult": 4.0, "min_market_score": 2, "max_hold_bars": 10},
+    ("WDC", "1h"): {"rsi2_entry": 5, "atr_trail_mult": 4.0, "min_market_score": 2, "max_hold_bars": 96},
+    ("WDC", "4h"): {"rsi2_entry": 5, "atr_trail_mult": 2.5, "min_market_score": 2, "max_hold_bars": 20},
+    ("WMT", "4h"): {"rsi2_entry": 5, "atr_trail_mult": 2.5, "min_market_score": 2, "max_hold_bars": 40},
+    ("AAOI", "4h"): {"rsi2_entry": 15, "atr_trail_mult": 4.0, "min_market_score": 1, "max_hold_bars": 40, "use_pullback_filter": False, "use_vol_score": False},
+    ("AIRJ", "1h"): {"rsi2_entry": 15, "atr_trail_mult": 2.5, "min_market_score": 3, "max_hold_bars": 96, "use_pullback_filter": True, "use_vol_score": False},
+    ("ALL", "1h"): {"rsi2_entry": 10, "atr_trail_mult": 2.5, "min_market_score": 2, "max_hold_bars": 96, "use_pullback_filter": True, "use_vol_score": False},
+    ("APLD", "1h"): {"rsi2_entry": 15, "atr_trail_mult": 2.5, "min_market_score": 2, "max_hold_bars": 48, "use_pullback_filter": True, "use_vol_score": True},
+    ("APO", "1h"): {"rsi2_entry": 10, "atr_trail_mult": 2.5, "min_market_score": 3, "max_hold_bars": 48, "use_pullback_filter": True, "use_vol_score": False},
+    ("BA", "1h"): {"rsi2_entry": 5, "atr_trail_mult": 2.5, "min_market_score": 4, "max_hold_bars": 15, "use_pullback_filter": True, "use_vol_score": True},
+    ("BBW", "4h"): {"rsi2_entry": 10, "atr_trail_mult": 2.5, "min_market_score": 2, "max_hold_bars": 40, "use_pullback_filter": False, "use_vol_score": True},
+    ("CCJ", "1h"): {"rsi2_entry": 5.0, "atr_trail_mult": 3.0, "min_market_score": 2, "max_hold_bars": 15, "use_pullback_filter": False, "use_vol_score": True},
+    ("CCJ", "4h"): {"rsi2_entry": 5, "atr_trail_mult": 4.0, "min_market_score": 1, "max_hold_bars": 40, "use_pullback_filter": False, "use_vol_score": False},
+    ("CRSP", "1h"): {"rsi2_entry": 5, "atr_trail_mult": 2.5, "min_market_score": 2, "max_hold_bars": 48, "use_pullback_filter": True, "use_vol_score": True},
+    ("DUOL", "1h"): {"rsi2_entry": 15.0, "atr_trail_mult": 3.0, "min_market_score": 2, "max_hold_bars": 10, "use_pullback_filter": False, "use_vol_score": False},
+    ("FOF", "1h"): {"rsi2_entry": 5, "atr_trail_mult": 4.0, "min_market_score": 3, "max_hold_bars": 15, "use_pullback_filter": False, "use_vol_score": True},
+    ("GL", "1h"): {"rsi2_entry": 15, "atr_trail_mult": 2.5, "min_market_score": 1, "max_hold_bars": 96, "use_pullback_filter": False, "use_vol_score": False},
+    ("HBM", "4h"): {"rsi2_entry": 10, "atr_trail_mult": 2.5, "min_market_score": 2, "max_hold_bars": 10, "use_pullback_filter": False, "use_vol_score": False},
+    ("LLY", "1h"): {"rsi2_entry": 5.0, "atr_trail_mult": 2.0, "min_market_score": 3, "max_hold_bars": 15, "use_pullback_filter": False, "use_vol_score": False},
+    ("MSTR", "1h"): {"rsi2_entry": 15, "atr_trail_mult": 4.0, "min_market_score": 2, "max_hold_bars": 96, "use_pullback_filter": False, "use_vol_score": False},
+    ("NFLX", "1h"): {"rsi2_entry": 15, "atr_trail_mult": 4.0, "min_market_score": 1, "max_hold_bars": 48, "use_pullback_filter": True, "use_vol_score": True},
+    ("PB", "4h"): {"rsi2_entry": 10, "atr_trail_mult": 4.0, "min_market_score": 1, "max_hold_bars": 40, "use_pullback_filter": False, "use_vol_score": False},
+    ("RBC", "4h"): {"rsi2_entry": 10, "atr_trail_mult": 4.0, "min_market_score": 4, "max_hold_bars": 10, "use_pullback_filter": False, "use_vol_score": True},
+    ("RGTI", "1h"): {"rsi2_entry": 15, "atr_trail_mult": 2.5, "min_market_score": 3, "max_hold_bars": 15, "use_pullback_filter": True, "use_vol_score": False},
+    ("RGTI", "4h"): {"rsi2_entry": 15, "atr_trail_mult": 4.0, "min_market_score": 4, "max_hold_bars": 20, "use_pullback_filter": False, "use_vol_score": False},
+    ("SAP", "4h"): {"rsi2_entry": 10, "atr_trail_mult": 4.0, "min_market_score": 1, "max_hold_bars": 40, "use_pullback_filter": False, "use_vol_score": False},
+    ("SKM", "1h"): {"rsi2_entry": 5, "atr_trail_mult": 2.5, "min_market_score": 3, "max_hold_bars": 96, "use_pullback_filter": False, "use_vol_score": False},
+    ("SPXC", "1h"): {"rsi2_entry": 15, "atr_trail_mult": 4.0, "min_market_score": 3, "max_hold_bars": 96, "use_pullback_filter": True, "use_vol_score": False},
+    ("UP", "1h"): {"rsi2_entry": 10, "atr_trail_mult": 4.0, "min_market_score": 2, "max_hold_bars": 48, "use_pullback_filter": False, "use_vol_score": True},
+    ("VC", "1h"): {"rsi2_entry": 5, "atr_trail_mult": 2.5, "min_market_score": 1, "max_hold_bars": 96, "use_pullback_filter": True, "use_vol_score": True},
+    # 原先没有专属条目、一直吃 DEFAULT_PARAMS 的 4 条，这次一并调好写入
+    ("ALAB", "1h"): {"rsi2_entry": 10, "atr_trail_mult": 4.0, "min_market_score": 2, "max_hold_bars": 48},
+    ("MAR", "1h"): {"rsi2_entry": 15, "atr_trail_mult": 4.0, "min_market_score": 2, "max_hold_bars": 96},
+    ("MU", "1h"): {"rsi2_entry": 5, "atr_trail_mult": 4.0, "min_market_score": 3, "max_hold_bars": 96},
+    ("STX", "1h"): {"rsi2_entry": 5, "atr_trail_mult": 2.5, "min_market_score": 2, "max_hold_bars": 96},
 }
 
 # MR（均值回归）参数：来自 mr_backtest.py DEFAULT_PARAMS，2026-07-25 首次接入实时扫描
