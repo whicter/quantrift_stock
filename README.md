@@ -108,6 +108,67 @@ theoretical R.
 - Originally researched for broad ETFs (SOXX/SMH/QQQ/SPY) but paused for insufficient sample size across the board (see LEARNING.md); those four still run on RSI2 in production
 - **2026-07-25**: first live deployment via `check_mr_signal()`, discovered through the watchlist batch probe rather than the original broad-ETF research — currently `TSM`, `FDVV` and `MKSI` (all 1h), on unoptimized default params
 
+### RSI2 per-route retune (2026-10-05)
+
+All 88 RSI2 routes were re-tuned individually; none were retired. Re-tested on
+full history with the parameters actually in production, 57 of 88 failed the
+project's own admission bar (Sharpe >= 0.6 @10bps) and 33 were negative -- 57 of
+them had been admitted in the 07-25 watchlist batch on default parameters, with
+the grid search and the cost/walk-forward checks logged as "not done".
+
+Each route ran 36 combinations (entry x3, trail x2, hold x3, regime score x2);
+the top 3 by full-sample Sharpe were re-run at 30bps and on a 60/40
+walk-forward split, and the final pick is the best **test-segment** Sharpe, not
+the best full-sample one.
+
+| TF | median Sharpe | >= 0.6 | negative |
+|---|---|---|---|
+| 1h | -0.193 -> **+0.407** | 8 -> 12 | 20 -> **11** |
+| 4h | +0.262 -> **+0.668** | 10 -> **19** | 12 -> 7 |
+| 1d | +0.641 -> +0.726 | 13 -> 14 | 1 -> **0** |
+
+84 of 88 improved, median +0.378. `max_hold_bars` is now recorded in the
+parameter snapshot for all 88 routes, closing a two-month-old gap where
+`review_core` had to fall back to a default.
+
+Three caveats that travel with those numbers: 18 routes are still negative
+(mostly financials -- PB/LVHI/JPM/VC/GL/ALL/SAP/MS); only 40 of 88 have a
+positive walk-forward test segment, and 4h's test-segment median is just
++0.108, so the 0.668 carries real selection optimism; and with holds now up to
+96 1h bars (~14 trading days), the first usable live sample lands late October.
+
+Rejected and not to be retried: switching the exit model from C to A/A70
+(full exit at RSI2>80). It looked strong on 90 days of live signals (+0.222R vs
+-0.167R) but was worse on 79 of 88 routes across full history, with a negative
+median delta in all six route-quality x timeframe subgroups. The effective
+lever was the holding cap, not the exit model.
+
+`rsi2_backtest.GRID` still cannot express the fix: its `max_hold_bars` is
+`[5,10,15]` while production uses 48 (1h) and 20 (4h), so `--optimize` could
+never have found "hold longer". The retune used per-timeframe grids instead.
+
+The 8 RSI2-Trend 1d routes are deliberately exempt: they were tuned per-route on
+10-05 (producing 5 different parameter sets) and restored to one shared set on
+10-08. Their evidence is a pre-registered generalization test with frozen
+parameters; per-symbol tuning dissolves that into eight in-sample fits, and it
+only bought a median +0.091 Sharpe.
+
+### Scheduler outage (2026-09-23 -> fixed 10-02)
+
+The system disk filled at 07:25 on 09-23; pm2 logged 927 `ENOSPC` errors and
+rebuilt its process list at 07:51. Five cron jobs (daily screener, both event
+radars, weekly review, monthly revalidation) then never started again for nine
+days -- the 09-27 weekly review was simply lost. The failure is near-invisible:
+cron re-registers hourly, nothing errors, and `pm2 status` shows `stopped`,
+which is also what a healthy finished run shows. Only the log file mtimes gave
+it away. Fixed by re-registering each job (`pm2 delete` + `pm2 start --only`)
+and `pm2 save`.
+
+There is still no disk-space check and no job-liveness monitor in this repo, and
+the futures-side watchdog only covers `ib-bot*`. This is the third silent
+failure here: IB refresh disconnects (13 days), dead 4h routes (6 weeks), cron
+outage (9 days).
+
 ## Timeframes
 
 1h / 4h / 1d (independent signals per timeframe)
