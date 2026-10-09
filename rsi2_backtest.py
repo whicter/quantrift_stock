@@ -93,12 +93,28 @@ DEFAULT_PARAMS = {
 # rsi2_half_exit 固定 80，需要对比时改为 [70, 80, 85] 加入 GRID
 GRID = {
     "rsi2_entry":          [5.0, 10.0, 15.0],
-    "atr_trail_mult":      [2.0, 2.5, 3.0],
-    "max_hold_bars":       [5, 10, 15],
+    "atr_trail_mult":      [2.0, 2.5, 3.0, 4.0],
     "min_market_score":    [1, 2, 3],
     "use_pullback_filter": [False, True],
     "use_vol_score":       [False, True],   # 成交量放量加分（vol > 20日均量 × 1.5）
     # use_vix_spike 不加入主 GRID，用 --vix-spike-test 专项测试
+}
+
+# max_hold_bars 必须按周期取值，不能放进上面那个跨周期共用的 GRID。
+#
+# 2026-10-05 的教训：这一项原来写在 GRID 里、取值 [5, 10, 15]，而生产中 21 条 1h
+# 路由用 48、28 条 4h 路由用 20——**网格里压根没有这些值，更没有更大的**。于是
+# `--optimize` 只会在 5/10/15 之间挑，永远得不出"持仓要更长"这个结论，而那恰恰是
+# 4h 唯一有效的修法（上限 20→40，27/36 条路由改善，中位 Sharpe 0.262→0.668）。
+# 优化器的搜索空间本身就是一个未经检验的假设：它不报错，只是安静地在一个不含正确
+# 答案的集合里返回"最优"。
+#
+# 取值围绕各周期的 DEFAULT_PARAMS（1h=48 / 4h=20 / 1d=10）上下展开，并保证覆盖
+# 生产中实际在用的值——`_assert_grid_covers_production()` 会在启动时核对。
+HOLD_GRID = {
+    "1h": [15, 48, 96],
+    "4h": [10, 20, 40],
+    "1d": [5, 10, 20, 30],
 }
 
 # 出场模型对比（--compare-exit）
@@ -485,11 +501,40 @@ def run_backtest_mode(symbols, tfs):
         print(f"\n结果已保存至 {out}")
 
 
+def _grid_for(tf: str) -> tuple[list[str], list[tuple]]:
+    """按周期拼出网格：公共项 + 该周期自己的 max_hold_bars 取值。"""
+    grid = {**GRID, "max_hold_bars": HOLD_GRID[tf]}
+    return list(grid.keys()), list(itertools.product(*grid.values()))
+
+
+def _assert_grid_covers_production(tfs: list[str]) -> None:
+    """生产在用的 max_hold_bars 必须落在网格内，否则优化结果不可信。
+
+    生产值跑到网格之外，说明这两处已经脱钩——而这正是 2026-10-05 之前的状态：
+    网格 [5,10,15] vs 生产 48/20，优化器两个月里一直在一个不含答案的集合里搜索。
+    """
+    try:
+        from alert_engine import RSI2_PARAMS, STRATEGY_MAP
+    except Exception:
+        return
+    missing = {}
+    for (sym, tf), strategy in STRATEGY_MAP.items():
+        if strategy != "rsi2" or tf not in tfs:
+            continue
+        hold = RSI2_PARAMS.get((sym, tf), {}).get(
+            "max_hold_bars", DEFAULT_PARAMS[tf]["max_hold_bars"])
+        if hold not in HOLD_GRID.get(tf, []):
+            missing.setdefault(tf, set()).add(hold)
+    for tf, vals in sorted(missing.items()):
+        print(f"⚠️ {tf}: 生产在用的 max_hold_bars {sorted(vals)} 不在 HOLD_GRID"
+              f"{HOLD_GRID[tf]} 内——优化结果不可直接采信，先补齐网格取值")
+
+
 def run_optimize_mode(symbols, tfs):
-    keys   = list(GRID.keys())
-    combos = list(itertools.product(*GRID.values()))
-    total  = len(combos)
-    print(f"网格大小：{total} 组合  总计：{total*len(symbols)*len(tfs)} 次\n")
+    _assert_grid_covers_production(tfs)
+    sizes = {tf: len(_grid_for(tf)[1]) for tf in tfs}
+    print("网格大小：" + "  ".join(f"{tf}={n} 组合" for tf, n in sizes.items())
+          + f"  总计：{sum(sizes.values())*len(symbols)} 次\n")
     df_vix   = load_vix()
     all_best = []
     for sym in symbols:
@@ -500,6 +545,8 @@ def run_optimize_mode(symbols, tfs):
             if df_raw is None or len(df_raw) < 250:
                 continue
             is_bm, is_etf, base = _setup_sym(sym, tf, DEFAULT_PARAMS[tf])
+            keys, combos = _grid_for(tf)
+            total = len(combos)
             best_sharpe, best_result, best_combo = -999, None, None
             for i, combo in enumerate(combos, 1):
                 params = {**base, **dict(zip(keys, combo))}

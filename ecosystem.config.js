@@ -195,6 +195,25 @@ module.exports = {
       log_date_format: "YYYY-MM-DD HH:mm:ss",
     },
     {
+      // 每小时 :25：磁盘余量 + 定时任务存活监控。
+      // 本项目三次静默失败（IB 保鲜掉线 13 天 / 36 条 4h 死路由一个上线周期 /
+      // 磁盘写满打掉 5 个 cron 任务 9 天）每次都靠人恰好去翻日志才发现——失败
+      // 模式是"退出 0、不报错、pm2 显示 stopped（和正常跑完一样）"，唯一信号是
+      // 日志 mtime 不更新。阈值取宽松（日级 80h 覆盖周末、小时级 3h），宁可漏
+      // 一轮也不要天天误报。它自己的心跳由 alert_engine._check_watchdog 核对。
+      name: "stock-health-check",
+      script: "/bin/zsh",
+      args: "run_health_check.sh",
+      cwd: "/Users/congrenhan/Documents/quantrift_stock",
+      interpreter: "none",
+      autorestart: false,
+      cron_restart: "25 * * * *",
+      out_file: "logs/health_check_pm2_out.log",
+      error_file: "logs/health_check_pm2_err.log",
+      merge_logs: true,
+      log_date_format: "YYYY-MM-DD HH:mm:ss",
+    },
+    {
       // 每小时 :10（主扫描之后）：期权纸面模拟。
       // 2026-08-15 加入——用户提出"信号触发时模拟买期权、到止盈出场看盈亏"。
       // 只覆盖实测流动性足够的18个标的（价差<5%粗筛 + 入场时实时价差<8%闸门），

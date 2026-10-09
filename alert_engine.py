@@ -1414,6 +1414,23 @@ def _flush_sector_alerts(queued: list[dict]) -> None:
         tg_alert(header + "\n\n" + "\n\n".join(i["msg"] for i in items))
 
 
+def _check_watchdog() -> None:
+    """守护进程自己也会死——每轮扫描核对 health_check 的心跳年龄。
+
+    `health_check.py` 负责发现"任务静默停摆"，但它自己停摆时没人知道。
+    主引擎是全系统最可靠的常驻进程（每小时必跑），所以把这道交叉检查放这里。
+    只打印不推送：真有问题时 health_check 停了，TG 也发不出来，而控制台日志
+    是人来查时第一眼看的地方。
+    """
+    path = Path("logs/.health_heartbeat")
+    if not path.exists():
+        print("  ⚠ health_check 从未运行过（logs/.health_heartbeat 不存在）")
+        return
+    age_h = (time.time() - path.stat().st_mtime) / 3600
+    if age_h > 3:
+        print(f"  ⚠ health_check 已 {age_h:.1f} 小时没运行——磁盘与任务存活监控当前失效")
+
+
 def _load_demoted_routes() -> set[str]:
     """读取被降级为影子的路由（`decay_action.py` 写入）。
 
@@ -1682,6 +1699,7 @@ def run_scan(ib=None):
         print(f"  MAG7 轮动: 本周已发送，跳过")
 
     # ── 降级路由：衰减监控+重验证双重确认后被降为影子的组合 ────────────────────
+    _check_watchdog()
     demoted_routes = _load_demoted_routes()
     if demoted_routes:
         print(f"  降级路由（仅记录不推送）: {', '.join(sorted(demoted_routes))}")

@@ -167,6 +167,7 @@ ssh -A mac-studio "cd /Users/congrenhan/Documents/quantrift_stock && git push"
 | `stock-weekly-review` | 周日 18:15 PT | 90天正股复盘+衰减监控 **+ 期权账本复盘** → TG |
 | `stock-weekly-data-consolidate` | 周日 19:00 PT | 历史CSV迁外置盘留符号链接 |
 | `stock-monthly-reval` | 每月1日 06:00 PT | rejected 池复检 |
+| `stock-health-check` | 每小时 :25 | 磁盘余量 + 定时任务存活监控，**有问题才推 TG**（本项目三次静默失败的补救） |
 | `stock-options-paper` | 每小时 :10 | 期权纸面模拟：对当轮新信号按 mid 开仓，正股出场时平仓（**绝不下单**） |
 | `stock-options-whitelist` | 周三 11:00 PT | 盘中重测已路由标的期权价差/OI（**非交易时段拒绝运行**） |
 
@@ -360,10 +361,13 @@ Sharpe 前 3 → 补跑 30bps 与 60/40 walk-forward → **按测试段 Sharpe �
 +0.222R vs -0.167R 很漂亮，但全历史 88 条里 79 条变差，按「路由好坏×周期」分 6 组
 后中位差全为负。那是 90 天单一行情的拟合。真正有效的是**拉长持仓上限**。
 
-**`rsi2_backtest.GRID` 的缺陷（仍未修）**：`max_hold_bars` 只有 `[5,10,15]`，而
-生产里 21 条 1h 用 48、28 条 4h 用 20——网格里压根没有这些值。所以历史上即便跑过
-`--optimize`，也永远搜不到「拉长持仓」这个方向，而它是 4h 唯一有效的修法。
-本次调参用的是按周期的网格：1h[15,48,96] / 4h[10,20,40] / 1d[10,20,30]。
+**`rsi2_backtest.GRID` 的缺陷（2026-10-09 已修）**：`max_hold_bars` 原来只有
+`[5,10,15]`，而生产里 21 条 1h 用 48、28 条 4h 用 20——网格里压根没有这些值。
+所以历史上即便跑过 `--optimize`，也永远搜不到「拉长持仓」这个方向，而它是 4h
+唯一有效的修法。现已拆出按周期的 `HOLD_GRID`（1h[15,48,96] / 4h[10,20,40] /
+1d[5,10,20,30]），`atr_trail_mult` 补上 4.0，并加了
+`_assert_grid_covers_production()`：优化前核对生产在用的 `max_hold_bars` 是否落在
+网格内，脱钩就直接打警告——这类脱钩不该再悄悄存在两个月。
 
 **RSI2-Trend 的 8 条 1d 例外**（LLY/CSCO/ISRG/AVDV/VYM/DGRO/TSM/CRWD）：
 10/05 本来被一并逐条调了（产生 5 套不同参数），10/08 **已全部恢复为共用同一套
@@ -386,10 +390,16 @@ mtime 不更新**。
 修复：逐个 `pm2 delete` + `pm2 start ecosystem.config.js --only <name>` 重新注册，
 然后 `pm2 save`。已验证 10/08 全部正常产出。
 
-**本仓库仍然没有磁盘余量检查，也没有任务存活监控**
-（`grep shutil.disk_usage|df -h|ENOSPC` 全空）；期货侧 `health_watchdog.py` 只管
-`ib-bot*`，不覆盖 `stock-*`。这是本项目第三次踩「静默失败」：
-IB 保鲜掉线 13 天 → 4h 死路由 6 周 → cron 停摆 9 天。
+这是本项目第三次踩「静默失败」：IB 保鲜掉线 13 天 → 4h 死路由 6 周 → cron 停摆 9 天。
+
+**已补监控（2026-10-09）**：`health_check.py` + pm2 `stock-health-check`（每小时 :25）
+检查系统盘余量（<25GB 警告 / <10GB 紧急）、外置盘挂载、以及 7 个任务产出文件的
+mtime 年龄（小时级 3h、日级 80h 覆盖周末、周级 216h），**只在发现问题时推 TG**。
+阈值刻意取宽松——会叫的狼来了没人听，和没有监控一样。
+它自己的心跳（`logs/.health_heartbeat`）由 `alert_engine._check_watchdog()` 每轮
+扫描核对，超过 3 小时在控制台提示——守护进程自己死掉时没人知道，这是上一次的教训。
+注意主引擎存活用的是 `~/.pm2/logs/stock-alert-out.log` 而不是 `signal_log.csv`：
+后者只在**有信号时**才写，无信号的几小时会被误判成引擎已死。
 
 ## 告警格式
 
