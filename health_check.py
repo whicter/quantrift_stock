@@ -23,6 +23,7 @@ pm2 显示 stopped（和正常跑完一样）"，只有日志文件 mtime 不更
 """
 from __future__ import annotations
 
+import json
 import os
 import shutil
 import sys
@@ -39,6 +40,7 @@ except Exception:
 
 ROOT = Path(__file__).resolve().parent
 HEARTBEAT = ROOT / "logs/.health_heartbeat"
+ALERT_STATE = ROOT / "logs/.health_alert_state.json"
 EXTERNAL = Path("/Volumes/X9_Pro/data_seriliazation/quantrift_stock")
 
 DISK_WARN_GB = 25.0      # 低于此值告警
@@ -55,26 +57,49 @@ WATCHED = [
     ("logs/daily_screener.log",     80, "stock-daily-screener（交易日 13:20）"),
     ("logs/watchlist_events.log",   80, "stock-watchlist-events（交易日 13:35）"),
     ("logs/weekly_review.log",     216, "stock-weekly-review（周日 18:15）"),
-    ("logs/options_whitelist.log", 216, "stock-options-whitelist（周三 11:00）"),
+    # 只看真实盘中重测成功后写入的心跳；盘后拒绝也会更新运行日志，不能据此判健康。
+    ("logs/.options_whitelist_heartbeat", 216, "stock-options-whitelist（周三 11:00）"),
 ]
 
 
-def _tg(msg: str) -> None:
+def _tg(msg: str) -> bool:
     token, chat = os.getenv("TG_TOKEN"), os.getenv("TG_CHAT_ID")
     if not token or not chat:
         print("[TG] 未配置凭证，跳过推送")
-        return
+        return False
     try:
         urllib.request.urlopen(
             f"https://api.telegram.org/bot{token}/sendMessage",
             data=urllib.parse.urlencode({"chat_id": chat, "text": msg}).encode(),
             timeout=15)
         print("[TG] 推送成功")
+        return True
     except Exception as exc:          # 推送失败绝不影响检查本身
         print(f"[TG] 推送失败: {exc}")
+        return False
 
 
-def check_disk() -> list[str]:
+def _load_alert_state() -> set[str]:
+    """读取上轮仍未解决的问题键；损坏的状态文件不能阻断检查。"""
+    try:
+        data = json.loads(ALERT_STATE.read_text())
+        return {str(key) for key in data.get("active", [])}
+    except (FileNotFoundError, json.JSONDecodeError, OSError, TypeError):
+        return set()
+
+
+def _save_alert_state(active: set[str]) -> None:
+    ALERT_STATE.write_text(json.dumps({"active": sorted(active)}, ensure_ascii=False) + "\n")
+
+
+def _new_problem_messages(
+    problems: list[tuple[str, str]], previous: set[str]
+) -> list[str]:
+    """同一未解决问题只通知一次；新增问题或问题集合改变时才推送。"""
+    return [message for key, message in problems if key not in previous]
+
+
+def check_disk() -> list[tuple[str, str]]:
     out = []
     usage = shutil.disk_usage("/System/Volumes/Data")
     free_gb = usage.free / 1024 ** 3
@@ -82,11 +107,11 @@ def check_disk() -> list[str]:
     line = f"系统盘可用 {free_gb:,.1f} GB / {usage.total / 1024**3:,.0f} GB"
     print(f"  {line}")
     if tag:
-        out.append(f"{tag} {line}（低于 {DISK_WARN_GB:.0f} GB 阈值；"
-                   f"2026-09-23 写满时打掉了 5 个定时任务，9 天无人察觉）")
+        out.append(("disk:system", f"{tag} {line}（低于 {DISK_WARN_GB:.0f} GB 阈值；"
+                   f"2026-09-23 写满时打掉了 5 个定时任务，9 天无人察觉）"))
     if not EXTERNAL.exists():
-        out.append("⚠️ 外置盘未挂载：data/ 下 2,800+ 个历史 CSV 是指向它的符号链接，"
-                   "夜间保鲜/回测/选股会受影响")
+        out.append(("disk:external", "⚠️ 外置盘未挂载：data/ 下 2,800+ 个历史 CSV 是指向它的符号链接，"
+                   "夜间保鲜/回测/选股会受影响"))
         print("  外置盘：未挂载 ⚠️")
     else:
         ext = shutil.disk_usage(EXTERNAL)
@@ -94,39 +119,45 @@ def check_disk() -> list[str]:
     return out
 
 
-def check_jobs() -> list[str]:
+def check_jobs() -> list[tuple[str, str]]:
     out = []
     now = time.time()
     for rel, max_age_h, name in WATCHED:
         path = Path(rel).expanduser() if rel.startswith("~") else ROOT / rel
         if not path.exists():
-            out.append(f"⚠️ {name}：产出文件不存在（{rel}）")
+            out.append((f"job:{rel}", f"⚠️ {name}：产出文件不存在（{rel}）"))
             print(f"  {name}: 文件不存在 ⚠️")
             continue
         age_h = (now - path.stat().st_mtime) / 3600
         stale = age_h > max_age_h
         print(f"  {name}: {age_h:5.1f}h 前更新（上限 {max_age_h}h）" + ("  ⚠️" if stale else ""))
         if stale:
-            out.append(f"⚠️ {name} 已 {age_h:.0f} 小时没有产出（上限 {max_age_h}h）→ "
+            out.append((f"job:{rel}", f"⚠️ {name} 已 {age_h:.0f} 小时没有产出（上限 {max_age_h}h）→ "
                        f"检查 `pm2 describe` 与日志 mtime；修法见 CLAUDE.md"
-                       f"「磁盘写满打掉 5 个定时任务」")
+                       f"「磁盘写满打掉 5 个定时任务」"))
     return out
 
 
 def main() -> int:
     print(f"=== health_check {time.strftime('%Y-%m-%d %H:%M:%S')} ===")
-    problems: list[str] = []
+    problems: list[tuple[str, str]] = []
     for fn in (check_disk, check_jobs):
         try:
             problems += fn()
         except Exception as exc:      # 单项检查失败不能让整个守护进程哑掉
-            problems.append(f"⚠️ 检查项 {fn.__name__} 自身异常：{exc}")
+            problems.append((f"check:{fn.__name__}", f"⚠️ 检查项 {fn.__name__} 自身异常：{exc}"))
             print(f"  {fn.__name__} 异常: {exc}")
     HEARTBEAT.parent.mkdir(exist_ok=True)
     HEARTBEAT.write_text(str(int(time.time())))
-    if problems:
-        _tg("🏥 quantrift_stock 健康检查发现问题\n\n" + "\n\n".join(problems))
-        print(f"\n发现 {len(problems)} 个问题，已推送")
+    previous = _load_alert_state()
+    active = {key for key, _ in problems}
+    new_messages = _new_problem_messages(problems, previous)
+    _save_alert_state(active)
+    if new_messages:
+        _tg("🏥 quantrift_stock 健康检查发现问题\n\n" + "\n\n".join(new_messages))
+        print(f"\n发现 {len(problems)} 个问题，其中 {len(new_messages)} 个为新增，已推送")
+    elif problems:
+        print(f"\n发现 {len(problems)} 个未解决问题，与上轮相同，不重复推送")
     else:
         print("\n全部正常")
     return 0                           # 永远正常退出，不触发 pm2 crash-restart

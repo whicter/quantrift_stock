@@ -23,6 +23,7 @@ bid/ask 只有 7.6% 非空，曾把 SMH、CSCO 这类明明流动性充裕的标
 import argparse
 import warnings
 from datetime import datetime
+from pathlib import Path
 from zoneinfo import ZoneInfo
 
 warnings.filterwarnings("ignore")
@@ -30,6 +31,7 @@ warnings.filterwarnings("ignore")
 import pandas as pd
 
 OUT = "logs/options_whitelist_live.csv"
+SUCCESS_HEARTBEAT = "logs/.options_whitelist_heartbeat"
 
 
 def market_open_now() -> bool:
@@ -83,6 +85,9 @@ def main() -> None:
 
     d = pd.DataFrame(rows)
     d.to_csv(OUT, index=False)
+    # 非交易时段的拒绝会写运行日志，但绝不能伪装成一次有效盘中重测。
+    # health_check 只看这个成功心跳，避免 PM2 手动重注册把漏跑掩盖掉。
+    Path(SUCCESS_HEARTBEAT).write_text(ny.isoformat() + "\n")
     ok = d[d.note == "ok"]
     print(f"\n采样时间 {ny:%Y-%m-%d %H:%M %Z}（盘中）")
     print(f"已路由 {len(d)} 个，取到实时双边报价 {len(ok)} 个")

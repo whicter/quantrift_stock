@@ -243,7 +243,9 @@ module.exports = {
       cwd: "/Users/congrenhan/Documents/quantrift_stock",
       interpreter: "none",
       autorestart: false,
-      cron_restart: "0 11 * * 3",
+      // PM2 的 day-of-week 以 0=Sunday 计；3 实际落在周二，导致文档所述的
+      // 周三盘中重测持续漏跑。4 才是周三 11:00 PT。
+      cron_restart: "0 11 * * 4",
       env: {
         TG_TOKEN: envVars.TG_TOKEN || "",
         TG_CHAT_ID: envVars.TG_CHAT_ID || "",
