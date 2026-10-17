@@ -164,10 +164,18 @@ which is also what a healthy finished run shows. Only the log file mtimes gave
 it away. Fixed by re-registering each job (`pm2 delete` + `pm2 start --only`)
 and `pm2 save`.
 
-There is still no disk-space check and no job-liveness monitor in this repo, and
-the futures-side watchdog only covers `ib-bot*`. This is the third silent
-failure here: IB refresh disconnects (13 days), dead 4h routes (6 weeks), cron
-outage (9 days).
+`health_check.py` now runs hourly at `:25`, checking disk capacity, external
+storage and task-output heartbeats. It persists active fault keys, so an
+unchanged fault sends one Telegram alert rather than an alert every hour.
+
+The options-whitelist health signal is its successful in-market output
+heartbeat (`logs/.options_whitelist_heartbeat`), not an execution log: a manual
+restart or an intentionally refused after-hours run is not healthy output. On
+2026-10-17, its PM2 weekday expression was corrected from `0 11 * * 3` (which
+ran Tuesday) to `0 11 * * 4` for Wednesday 11:00 PT.
+
+This remains the third silent-failure class here: IB refresh disconnects (13
+days), dead 4h routes (6 weeks), and the cron outage (9 days).
 
 ## Timeframes
 
@@ -271,7 +279,8 @@ confluence to rsi2 without per-symbol params. Six weeks of a dead comparison.
 | `options_paper.py` | 期权纸面模拟：信号当下按 mid 买 ATM，正股出场时平仓（**不下单**） |
 | `options_liquidity.py` | 按各路由持仓上限匹配 DTE，筛出期权流动性够的标的（读 options-lab 库；bid/ask 覆盖仅 7.6%，只作历史参考） |
 | `options_review.py` | 期权账本复盘：捕获率 + 自助法区间 + 美元口径 + 账本质量自检（挂周日 weekly review） |
-| `options_whitelist.py` | 盘中重测已路由标的的真实价差/OI；**非交易时段拒绝运行**，选合约直接调 `pick_contract` |
+| `options_whitelist.py` | 盘中重测已路由标的的真实价差/OI；**非交易时段拒绝运行**，成功后写健康心跳，选合约直接调 `pick_contract` |
+| `health_check.py` | 磁盘、外置盘与任务成功产出心跳监控；持久化去重，同一故障仅首报 |
 | `consolidate_data.py` | 历史行情CSV迁外置盘，本地留符号链接（幂等，每周自动） |
 | `confluence_direction_test.py` / `rsi2_ibs_test.py` | 多空腿分离 / IBS过滤器 对照验证（研究脚本） |
 | `harmonic_signals.py` / `harmonic_strategy.py` / `harmonic_backtest.py` | 谐波形态原型（研究用，样本不足未接入） |
