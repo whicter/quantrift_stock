@@ -571,12 +571,19 @@ def main():
                 return
             for sym in missing:
                 try:
-                    if len(missing) == 1:
-                        sub = raw.copy()
-                    else:
+                    # 2026-10-22：单标的时不能用 raw.copy()。yfinance 带
+                    # group_by="ticker" 下载**一个**标的，列仍是 (ticker, field)
+                    # 的 MultiIndex，`get_level_values(0)` 取到的是一串 ticker 名
+                    # （['NVDA','NVDA',...]），于是 price["High"] 直接 KeyError。
+                    # 这里不报错——帧看上去是正常的 DataFrame，崩溃发生在下游
+                    # review_core._atr 里，周复盘因此整轮挂掉（10/11、10/18 两次）。
+                    # 统一按 ticker 取子表，并用最后一级（field）当列名。
+                    if isinstance(raw.columns, pd.MultiIndex) and sym in raw.columns.get_level_values(0):
                         sub = raw[sym].copy()
+                    else:
+                        sub = raw.copy()
                     if isinstance(sub.columns, pd.MultiIndex):
-                        sub.columns = sub.columns.get_level_values(0)
+                        sub.columns = sub.columns.get_level_values(-1)
                     sub.index = pd.to_datetime(sub.index).tz_localize(None)
                     sub = sub.dropna(how="all")
                     if interval == "4h" and not sub.empty:

@@ -1127,3 +1127,29 @@ SCHW(0.029)/QQQX(0.164) 测试段接近归零而训练段近 1.0，是典型样�
 
 **下一步需要你拍板**：是否补这批 ETF 数据（IB 逐个 `--merge`，11–13 个标的，
 按 12s/请求约 3 分钟，不影响生产任务）。
+
+### ㊱ 周复盘崩溃两周 + 期权 DTE 上限没落实（2026-10-22 修复）
+
+复盘「最近表现」时发现两处缺陷，均已修。
+
+**1. `signal_review.py` 单标的下载列错位 → 周复盘整轮崩溃（10/11、10/18 两次）**
+`_batch_download` 里 `len(missing)==1` 时用 `raw.copy()`，但 yfinance 带
+`group_by="ticker"` 下载**一个**标的时列仍是 `(ticker, field)` 的 MultiIndex，
+`get_level_values(0)` 取到的是一串 ticker 名 → `price["High"]` KeyError。
+崩溃点在下游 `review_core._atr`，**当场不报错**，帧看上去是正常 DataFrame。
+后果：`run_weekly_review.sh` 有 `set -e`，signal_review 挂掉后**期权复盘根本不执行**
+（`options_review.log` 停在 10/04），衰减监控 `review_history.csv` 同样两周没写。
+修法：统一按 ticker 取子表 + 用最后一级（field）当列名。已验证单标的路径列正确。
+
+**2. `options_paper.pick_contract` 的 DTE 上限只夹目标、没夹选择**
+`MAX_TARGET_DTE=60` 只用在 `target_dte = min(..., 60)`，而候选池是
+`[e for e in expiries if _dte(e) >= MIN_DTE]`——没有上限。当最近的月度到期在 73 天
+甚至 119 天外时照样被选中。账本 153 笔里 **7 笔 DTE>60，最远 119 天**（GFS 09-18）。
+而 CLAUDE.md 写着「封顶 60 是硬性教训：LLY 按 3.5 倍外推到 105DTE 时 OI 只剩 39，
+34DTE 处有 602」。**写了意图没落实到代码，等于没有。**
+修法：候选池改为 `MIN_DTE <= _dte(e) <= MAX_TARGET_DTE`。已入账的 7 笔不追溯。
+
+**这是本项目第四次静默失败**（IB 保鲜 13 天 → 4h 死路由 6 周 → cron 停摆 9 天 →
+周复盘崩溃 2 周）。`health_check` 这次**没抓到**：它盯的是 `weekly_review.log` 的
+mtime，而崩溃**也会写日志**（traceback 进同一个文件）。
+**待办：mtime 不足以判定产出有效，需要看内容特征（如末尾是否含「汇总统计」）。**

@@ -232,7 +232,13 @@ def pick_contract(symbol: str, direction: str, hold_days: float) -> dict | None:
         # 会把下限吃掉：目标 30DTE 时一张 16DTE 的月度合约因偏差 14 天（≤21）被
         # 接受，全账本 49% 的入场落在 30 天以内、最短 16 天——正好在本模块注释
         # 声明要避开的 theta 陡坡里面。先按下限过滤，再谈月度优先。
-        usable = [e for e in expiries if _dte(e) >= MIN_DTE]
+        # 上下限都是**硬约束**。2026-10-22 发现 MAX_TARGET_DTE 此前只夹住 target_dte，
+        # 没夹住挑选范围：当最近的月度到期在 73 天甚至 119 天外时，
+        # `min(pool, key=|dte-target|)` 照样把它选出来——账本里 153 笔有 7 笔
+        # DTE>60，最远 119 天（GFS 2026-09-18）。而 CLAUDE.md 写的是「封顶 60 是
+        # 硬性教训：LLY 按 3.5 倍外推到 105DTE 时 OI 只剩 39，34DTE 处有 602」。
+        # 写了意图没落实到代码，就等于没有。
+        usable = [e for e in expiries if MIN_DTE <= _dte(e) <= MAX_TARGET_DTE]
         if not usable:
             return None
         monthly = [e for e in usable if _is_monthly(e)]
