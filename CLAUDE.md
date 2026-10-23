@@ -392,6 +392,21 @@ mtime 不更新**。
 
 这是本项目第三次踩「静默失败」：IB 保鲜掉线 13 天 → 4h 死路由 6 周 → cron 停摆 9 天。
 
+**第四次：周复盘崩溃两周，而监控没抓到（2026-10-22）**
+`signal_review` 自 10/11 起每轮崩在 `KeyError: 'High'`（yfinance 单标的下载的列是
+`(ticker, field)` MultiIndex，取 level 0 得到一串 ticker 名）。**traceback 照样写进
+`weekly_review.log`，mtime 每周正常刷新**，`health_check` 连续两周报「全部正常」。
+而 `run_weekly_review.sh` 的 `set -e` 让期权复盘根本没执行——`options_review.log`
+停在 10/04，却从来不在监控清单里。一个 bug 吃掉两份复盘 + 两周衰减监控。
+
+两处已修：
+1. `health_check` 增加**内容校验**（第四个字段「健康标记」）：文件尾部必须出现
+   「这一轮真的跑完了」的标记，且最后一次标记之后不得有 traceback；
+   `options_review.log` 单独列为一项监控。**mtime 只能证明有人写过，不能证明写对。**
+2. `run_weekly_review.sh` 去掉 `set -e` 的连坐：两条复盘各自执行、各记退出码、
+   任一失败推 TG。互不依赖的任务不该共命运。
+
+
 **已补监控（2026-10-09）**：`health_check.py` + pm2 `stock-health-check`（每小时 :25）
 检查系统盘余量（<25GB 警告 / <10GB 紧急）、外置盘挂载、以及 7 个任务产出文件的
 mtime 年龄（小时级 3h、日级 80h 覆盖周末、周级 216h）。同一未解决问题只推送一次，

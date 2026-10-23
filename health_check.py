@@ -48,18 +48,33 @@ DISK_URGENT_GB = 10.0    # 低于此值标记为紧急
 
 # (产出文件, 最大允许年龄小时, 任务名)
 # 日级任务给 80 小时：周五 14:40 跑完到周一 13:20 约 71 小时，留余量。
+# (产出文件, 最大允许年龄小时, 任务名, 健康标记)
+#
+# ⚠️ 第四条字段是 2026-10-22 加的，起因是 mtime 根本不足以判定产出有效：
+# `signal_review` 从 10/11 起每轮都崩在 KeyError 'High'，**traceback 照样写进
+# weekly_review.log**，mtime 每周正常刷新，本脚本连续两周报「全部正常」。
+# 而 `run_weekly_review.sh` 有 `set -e`，signal_review 一挂，期权复盘根本不执行
+# ——`options_review.log` 停在 10/04 却从来没被监控过，因为它压根不在清单里。
+#
+# 所以现在要求：文件尾部必须出现「这一轮真的跑完了」的标记，且最后一次标记之后
+# 不得再有 traceback。标记为 None 表示该文件只看 mtime（心跳文件没有内容特征）。
 WATCHED = [
     # 用 pm2 输出日志而不是 signal_log.csv：后者只在**有信号时**才写，
     # 无信号的几个小时会被误判成引擎死了。pm2 out 每轮扫描都有输出。
-    ("~/.pm2/logs/stock-alert-out.log", 3, "stock-alert（主引擎，每小时）"),
-    ("logs/options_paper.log",       3, "stock-options-paper（每小时 :10）"),
-    ("logs/nightly_ib_refresh.log", 80, "stock-nightly-ib-refresh（交易日 14:40）"),
-    ("logs/daily_screener.log",     80, "stock-daily-screener（交易日 13:20）"),
-    ("logs/watchlist_events.log",   80, "stock-watchlist-events（交易日 13:35）"),
-    ("logs/weekly_review.log",     216, "stock-weekly-review（周日 18:15）"),
+    ("~/.pm2/logs/stock-alert-out.log", 3, "stock-alert（主引擎，每小时）", "扫描完成"),
+    ("logs/options_paper.log",       3, "stock-options-paper（每小时 :10）", "期权纸面"),
+    ("logs/nightly_ib_refresh.log", 80, "stock-nightly-ib-refresh（交易日 14:40）", "本轮"),
+    ("logs/daily_screener.log",     80, "stock-daily-screener（交易日 13:20）", "[Telegram]"),
+    ("logs/watchlist_events.log",   80, "stock-watchlist-events（交易日 13:35）", "[Telegram]"),
+    ("logs/weekly_review.log",     216, "stock-weekly-review·正股（周日 18:15）", "汇总统计"),
+    # 期权复盘单列一项：它是 run_weekly_review.sh 的**第二条命令**，前一条崩掉时
+    # 它不会执行，而 weekly_review.log 的 mtime 看不出这件事。
+    ("logs/options_review.log",    216, "stock-weekly-review·期权（周日 18:15）", "期权纸面复盘"),
     # 只看真实盘中重测成功后写入的心跳；盘后拒绝也会更新运行日志，不能据此判健康。
-    ("logs/.options_whitelist_heartbeat", 216, "stock-options-whitelist（周三 11:00）"),
+    ("logs/.options_whitelist_heartbeat", 216, "stock-options-whitelist（周三 11:00）", None),
 ]
+
+TAIL_BYTES = 20000      # 只读尾部，日志有几十 MB
 
 
 def _tg(msg: str) -> bool:
@@ -122,7 +137,7 @@ def check_disk() -> list[tuple[str, str]]:
 def check_jobs() -> list[tuple[str, str]]:
     out = []
     now = time.time()
-    for rel, max_age_h, name in WATCHED:
+    for rel, max_age_h, name, marker in WATCHED:
         path = Path(rel).expanduser() if rel.startswith("~") else ROOT / rel
         if not path.exists():
             out.append((f"job:{rel}", f"⚠️ {name}：产出文件不存在（{rel}）"))
@@ -130,7 +145,28 @@ def check_jobs() -> list[tuple[str, str]]:
             continue
         age_h = (now - path.stat().st_mtime) / 3600
         stale = age_h > max_age_h
-        print(f"  {name}: {age_h:5.1f}h 前更新（上限 {max_age_h}h）" + ("  ⚠️" if stale else ""))
+        note = ""
+        if marker:
+            try:
+                with open(path, "rb") as fh:
+                    fh.seek(max(0, path.stat().st_size - TAIL_BYTES))
+                    tail = fh.read().decode("utf-8", errors="replace")
+            except OSError as exc:
+                tail = ""
+                note = f"  读取失败 {exc}"
+            pos = tail.rfind(marker)
+            if pos < 0:
+                note = f"  尾部无「{marker}」⚠️"
+                out.append((f"content:{rel}",
+                            f"⚠️ {name}：日志尾部找不到成功标记「{marker}」——"
+                            f"mtime 是新的但这一轮没跑完（2026-10-22 周复盘崩溃两周就是这种）"))
+            elif "Traceback (most recent call last)" in tail[pos:]:
+                note = "  最后一次成功之后有 traceback ⚠️"
+                out.append((f"content:{rel}",
+                            f"⚠️ {name}：最后一次成功标记之后出现 traceback，"
+                            f"最近一轮很可能已崩溃 → `tail -40 {rel}`"))
+        print(f"  {name}: {age_h:5.1f}h 前更新（上限 {max_age_h}h）"
+              + ("  ⚠️" if stale else "") + note)
         if stale:
             out.append((f"job:{rel}", f"⚠️ {name} 已 {age_h:.0f} 小时没有产出（上限 {max_age_h}h）→ "
                        f"检查 `pm2 describe` 与日志 mtime；修法见 CLAUDE.md"
