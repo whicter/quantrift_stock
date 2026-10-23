@@ -1,5 +1,5 @@
 {
-  "equity": 83744.95,
+  "equity": 84163.78,
   "positions": [
     {
       "timestamp": "2026-07-20 07:00",
@@ -24337,12 +24337,17 @@
       "market_regime": "neutral",
       "is_repeat": 0,
       "opened_at": "2026-10-15T13:00:34",
-      "status": "open",
+      "status": "closed",
       "risk_pct": 0.0075,
       "weight": 0.1,
       "sector": "其他",
       "tp1_seen": false,
-      "pyramiding_notified": false
+      "pyramiding_notified": false,
+      "outcome": "ATR追踪出场",
+      "r_mult": -1.959,
+      "bars": 6,
+      "exit_model": "close",
+      "closed_at": "2026-10-23T13:00:39"
     },
     {
       "timestamp": "2026-10-15 13:00",
@@ -24443,13 +24448,19 @@
       "market_regime": "neutral",
       "is_repeat": 0,
       "opened_at": "2026-10-15T19:00:15",
-      "status": "open",
+      "status": "closed",
       "risk_pct": 0.0075,
       "weight": 0.1,
       "sector": "必需消费",
       "tp1_seen": true,
       "pyramiding_notified": true,
-      "tp1_seen_at": "2026-10-16T08:00:34"
+      "tp1_seen_at": "2026-10-16T08:00:34",
+      "outcome": "止损",
+      "r_mult": 2.665,
+      "bars": 13,
+      "exit_model": "close",
+      "ambiguity": "开盘跳空止损",
+      "closed_at": "2026-10-23T10:00:38"
     },
     {
       "timestamp": "2026-10-16 11:00",
@@ -25052,21 +25063,41 @@
       "sector": "宽基ETF",
       "tp1_seen": false,
       "pyramiding_notified": false
+    },
+    {
+      "timestamp": "2026-10-23 13:00",
+      "bar_date": "2026-10-23",
+      "symbol": "NVDA",
+      "tf": "1d",
+      "strategy": "RSI2",
+      "direction": "做多",
+      "entry_price": 210.96,
+      "atr": 6.0595,
+      "tp1": 0.0,
+      "tp2": 0.0,
+      "sl": 195.8112,
+      "market_score": 1.0,
+      "vix": 19.79,
+      "quality": 5,
+      "signal_id": "NVDA|1d|RSI2|2026-10-23|做多",
+      "source": "live",
+      "is_shadow": 0,
+      "source_strategy": "",
+      "params_json": "{\"atr_trail_mult\": 2.5, \"max_hold_bars\": 10, \"min_market_score\": 1, \"rsi2_entry\": 15, \"use_vix_spike\": true}",
+      "sector_aligned": false,
+      "screener_rank": "",
+      "market_regime": "neutral",
+      "is_repeat": 0,
+      "opened_at": "2026-10-23T13:00:23",
+      "status": "open",
+      "risk_pct": 0.0075,
+      "weight": 0.1,
+      "sector": "半导体",
+      "tp1_seen": false,
+      "pyramiding_notified": false
     }
   ],
   "events": [
-    {
-      "type": "closed",
-      "symbol": "AGI",
-      "outcome": "时间止损",
-      "r_mult": 0.0
-    },
-    {
-      "type": "closed",
-      "symbol": "CRWD",
-      "outcome": "时间止损",
-      "r_mult": 0.0
-    },
     {
       "type": "closed",
       "symbol": "FOX",
@@ -26254,6 +26285,18 @@
       "symbol": "AIS",
       "outcome": "TP1后创新高",
       "r_mult": 0.0
+    },
+    {
+      "type": "closed",
+      "symbol": "KO",
+      "outcome": "止损",
+      "r_mult": 2.665
+    },
+    {
+      "type": "closed",
+      "symbol": "AVDV",
+      "outcome": "ATR追踪出场",
+      "r_mult": -1.959
     }
   ]
 }
