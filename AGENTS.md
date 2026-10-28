@@ -142,6 +142,7 @@ ssh -A mac-studio "cd /Users/congrenhan/Documents/quantrift_stock && git push"
 | `stock-weekly-review` | 周日 18:15 PT | 90天正股复盘+衰减监控 **+ 期权账本复盘** → TG |
 | `stock-weekly-data-consolidate` | 周日 19:00 PT | 历史CSV迁外置盘留符号链接 |
 | `stock-monthly-reval` | 每月1日 06:00 PT | rejected 池复检 |
+| `stock-backup-ledgers` | 每日 21:05 PT | 不可再生账本 → X9_Pro（**源文件变小即拒绝覆盖**） |
 | `stock-health-check` | 每小时 :25 | 磁盘余量 + 定时任务存活监控，**有问题才推 TG**（本项目三次静默失败的补救） |
 | `stock-options-paper` | 每小时 :10 | 期权纸面模拟：对当轮新信号按 mid 开仓，正股出场时平仓（**绝不下单**） |
 | `stock-options-whitelist` | 周三 11:00 PT | 盘中重测已路由标的期权价差/OI（**非交易时段拒绝运行**） |
@@ -393,6 +394,32 @@ mtime 年龄（小时级 3h、日级 80h 覆盖周末、周级 216h）。同一�
 扫描核对，超过 3 小时在控制台提示——守护进程自己死掉时没人知道，这是上一次的教训。
 注意主引擎存活用的是 `~/.pm2/logs/stock-alert-out.log` 而不是 `signal_log.csv`：
 后者只在**有信号时**才写，无信号的几小时会被误判成引擎已死。
+
+## 备份（2026-10-28 起）
+
+**只备「丢了补不回来」的那 11 个文件**（约 2.3 MB），`backup_ledgers.py` +
+pm2 `stock-backup-ledgers`（每日 21:05 PT）→
+`/Volumes/X9_Pro/data_seriliazation/quantrift_stock/backup/`，
+`latest/` 最新一份 + `daily/YYYY-MM-DD/` 保留 30 天。
+
+范围是这样划的：
+
+| 类别 | 内容 | 处理 |
+|---|---|---|
+| ① 不可再生 | `signal_log.csv`（引擎当时**实际发出**的信号，带那一刻的 params/market_score/vix）、`options_paper_log.csv`（开平仓那一分钟的 bid/ask/IV/OI，期权报价没有免费历史源）、`review_history.csv`、`paper_equity.csv`、`.paper_positions.json`、`.open_ideas.json`、`.sent_signals.json`、`.data_sources.json`、`options_skipped.csv`、`options_whitelist_live.csv`、`.env` | **备**。这些全被 `.gitignore` 的 `logs/*.csv` 挡在版本控制外，此前只有系统盘一份 |
+| ② 可再生但重拉贵 | `data/` 下 6.5 GB 历史 CSV | **不备**。它们本来就在 X9_Pro 上（`data/` 是指向它的符号链接），往同一块盘再复制一份等于没备份。要真防盘坏得放另一块物理盘（兄弟项目 `stock_volatility_alert` 备到 WD_BLACK 就是这个道理） |
+| ③ 不必备 | `backfill_*.csv`（29 MB，十分钟重算）、`.venv`、运行日志、模型缓存 | **不备**，且已删/已轮转 |
+
+**镜像不能无脑覆盖**：账本只增不减，源文件变小说明被截断或写坏，这时覆盖等于把
+损坏复制到唯一的好副本上。所以**变小即拒绝覆盖 + 推 TG**，保留上一份。
+上线时实测过：把 `options_skipped.csv` 截成 20 行，备份盘那份 190 行的完好副本
+未被覆盖。健康检查看的是 `logs/.backup_heartbeat` 而不是运行日志——X9_Pro 未挂载
+或拒绝覆盖时同样会写日志。
+
+**同期清理（2026-10-28）**：仓库 299M → 51M。删 `.venv`（241M，本机所有脚本都走
+`/opt/homebrew/bin/python3.11`，没有任何引用）、`__pycache__`、`.pytest_cache`；
+6 个大运行日志保留尾部 2000 行、历史段 gzip 归档到 X9_Pro 的 `archive/logs/`；
+`.bak` 证据原件复制一份到 `archive/bak/`（**仓库里的原件保留**，文档多处引用它们）。
 
 ## 告警格式
 

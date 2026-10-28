@@ -1,0 +1,57 @@
+{
+  "logs/signal_log.csv": {
+    "size": 792482,
+    "sha": "af89e0fbc1d71b8818735685335bc073a613f107a80a387d2820b12be5e6206c",
+    "at": "2026-10-28T00:20:04"
+  },
+  "logs/options_paper_log.csv": {
+    "size": 40123,
+    "sha": "c2146e2b7fa1bd44e5da72f30fc097bc353fbba3114c1971d19abeab66d6f4a7",
+    "at": "2026-10-28T00:20:04"
+  },
+  "logs/paper_equity.csv": {
+    "size": 34277,
+    "sha": "6ee95ae6d6f5bd86a2028787132bf226e630f3405d60052d49f51b0aff09d27d",
+    "at": "2026-10-28T00:20:04"
+  },
+  "logs/review_history.csv": {
+    "size": 155819,
+    "sha": "ffb07fc43dc918f8525d0010b7b1c6754bf314a92bde6d6ccc862a4f76088aad",
+    "at": "2026-10-28T00:20:04"
+  },
+  "logs/options_skipped.csv": {
+    "size": 9042,
+    "sha": "17080f195cfaff22f827f96f1ce9fd00d233479fedd81ca730d247026487caad",
+    "at": "2026-10-28T00:20:04"
+  },
+  "data/.paper_positions.json": {
+    "size": 1080399,
+    "sha": "f9b481ae2d124243e09e6fdecd4762a103ca62a4eb7f9e16fb4fc1f973e92a23",
+    "at": "2026-10-28T00:20:04"
+  },
+  "data/.open_ideas.json": {
+    "size": 126409,
+    "sha": "73e27d04e3d49c02f10130bd34ff7cdef95d2b31c16723fc6c21b406c54639f7",
+    "at": "2026-10-28T00:20:04"
+  },
+  "data/.sent_signals.json": {
+    "size": 4121,
+    "sha": "1bedbb70e301a463a35205c54aa14af15d9b669a338851820f3161de4c3cf116",
+    "at": "2026-10-28T00:20:04"
+  },
+  "data/.data_sources.json": {
+    "size": 54378,
+    "sha": "d713879d03c81c116818f623e42dabafa2e22290130bce51c7b61cb803a17a36",
+    "at": "2026-10-28T00:20:04"
+  },
+  "logs/options_whitelist_live.csv": {
+    "size": 4170,
+    "sha": "87c5d9ccf3cfc68c824c454a4099506f308d2af3d6c32f553544482c0a9213ac",
+    "at": "2026-10-28T00:20:05"
+  },
+  ".env": {
+    "size": 202,
+    "sha": "5f275b3629865edc087acc554e9b6e97a3def7f06456f8cec2f65c0139dcba76",
+    "at": "2026-10-28T00:20:05"
+  }
+}

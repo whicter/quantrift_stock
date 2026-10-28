@@ -72,6 +72,8 @@ WATCHED = [
     ("logs/options_review.log",    216, "stock-weekly-review·期权（周日 18:15）", "期权纸面复盘"),
     # 只看真实盘中重测成功后写入的心跳；盘后拒绝也会更新运行日志，不能据此判健康。
     ("logs/.options_whitelist_heartbeat", 216, "stock-options-whitelist（周三 11:00）", None),
+    # 同理看心跳：X9_Pro 未挂载或拒绝覆盖时也会写运行日志，不能据此判健康。
+    ("logs/.backup_heartbeat", 30, "stock-backup-ledgers（每日 21:05）", None),
 ]
 
 TAIL_BYTES = 20000      # 只读尾部，日志有几十 MB

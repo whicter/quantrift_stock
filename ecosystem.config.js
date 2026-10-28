@@ -195,6 +195,25 @@ module.exports = {
       log_date_format: "YYYY-MM-DD HH:mm:ss",
     },
     {
+      // 每日 21:05 PT：不可再生账本 → X9_Pro。
+      // signal_log / options_paper_log / review_history 这些记录的是「当时发生了
+      // 什么」——引擎实际发出的信号带着那一刻的 params/market_score/vix，期权账本
+      // 带着那一分钟的 bid/ask/IV/OI。输入已经过去，重算不出来；而它们全被
+      // .gitignore 的 logs/*.csv 挡在版本控制外，此前只有系统盘一份。
+      // 账本只增不减：源文件变小即拒绝覆盖并告警，避免把损坏复制到唯一的好副本上。
+      name: "stock-backup-ledgers",
+      script: "/bin/zsh",
+      args: "run_backup_ledgers.sh",
+      cwd: "/Users/congrenhan/Documents/quantrift_stock",
+      interpreter: "none",
+      autorestart: false,
+      cron_restart: "5 21 * * *",
+      out_file: "logs/backup_ledgers_pm2_out.log",
+      error_file: "logs/backup_ledgers_pm2_err.log",
+      merge_logs: true,
+      log_date_format: "YYYY-MM-DD HH:mm:ss",
+    },
+    {
       // 每小时 :25：磁盘余量 + 定时任务存活监控。
       // 本项目三次静默失败（IB 保鲜掉线 13 天 / 36 条 4h 死路由一个上线周期 /
       // 磁盘写满打掉 5 个 cron 任务 9 天）每次都靠人恰好去翻日志才发现——失败
